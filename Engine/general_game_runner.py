@@ -175,8 +175,8 @@ def loadAgent(matches, superQuiet=True):
             )
             traceback.print_exc()
             pass
-        except:
-            pass
+        # except:
+        #     pass
 
         # if student's agent does not exist, use random agent.
         if agent_temp != None:
