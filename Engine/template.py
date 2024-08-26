@@ -3,16 +3,16 @@ import random
 
 
 class GameState:
-
-    def __init__(self,num_of_agent,agent_id):
+    def __init__(self, num_of_agent, agent_id):
         pass
-    
+
+
 class Action:
     pass
 
 
 class GameRule:
-    def __init__(self, num_of_agent = 2):
+    def __init__(self, num_of_agent=2):
         self.current_agent_index = 0
         self.num_of_agent = num_of_agent
         self.current_game_state = self.initialGameState()
@@ -33,7 +33,7 @@ class GameRule:
         utils.raiseNotDefined()
         return []
 
-    def calScore(self, game_state,agent_id):
+    def calScore(self, game_state, agent_id):
         utils.raiseNotDefined()
         return 0
 
@@ -43,12 +43,15 @@ class GameRule:
 
     def update(self, action):
         temp_state = self.current_game_state
-        self.current_game_state = self.generateSuccessor(temp_state, action, self.current_agent_index)
+        self.current_game_state = self.generateSuccessor(
+            temp_state, action, self.current_agent_index
+        )
         self.current_agent_index = self.getNextAgentIndex()
         self.action_counter += 1
 
     def getCurrentAgentIndex(self):
         return self.current_agent_index
+
 
 class Agent(object):
     def __init__(self, _id):
@@ -57,7 +60,7 @@ class Agent(object):
 
     # Given a set of available actions for the agent to execute, and
     # a copy of the current game state (including that of the agent),
-    # select one of the actions to execute. 
+    # select one of the actions to execute.
     def SelectAction(self, actions, game_state):
         return random.choice(actions)
 
@@ -65,20 +68,19 @@ class Agent(object):
 class Displayer:
     def __init__(self):
         pass
-    
+
     # show the displayer for the first time
-    def InitDisplayer(self,runner):
+    def InitDisplayer(self, runner):
         pass
-            
-    def ExcuteAction(self,i,move,game_state):
+
+    def ExcuteAction(self, i, move, game_state):
         utils.raiseNotDefined()
         pass
 
-    def TimeOutWarning(self,runner,id):
+    def TimeOutWarning(self, runner, id):
         utils.raiseNotDefined()
         pass
 
-    def EndGame(self,game_state,scores):
+    def EndGame(self, game_state, scores):
         utils.raiseNotDefined()
         pass
-

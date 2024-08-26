@@ -13,16 +13,16 @@ import time
 from Splendor.splendor_model import *
 import heapq
 
-gemTypes = ['red', 'green', 'blue', 'black', 'white', 'yellow']
+gemTypes = ["red", "green", "blue", "black", "white", "yellow"]
 THINKTIME = 0.95
 game_rule = SplendorGameRule(2)
 
 
 # FUNCTIONS ----------------------------------------------------------------------------------------------------------#
 
+
 # Priority Queue code taken from Assignment 1
 class PriorityQueue:
-
     def __init__(self):
         self.heap = []
         self.count = 0
@@ -59,12 +59,12 @@ def calculateHeuristicValue(nobles, each_action):
     buy_noble, points, gem_income, gem_card = action_changes(each_action)
 
     # score priority (how much points u give)
-    '''
+    """
     noble priority => give score if u can get a noble
     gem_card_priority => give score if u can get a gem card (game points dont matter)
     gem_income_priority => give score if you can get gems from the stashes
     points_priority => give score if you can get points
-    '''
+    """
     noble_priority = 100
     # gem card points is always 1 because it gets 1 gem card
     gem_card_priority = 10
@@ -116,8 +116,7 @@ def calculateHeuristicValue(nobles, each_action):
     gem_income_weight_list = []
     for i in range(0, len(gem_income_values)):
         if gem_income_values[i] > 0:
-            gem_income_weight_list.append(
-                gem_income_values[i])
+            gem_income_weight_list.append(gem_income_values[i])
         else:
             gem_income_weight_list.append(0)
 
@@ -129,7 +128,7 @@ def calculateHeuristicValue(nobles, each_action):
     points_weight = points
 
     # calculate reserve points
-    if each_action['type'] == 'buy_reserve':
+    if each_action["type"] == "buy_reserve":
         return 10000
 
     # sum them up and return the value
@@ -172,15 +171,18 @@ class myAgent(Agent):
             current_time = time.time()
             time_taken = current_time - initiate_time
             if THINKTIME > time_taken:
-                priorityQueue.push(each_action, self.a_star(
-                    own_buy_ability, nobles, each_action, game_state, actions))
+                priorityQueue.push(
+                    each_action,
+                    self.a_star(
+                        own_buy_ability, nobles, each_action, game_state, actions
+                    ),
+                )
             else:
                 break
 
         return priorityQueue.pop()
 
     def agent_can_buy(self, cost, agent_gems):
-
         agent_gems_ret = agent_gems
         for key in cost:
             agent_gems_ret[key] = agent_gems_ret[key] - cost[key]
@@ -194,10 +196,10 @@ class myAgent(Agent):
         return agent_gems_ret
 
     def a_star(self, own_buy_ability, nobles, each_action, game_state, actions):
-        '''
+        """
         a_star heuristic function
         own_buy_ablitiy how much resources you have to buy something
-        '''
+        """
         buy_noble, points, gem_income, gem_card = action_changes(each_action)
         new_heuristic = 0
         # plan to get the most points
@@ -212,15 +214,20 @@ class myAgent(Agent):
         # no good cards to buy, looking at buying next turn
         elif buy_now > 90:
             successor_state = self.gr.generateSuccessor(
-                game_state, each_action, self.id)
+                game_state, each_action, self.id
+            )
             # combine the decks together
-            deck = successor_state.board.dealt[0] + \
-                successor_state.board.dealt[1] + successor_state.board.dealt[2]
+            deck = (
+                successor_state.board.dealt[0]
+                + successor_state.board.dealt[1]
+                + successor_state.board.dealt[2]
+            )
             cards_can_buy = []
             for c in deck:
                 if c is not None:
                     bool_suff = self.gr.resources_sufficient(
-                        game_state.agents[self.id], c.cost)
+                        game_state.agents[self.id], c.cost
+                    )
 
                     # when true
                     if bool_suff:
@@ -235,14 +242,15 @@ class myAgent(Agent):
                 final_gem_resource_count = []
                 for c in deck:
                     if c is not None:
-                        ag = self.agent_can_buy(c.cost,
-                                                copy.copy(own_buy_ability))
+                        ag = self.agent_can_buy(c.cost, copy.copy(own_buy_ability))
                         final_gem_resource.append(ag)
                         final_gem_resource_count.append(sum(ag.values()))
                     else:
                         continue
 
-                smallest_index = final_gem_resource_count.index(min(final_gem_resource_count))
+                smallest_index = final_gem_resource_count.index(
+                    min(final_gem_resource_count)
+                )
                 card_to_take = final_gem_resource[smallest_index]
 
                 weightage = 0
@@ -281,41 +289,44 @@ def available_nobles(game_state):
 def action_changes(action):
     points = 0
     buy_noble = False
-    gem_income = {"red": 0, "green": 0, "blue": 0,
-                  "black": 0, "white": 0, "yellow": 0}
+    gem_income = {"red": 0, "green": 0, "blue": 0, "black": 0, "white": 0, "yellow": 0}
     gem_card = {}
-    if action['type'] == 'collect_diff' or action['type'] == 'collect_same':
+    if action["type"] == "collect_diff" or action["type"] == "collect_same":
         points = 0
-        for gem in action['collected_gems']:
-            gem_income[gem] = action['collected_gems'][gem]
+        for gem in action["collected_gems"]:
+            gem_income[gem] = action["collected_gems"][gem]
 
-            if len(action['returned_gems']) != 0:
+            if len(action["returned_gems"]) != 0:
                 returned_gem_color = 0
                 returned_gem_val = 0
-                for key, val in action['returned_gems'].items():
+                for key, val in action["returned_gems"].items():
                     returned_gem_color = key
                     returned_gem_val = val
 
-                gem_income[returned_gem_color] = gem_income[returned_gem_color] - \
-                    returned_gem_val
+                gem_income[returned_gem_color] = (
+                    gem_income[returned_gem_color] - returned_gem_val
+                )
 
-    elif action['type'] == 'buy_available' or action['type'] == 'buy_reserve':
-        points = action['card'].points
-        for gem in action['returned_gems']:
+    elif action["type"] == "buy_available" or action["type"] == "buy_reserve":
+        points = action["card"].points
+        for gem in action["returned_gems"]:
             returned_gem_color = 0
             returned_gem_val = 0
-            for key, val in action['returned_gems'].items():
+            for key, val in action["returned_gems"].items():
                 returned_gem_color = key
                 returned_gem_val = val
-            gem_income[returned_gem_color] = gem_income[returned_gem_color] - \
-                returned_gem_val
+            gem_income[returned_gem_color] = (
+                gem_income[returned_gem_color] - returned_gem_val
+            )
 
-        gem_card[action['card'].colour] = 1
+        gem_card[action["card"].colour] = 1
 
-    elif action['type'] == 'reserve':
+    elif action["type"] == "reserve":
         gem_income["yellow"] = 1
 
-    if action['noble']:
+    if action["noble"]:
         buy_noble = True
     return buy_noble, points, gem_income, gem_card
+
+
 #

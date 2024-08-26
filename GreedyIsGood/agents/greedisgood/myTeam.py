@@ -1,6 +1,6 @@
 from template import Agent
 
-gemTypes = ['red', 'green', 'blue', 'black', 'white', 'yellow']
+gemTypes = ["red", "green", "blue", "black", "white", "yellow"]
 
 total_collect_features = 7
 # feature 1 -> feature for own available cards
@@ -55,8 +55,8 @@ def current_card_status(game_state, id):
                 cost = game_state.board.dealt[i][j].cost
                 score = game_state.board.dealt[i][j].points
                 temp = {}
-                temp['colour'] = colour
-                temp['score'] = score
+                temp["colour"] = colour
+                temp["score"] = score
                 for gem in gemTypes:
                     if gem in cost:
                         temp[gem] = cost[gem]
@@ -83,9 +83,9 @@ def current_nobles(game_state):
 def current_reserve_card(game_state, id):
     reserved_cards = []
     # card from reserve
-    for card in game_state.agents[id].cards['yellow']:
+    for card in game_state.agents[id].cards["yellow"]:
         temp = {}
-        temp['point'] = card.points
+        temp["point"] = card.points
         for gem in gemTypes:
             if gem in card.cost:
                 temp[gem] = card.cost[gem]
@@ -99,42 +99,42 @@ def current_reserve_card(game_state, id):
 def action_changes(action):
     points = 0
     buy_noble = False
-    gem_income = {"red": 0, "green": 0, "blue": 0,
-                  "black": 0, "white": 0, "yellow": 0}
+    gem_income = {"red": 0, "green": 0, "blue": 0, "black": 0, "white": 0, "yellow": 0}
     gem_card = {}
-    if action['type'] == 'collect_diff' or action['type'] == 'collect_same':
+    if action["type"] == "collect_diff" or action["type"] == "collect_same":
         points = 0
-        for gem in action['collected_gems']:
+        for gem in action["collected_gems"]:
+            gem_income[gem] = action["collected_gems"][gem]
 
-            gem_income[gem] = action['collected_gems'][gem]
-
-            if len(action['returned_gems']) != 0:
+            if len(action["returned_gems"]) != 0:
                 returned_gem_color = 0
                 returned_gem_val = 0
-                for key, val in action['returned_gems'].items():
+                for key, val in action["returned_gems"].items():
                     returned_gem_color = key
                     returned_gem_val = val
 
-                gem_income[returned_gem_color] = gem_income[returned_gem_color] - \
-                                                 returned_gem_val
+                gem_income[returned_gem_color] = (
+                    gem_income[returned_gem_color] - returned_gem_val
+                )
 
-    elif action['type'] == 'buy_available' or action['type'] == 'buy_reserve':
-        points = action['card'].points
-        for gem in action['returned_gems']:
+    elif action["type"] == "buy_available" or action["type"] == "buy_reserve":
+        points = action["card"].points
+        for gem in action["returned_gems"]:
             returned_gem_color = 0
             returned_gem_val = 0
-            for key, val in action['returned_gems'].items():
+            for key, val in action["returned_gems"].items():
                 returned_gem_color = key
                 returned_gem_val = val
-            gem_income[returned_gem_color] = gem_income[returned_gem_color] - \
-                                             returned_gem_val
+            gem_income[returned_gem_color] = (
+                gem_income[returned_gem_color] - returned_gem_val
+            )
 
-        gem_card[action['card'].colour] = 1
+        gem_card[action["card"].colour] = 1
 
-    elif action['type'] == 'reserve':
+    elif action["type"] == "reserve":
         gem_income["yellow"] = 1
 
-    if action['noble']:
+    if action["noble"]:
         buy_noble = True
 
     return buy_noble, points, gem_income, gem_card
@@ -161,13 +161,13 @@ class myAgent(Agent):
         #     for weightage_number in range(total_collect_features):
         #         collect_weight = cw.readline()
         #         collect_weightage.append(float(collect_weight))
-        
+
         # with open("reserve_weightage.txt", "r") as rw:
         #     reserve_weightage = []
         #     for weightage_number in range(total_reserve_features):
         #         reserve_weight = rw.readline()
         #         reserve_weightage.append(float(reserve_weight))
-        
+
         # with open("buy_weightage.txt", "r") as bw:
         #     buy_weightage = []
         #     for weightage_number in range(total_buy_features):
@@ -181,13 +181,26 @@ class myAgent(Agent):
         best_value = 0
 
         # return the feature that belongs to collect actions
-        def get_collect_features(own_buy_ability, available_cards, enemy_buy_ability,
-                                 own_reserve_cards, enemy_reserve_cards, action):
+        def get_collect_features(
+            own_buy_ability,
+            available_cards,
+            enemy_buy_ability,
+            own_reserve_cards,
+            enemy_reserve_cards,
+            action,
+        ):
             # calculate insufficient resources
             def insuf_res(cards, buy_ability):
                 resource_needs = []
                 for cost in cards:
-                    resource_need = {'red': 0, 'green': 0, 'blue': 0, 'black': 0, 'white': 0, 'yellow': 0}
+                    resource_need = {
+                        "red": 0,
+                        "green": 0,
+                        "blue": 0,
+                        "black": 0,
+                        "white": 0,
+                        "yellow": 0,
+                    }
                     for gem in gemTypes:
                         if gem in cost:
                             if cost[gem] - buy_ability[gem] > 0:
@@ -199,14 +212,18 @@ class myAgent(Agent):
 
             insuf_res_available_cards = insuf_res(available_cards, own_buy_ability)
             insuf_res_reserve_cards = insuf_res(own_reserve_cards, own_buy_ability)
-            insuf_res_enemy_available_cards = insuf_res(available_cards, enemy_buy_ability)
-            insuf_res_enemy_reserve_cards = insuf_res(enemy_reserve_cards, enemy_buy_ability)
+            insuf_res_enemy_available_cards = insuf_res(
+                available_cards, enemy_buy_ability
+            )
+            insuf_res_enemy_reserve_cards = insuf_res(
+                enemy_reserve_cards, enemy_buy_ability
+            )
 
             def collected_value(resources):
                 val = 0
                 for resource in resources:
-                    if 'collected_gems' in action:
-                        for colour, count in action['collected_gems'].items():
+                    if "collected_gems" in action:
+                        for colour, count in action["collected_gems"].items():
                             useful_gem = resource[colour] - count
                             if useful_gem > 0:
                                 val += useful_gem / resource[colour]
@@ -218,13 +235,21 @@ class myAgent(Agent):
             # feature 2 -> feature for own reserved cards
             # feature 3 -> feature for own enemy available cards
             # feature 4 -> feature for own enemy reserve cards
-            available_cards_feature = collected_value(insuf_res_available_cards);
-            available_reserve_feature = collected_value(insuf_res_reserve_cards);
-            available_enemy_cards_feature = collected_value(insuf_res_enemy_available_cards);
-            available_enemy_reserve_feature = collected_value(insuf_res_enemy_reserve_cards);
+            available_cards_feature = collected_value(insuf_res_available_cards)
+            available_reserve_feature = collected_value(insuf_res_reserve_cards)
+            available_enemy_cards_feature = collected_value(
+                insuf_res_enemy_available_cards
+            )
+            available_enemy_reserve_feature = collected_value(
+                insuf_res_enemy_reserve_cards
+            )
 
-            collect_features = [available_cards_feature, available_reserve_feature, available_enemy_cards_feature,
-                                available_enemy_reserve_feature]
+            collect_features = [
+                available_cards_feature,
+                available_reserve_feature,
+                available_enemy_cards_feature,
+                available_enemy_reserve_feature,
+            ]
 
             # feature 7 -> feature for the score from the available cards
             # get the score of cards
@@ -237,8 +262,10 @@ class myAgent(Agent):
                 counter = 0
                 for cost in insuf_res_available_cards:
                     counter = counter + 1
-                    if 'collected_gems' in action:
-                        for colour, count in action['collected_gems'].items():  # collect gems
+                    if "collected_gems" in action:
+                        for colour, count in action[
+                            "collected_gems"
+                        ].items():  # collect gems
                             cost[colour] = cost[colour] - count
                         if sum(cost.values()) == 0:
                             return score_list[counter - 1]
@@ -248,13 +275,13 @@ class myAgent(Agent):
             future_buy_card_feature = check_can_buy(insuf_res_available_cards, action)
 
             # feature 5 -> feature for penalty of collecting less than 3 diff gems
-            if action['type'] == 'collect_diff' and len(action['collected_gems']) < 3:
+            if action["type"] == "collect_diff" and len(action["collected_gems"]) < 3:
                 collect_features.append(1)
             else:
                 collect_features.append(0)
 
             # feature 6 -> feature for penalty of returning gem
-            if action['returned_gems']:
+            if action["returned_gems"]:
                 collect_features.append(1)
             else:
                 collect_features.append(0)
@@ -264,20 +291,30 @@ class myAgent(Agent):
             return collect_features
 
         # return the feature that belongs to reserve actions
-        def get_reserve_features(own_buy_ability, available_cards, enemy_buy_ability,
-                                 own_reserve_cards, enemy_reserve_cards, own_owned_cards,
-                                 available_nobles, action):
-
+        def get_reserve_features(
+            own_buy_ability,
+            available_cards,
+            enemy_buy_ability,
+            own_reserve_cards,
+            enemy_reserve_cards,
+            own_owned_cards,
+            available_nobles,
+            action,
+        ):
             reserving_features = []
             # if (bool(available_nobles)) == True and action['card'].points <= 2:
             if (bool(available_nobles)) == True:
-                colour_type = action['card'].colour
+                colour_type = action["card"].colour
 
                 def need_reserve_card(nobles):
                     need_card = 0
                     for noble in nobles:
                         if colour_type in noble:
-                            if float(noble[colour_type]) - float(own_owned_cards[colour_type]) > 0:
+                            if (
+                                float(noble[colour_type])
+                                - float(own_owned_cards[colour_type])
+                                > 0
+                            ):
                                 need_card += 1
                     return need_card / 10
 
@@ -287,13 +324,20 @@ class myAgent(Agent):
             return reserving_features
 
         # return the features belongs to buy actions
-        def get_buying_features(own_buy_ability, available_cards, enemy_buy_ability,
-                                own_reserve_cards, enemy_reserve_cards, own_owned_cards, available_nobles, action):
-
+        def get_buying_features(
+            own_buy_ability,
+            available_cards,
+            enemy_buy_ability,
+            own_reserve_cards,
+            enemy_reserve_cards,
+            own_owned_cards,
+            available_nobles,
+            action,
+        ):
             buying_features = []
 
             # feature 1: can buy noble
-            if action['noble'] is not None:
+            if action["noble"] is not None:
                 buying_features.append(1)
             else:
                 buying_features.append(0)
@@ -308,7 +352,7 @@ class myAgent(Agent):
                 buying_features.append(points)
 
             # feature 3: check if its a requirement for nobles
-            colour_type = action['card'].colour
+            colour_type = action["card"].colour
 
             def need_gem_card(nobles):
                 if bool(nobles) == False:
@@ -316,7 +360,11 @@ class myAgent(Agent):
                 need_card = 0
                 for noble in nobles:
                     if colour_type in noble:
-                        if float(noble[colour_type]) - float(own_owned_cards[colour_type]) > 0:
+                        if (
+                            float(noble[colour_type])
+                            - float(own_owned_cards[colour_type])
+                            > 0
+                        ):
                             need_card += 1
                 return need_card
 
@@ -353,47 +401,70 @@ class myAgent(Agent):
             return sum
 
         ###############################The fixed weightage that is to be used in the run vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-        collect_weightage = [6.975935499655273,
-                             5.228263197896148,
-                             2.513501251091439,
-                             2.4911915359085643,
-                             -102.3304321010679,
-                             -118.69290032342936,
-                             2.115527547040101]
+        collect_weightage = [
+            6.975935499655273,
+            5.228263197896148,
+            2.513501251091439,
+            2.4911915359085643,
+            -102.3304321010679,
+            -118.69290032342936,
+            2.115527547040101,
+        ]
         reserve_weightage = [1.4001612283467788]
-        buy_weightage = [64.7072330883441,
-                         10.204497783614694,
-                         72.9297577005887,
-                         3.6020465109570927,
-                         -101.53688110060882,
-                         1000.96569541246016]
+        buy_weightage = [
+            64.7072330883441,
+            10.204497783614694,
+            72.9297577005887,
+            3.6020465109570927,
+            -101.53688110060882,
+            1000.96569541246016,
+        ]
         ###############################The fixed weightage that is to be used in the run ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
         # evaluate q value for action
         for action in actions:
             if action["type"] == "collect_diff" or action["type"] == "collect_same":
-                collected_feature = get_collect_features(own_buy_ability, available_cards, enemy_buy_ability,
-                                                         own_reserve_cards, enemy_reserve_cards, action)
+                collected_feature = get_collect_features(
+                    own_buy_ability,
+                    available_cards,
+                    enemy_buy_ability,
+                    own_reserve_cards,
+                    enemy_reserve_cards,
+                    action,
+                )
 
                 q_value = get_q_value(collected_feature, collect_weightage)
                 if q_value > best_value:
                     best_value = q_value
                     best_action = action
 
-
             elif action["type"] == "reserve":
-                reserve_feature = get_reserve_features(own_buy_ability, available_cards, enemy_buy_ability,
-                                                       own_reserve_cards, enemy_reserve_cards, own_owned_cards,
-                                                       available_nobles, action)
+                reserve_feature = get_reserve_features(
+                    own_buy_ability,
+                    available_cards,
+                    enemy_buy_ability,
+                    own_reserve_cards,
+                    enemy_reserve_cards,
+                    own_owned_cards,
+                    available_nobles,
+                    action,
+                )
                 q_value = get_q_value(reserve_feature, reserve_weightage)
                 if q_value > best_value:
                     best_value = q_value
                     best_action = action
 
             elif action["type"] == "buy_reserve" or action["type"] == "buy_available":
-                buying_features = get_buying_features(own_buy_ability, available_cards, enemy_buy_ability,
-                                                      own_reserve_cards, enemy_reserve_cards, own_owned_cards,
-                                                      available_nobles, action)
+                buying_features = get_buying_features(
+                    own_buy_ability,
+                    available_cards,
+                    enemy_buy_ability,
+                    own_reserve_cards,
+                    enemy_reserve_cards,
+                    own_owned_cards,
+                    available_nobles,
+                    action,
+                )
 
                 q_value = get_q_value(buying_features, buy_weightage)
                 if q_value > best_value:
@@ -411,65 +482,65 @@ class myAgent(Agent):
         #     incentive = 100 * (game_state.agents[self.id].score - old_score)
         #     if game_state.agents[self.id].score >= 15:
         #         incentive = incentive + 500
-                
+
         #     Q_multiplier = Ace * (incentive + Beta * best_value - old_value)
-                    
+
         #     for collect_feature in range(total_collect_features):
         #         old_feature = float(cf.readline())
         #         collect_weightage[collect_feature] += Q_multiplier * old_feature
-                    
+
         #     with open("collect_weightage.txt", "w") as cw:
         #         for w in collect_weightage:
         #             cw.write(str(w) + '\n')
-            
+
         # with open("buy_feature.txt", "r") as bf:
         #     old_value = float(bf.readline())
         #     old_score = float(bf.readline())
-                
+
         #     incentive = 100 * (game_state.agents[self.id].score - old_score)
         #     if game_state.agents[self.id].score >= 15:
         #         incentive = incentive + 500
-                
+
         #     Q_multiplier = Ace * (incentive + Beta * best_value - old_value)
-                    
+
         #     for buy_feature in range(total_buy_features):
         #         old_feature = float(bf.readline())
         #         buy_weightage[buy_feature] += Q_multiplier * old_feature
-                    
+
         #     with open("buy_weightage.txt", "w") as bw:
         #         for w in buy_weightage:
         #             bw.write(str(w) + '\n')
-        
+
         # with open("reserve_feature.txt", "r") as rf:
         #     old_value = float(rf.readline())
         #     old_score = float(rf.readline())
-                
+
         #     incentive = 100 * (game_state.agents[self.id].score - old_score)
         #     if game_state.agents[self.id].score >= 15:
         #         incentive = incentive + 500
-                
+
         #     Q_multiplier = Ace * (incentive + Beta * best_value - old_value)
-                    
+
         #     for reserve_feature in range(total_reserve_features):
         #         old_feature = float(rf.readline())
         #         reserve_weightage[reserve_feature] += Q_multiplier * old_feature
-                
+
         #     with open("reserve_weightage.txt", "w") as rw:
         #         for w in reserve_weightage:
         #             rw.write(str(w) + '\n')
-        
+
         # use the best action feature and take the values to save up
         # if best_action['type'] == "collect_diff" or best_action['type'] == "collect_same":
-        #     with open('collect_feature.txt', 'w') as cf: 
+        #     with open('collect_feature.txt', 'w') as cf:
         #         collect_feature = get_collect_features(own_buy_ability, available_cards, enemy_buy_ability, own_reserve_cards,
         #                                         enemy_reserve_cards, best_action)
         #         cf.write(str(best_value) + '\n')
         #         cf.write(str(game_state.agents[self.id].score) + '\n')
         #         for collect_detail in collect_feature:
         #             cf.write(str(collect_detail) + '\n')
-        
+
         # elif best_action['type'] == "r":
-        #     with open('buy_feature.txt', 'w') as bf:   
+        #     with open('buy_feature.txt', 'w') as bf:
         #         buy_feature = get_buying_features(own_buy_ability, available_cards, enemy_buy_ability,
         #                                         own_reserve_cards, enemy_reserve_cards, own_owned_cards,
         #                                         available_nobles, best_action)
@@ -477,9 +548,9 @@ class myAgent(Agent):
         #         bf.write(str(game_state.agents[self.id].score) + '\n')
         #         for buy_detail in buy_feature:
         #             bf.write(str(buy_detail) + '\n')
-        
+
         # elif best_action["type"] == "buy_reserve" or best_action["type"] == "buy_available":
-        #     with open('reserve_feature.txt', 'w') as rf: 
+        #     with open('reserve_feature.txt', 'w') as rf:
         #         reserve_feature = get_reserve_features(own_buy_ability, available_cards, enemy_buy_ability,
         #                                         own_reserve_cards, enemy_reserve_cards, own_owned_cards,
         #                                         available_nobles, best_action)
