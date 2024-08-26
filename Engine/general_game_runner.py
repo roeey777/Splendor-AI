@@ -283,7 +283,7 @@ def run(options, msg):
         displayer = None
 
     # if random seed is not provide, using timestamp
-    if options.setRandomSeed == 90054:
+    if options.setRandomSeed == 67842:
         random_seed = int(str(time.time()).replace(".", ""))
     else:
         random_seed = options.setRandomSeed
@@ -575,8 +575,8 @@ def loadParameter():
     parser.add_option(
         "--setRandomSeed",
         type="int",
-        help="Set the random seed, otherwise it will be completely random (default: 90054)",
-        default=90054,
+        help="Set the random seed, otherwise it will be completely random (default: 67842)",
+        default=67842,
     )
     parser.add_option(
         "-s",
