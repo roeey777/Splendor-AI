@@ -31,7 +31,7 @@ class Game:
         
         self.seed = seed
         random.seed(self.seed)
-        self.seed_list = [random.randint(0,1e10) for _ in range(1000)]
+        self.seed_list = [random.randint(0,int(1e10)) for _ in range(1000)]
         self.seed_idx = 0
 
         # Make sure we are forming a valid game, and that agent

@@ -259,7 +259,7 @@ def run(options,msg):
     
     # make sure random seed is traceable
     random.seed(random_seed)
-    seed_list = [random.randint(0,1e10) for _ in range(1000)]
+    seed_list = [random.randint(0,int(1e10)) for _ in range(1000)]
     seed_idx = 0
 
     num_of_warning = options.numOfWarnings
@@ -443,7 +443,7 @@ def loadParameter():
     parser.add_option('-n', '--num_of_agents', type='int',help='The number of agents in this game', default=2)
 
     parser.add_option('-t','--textgraphics', action='store_true', help='Display output as text only (default: False)', default=False)
-    parser.add_option('-g','--game', help='The name of the game, starting with a uppercase character (default: Yinsh)', default="Yinsh")
+    parser.add_option('-g','--game', help='The name of the game, starting with a uppercase character (default: Splendor)', default="Splendor")
     parser.add_option('-q','--quiet', action='store_true', help='No text nor graphics output, only show game info', default=False)
     parser.add_option('-Q', '--superQuiet', action='store_true', help='No output at all', default=False)
     parser.add_option('-w', '--warningTimeLimit', type='float',help='Time limit for a warning of one move in seconds (default: 1)', default=1.0)
