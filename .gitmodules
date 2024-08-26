@@ -1,0 +1,6 @@
+[submodule "GreedyIsGood"]
+	path = GreedyIsGood
+	url = https://github.com/GantorisLee/AI-Planning-for-Autonomy-greedisgood.git
+[submodule "Splendid"]
+	path = Splendid
+	url = https://github.com/AllisonXY/splendor-AI-competition.git
