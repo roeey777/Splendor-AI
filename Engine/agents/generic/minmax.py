@@ -4,7 +4,7 @@ from template import Agent
 from copy import deepcopy
 from timeit import default_timer as timer
 
-DEPTH = 1
+DEPTH = 2
 
 class myAgent(Agent):
     def __init__(self, _id):
@@ -18,12 +18,9 @@ class myAgent(Agent):
         agent_id = int(not is_maximizing)
         actions = game_rule.getLegalActions(game_state, agent_id)
         random.shuffle(actions)
-        # actions.sort(key=lambda action: action["type"])
+        actions.sort(key=lambda action: action["type"])
         if depth == 0 or len(actions) == 0:
             return None, self.evaluation_function(game_state, agent_id)
-
-        agent, board = (deepcopy(game_state.agents[agent_id]),
-                        deepcopy(game_state.board))
 
         if is_maximizing:
             best_value = -np.inf
@@ -31,16 +28,20 @@ class myAgent(Agent):
             for action in actions:
                 next_state = game_rule.generateSuccessor(game_state,
                                                          action, agent_id)
-                game_state.agents[agent_id] = agent
-                game_state.board = board
                 _, action_value = self.SelectActionRecursion(next_state,
                                                               game_rule, depth - 1,
                                                              not is_maximizing, alpha, beta)
+                # generateSuccessor alternates the game_state inplace,
+                # that's why we need to call generatePredecessor to revert
+                # it (even though we do not need its output)
+                prev_state = game_rule.generatePredecessor(game_state,
+                                                           action, agent_id)
 
                 if action_value > best_value:
                     best_value = action_value
                     best_action = action
                 if best_value >= beta:
+                    print("beta")
                     break
 
         else:
@@ -49,15 +50,19 @@ class myAgent(Agent):
             for action in actions:
                 next_state = game_rule.generateSuccessor(game_state,
                                                          action, agent_id)
-                game_state.agents[agent_id] = agent
-                game_state.board = board
                 _, action_value = self.SelectActionRecursion(next_state,
                                                              game_rule, depth - 1,
                                                         not is_maximizing, alpha, beta)
+                # generateSuccessor alternates the game_state inplace,
+                # that's why we need to call generatePredecessor to revert
+                # it (even though we do not need its output)
+                prev_state = game_rule.generatePredecessor(game_state,
+                                                           action, agent_id)
                 if action_value < best_value:
                     best_value = action_value
                     best_action = action
                 if best_value <= alpha:
+                    print("alpha")
                     break
 
         return best_action, best_value
@@ -70,7 +75,7 @@ class myAgent(Agent):
         gems_factor = 0.1
         gems_var_factor = -0.2
         color_cost_factor = 0.1
-        result = 0
+        reward = 0
 
         if agent_state.score >= 15:
             return 99999
@@ -80,11 +85,26 @@ class myAgent(Agent):
 
         for row in state.board.dealt + [agent_state.cards["yellow"]]:
             for card in [c for c in row if c]:  # filter Nones out
+                relevant_to_nobles = 0
+                for noble in state.board.nobles:
+                    if (card.colour in noble[1] and len(agent_state.cards[
+                                                            card.colour])
+                            < noble[1][card.colour]):
+                        # Card is relevant for nobles, increase its weight
+                        relevant_to_nobles += 1
+
                 for color, color_cost in card.cost.items():
-                    result -= ((color_cost - (agent_state.gems[color] +
-                                                  len(
-                        agent_state.cards[color]))) * color_cost_factor *
-                               (card.points + 1))
+                    reward -= ((color_cost - (agent_state.gems[color] +
+                              len(agent_state.cards[color]))) * color_cost_factor *
+                               (card.points + 1 + relevant_to_nobles * 0.5))
+
+                # More points if cards are relevant to nobles
+                # for noble in state.board.nobles:
+                #     if (card.colour in noble[1] and len(agent_state.cards[
+                #                                             card.colour])
+                #             < noble[1][card.colour]):
+                #         reward += * (card.points + 2) / cost
+                    # if card.color in
                 #
                 #
                 #     if
@@ -113,7 +133,7 @@ class myAgent(Agent):
                 #         ):
                 #             reward_point += count * (card.points + 2) / cost
 
-        return (result + agent_state.score * score_factor + len(
+        return (reward + agent_state.score * score_factor + len(
             agent_state.cards) *
                 cards_factor + sum(agent_state.gems.values()) * gems_factor
                 + gems_var * gems_var_factor)
