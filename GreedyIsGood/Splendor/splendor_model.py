@@ -18,7 +18,7 @@ from template import GameState, GameRule
 
 
 # Represents cards with a colour (str), unique code (str), resource costs (dict), deck ID (int), and points (int).
-class Card():
+class Card:
     def __init__(self, colour, code, cost, deck_id, points):
         self.colour = colour
         self.code = code
@@ -27,17 +27,21 @@ class Card():
         self.points = points
 
     def __str__(self):
-        gem_string = ''
+        gem_string = ""
         for colour, number in self.cost.items():
             gem_string += f'{", " if gem_string!="" else ""}{number} {colour}'
-        return f'Tier {self.deck_id+1} {self.colour} card costing {gem_string}'
+        return f"Tier {self.deck_id+1} {self.colour} card costing {gem_string}"
 
     def __repr__(self):
         return self.code
 
     # Equal in the ways that matter: code is identical, and points haven't been tampered with.
     def __eq__(self, other):
-        return hasattr(other, 'code') and other.code == self.code and self.points == other.points == CARDS[other.code][-1]
+        return (
+            hasattr(other, "code")
+            and other.code == self.code
+            and self.points == other.points == CARDS[other.code][-1]
+        )
 
 
 # Represents game as agents playing on a board with cards, gems, and nobles.
@@ -50,13 +54,19 @@ class SplendorState(GameState):
     class BoardState:
         def __init__(self, num_agents):
             self.decks = [[], [], []]
-            self.dealt = [[None]*4 for i in range(3)]
+            self.dealt = [[None] * 4 for i in range(3)]
             # All gem stacks start at (4,5,7) for games of (2,3,4) players respectively. Yellow seals always start at 5.
-            n = [4, 5, 7][num_agents-2]
-            self.gems = {'black': n, 'red': n, 'yellow': 5,
-                         'green': n, 'blue': n, 'white': n}
+            n = [4, 5, 7][num_agents - 2]
+            self.gems = {
+                "black": n,
+                "red": n,
+                "yellow": 5,
+                "green": n,
+                "blue": n,
+                "white": n,
+            }
             # Deal out num_agents+1 of the 10 nobles at random. Nobles = (code, cost).
-            self.nobles = random.sample(NOBLES, k=num_agents+1)
+            self.nobles = random.sample(NOBLES, k=num_agents + 1)
             # Sort cards into three deck tiers. Deal four cards per tier. Decks are shuffled before each deal.
             for code, (colour, cost, deck_id, points) in CARDS.items():
                 # Deck IDs are read in as (1-3), but should be zero-indexed instead.
@@ -107,68 +117,74 @@ class SplendorGameRule(GameRule):
         agent.last_action = action
         score = 0
 
-        if 'card' in action:
-            card = action['card']
+        if "card" in action:
+            card = action["card"]
 
-        if 'collect' in action['type'] or action['type'] == 'reserve':
+        if "collect" in action["type"] or action["type"] == "reserve":
             # Decrement board gem stacks by collected_gems. Increment player gem stacks by collected_gems.
-            for colour, count in action['collected_gems'].items():
+            for colour, count in action["collected_gems"].items():
                 board.gems[colour] -= count
                 agent.gems[colour] += count
             # Decrement player gem stacks by returned_gems. Increment board gem stacks by returned_gems.
-            for colour, count in action['returned_gems'].items():
+            for colour, count in action["returned_gems"].items():
                 agent.gems[colour] -= count
                 board.gems[colour] += count
 
-            if action['type'] == 'reserve':
+            if action["type"] == "reserve":
                 # Remove card from dealt cards by locating via unique code (cards aren't otherwise hashable).
                 # Since we want to retain the positioning of dealt cards, set removed card slot to new dealt card.
                 # Since the board may have None cards (empty slots that cannot be filled), check cards first.
                 # Add card to player's yellow stack.
                 for i in range(len(board.dealt[card.deck_id])):
-                    if board.dealt[card.deck_id][i] and board.dealt[card.deck_id][i].code == card.code:
+                    if (
+                        board.dealt[card.deck_id][i]
+                        and board.dealt[card.deck_id][i].code == card.code
+                    ):
                         board.dealt[card.deck_id][i] = board.deal(card.deck_id)
-                        agent.cards['yellow'].append(card)
+                        agent.cards["yellow"].append(card)
                         break
 
-        elif 'buy' in action['type']:
+        elif "buy" in action["type"]:
             # Decrement player gem stacks by returned_gems. Increment board gem stacks by returned_gems.
-            for colour, count in action['returned_gems'].items():
+            for colour, count in action["returned_gems"].items():
                 agent.gems[colour] -= count
                 board.gems[colour] += count
             # If buying one of the available cards on the board, set removed card slot to new dealt card.
             # Since the board may have None cards (empty slots that cannot be filled), check cards first.
-            if 'available' in action['type']:
+            if "available" in action["type"]:
                 for i in range(len(board.dealt[card.deck_id])):
-                    if board.dealt[card.deck_id][i] and board.dealt[card.deck_id][i].code == card.code:
+                    if (
+                        board.dealt[card.deck_id][i]
+                        and board.dealt[card.deck_id][i].code == card.code
+                    ):
                         board.dealt[card.deck_id][i] = board.deal(card.deck_id)
                         break
             # Else, agent is buying a reserved card. Remove card from player's yellow stack.
             else:
-                for i in range(len(agent.cards['yellow'])):
-                    if agent.cards['yellow'][i].code == card.code:
-                        del agent.cards['yellow'][i]
+                for i in range(len(agent.cards["yellow"])):
+                    if agent.cards["yellow"][i].code == card.code:
+                        del agent.cards["yellow"][i]
                         break
 
             # Add card to player's stack of matching colour, and increment agent's score accordingly.
             agent.cards[card.colour].append(card)
             score += card.points
 
-        if action['noble']:
+        if action["noble"]:
             # Remove noble from board. Add noble to player's stack. Like cards, nobles aren't hashable due to possessing
             # dictionaries (i.e. resource costs). Therefore, locate and delete the noble via unique code.
             # Add noble's points to agent score.
             for i in range(len(board.nobles)):
-                if board.nobles[i][0] == action['noble'][0]:
+                if board.nobles[i][0] == action["noble"][0]:
                     del board.nobles[i]
-                    agent.nobles.append(action['noble'])
+                    agent.nobles.append(action["noble"])
                     score += 3
                     break
 
         # Log this turn's action and any resultant score. Return updated gamestate.
         agent.agent_trace.action_reward.append((action, score))
         agent.score += score
-        agent.passed = action['type'] == 'pass'
+        agent.passed = action["type"] == "pass"
         return state
 
     # Game ends if any agent possesses at least 15 points, and all agents have gone in this round. As a very rare edge
@@ -187,7 +203,8 @@ class SplendorGameRule(GameRule):
         details = []
         for a in game_state.agents:
             bought_cards = sum(
-                [len(cards) for colour, cards in a.cards.items() if colour != 'yellow'])
+                [len(cards) for colour, cards in a.cards.items() if colour != "yellow"]
+            )
             details.append((a.id, bought_cards, a.score))
             max_score = max(a.score, max_score)
         victors = [d for d in details if d[-1] == max_score]
@@ -203,16 +220,20 @@ class SplendorGameRule(GameRule):
     # is sampled exhaustively, this function simply needs to screen out colours in collected_gems, in order for agents
     # to be given all collected/returned combinations permissible.
     def generate_return_combos(self, current_gems, collected_gems):
-        total_gem_count = sum(current_gems.values()) + \
-            sum(collected_gems.values())
+        total_gem_count = sum(current_gems.values()) + sum(collected_gems.values())
         if total_gem_count > 10:
             return_combos = []
             num_return = total_gem_count - 10
             # Combine current and collected gems. Screen out gem colours that were just collected.
-            total_gems = {i: current_gems.get(
-                i, 0) + collected_gems.get(i, 0) for i in set(current_gems)}
-            total_gems = {i[0]: i[1] for i in total_gems.items(
-            ) if i[0] not in collected_gems.keys()}.items()
+            total_gems = {
+                i: current_gems.get(i, 0) + collected_gems.get(i, 0)
+                for i in set(current_gems)
+            }
+            total_gems = {
+                i[0]: i[1]
+                for i in total_gems.items()
+                if i[0] not in collected_gems.keys()
+            }.items()
             # Form a total gems list (with elements == gem colours, and len == number of gems).
             total_gems_list = []
             for colour, count in total_gems:
@@ -229,7 +250,8 @@ class SplendorGameRule(GameRule):
                     returned_gems[colour] += 1
                 # Filter out colours with zero gems, and append.
                 return_combos.append(
-                    dict({i for i in returned_gems.items() if i[-1] > 0}))
+                    dict({i for i in returned_gems.items() if i[-1] > 0})
+                )
 
             return return_combos
 
@@ -239,7 +261,7 @@ class SplendorGameRule(GameRule):
     # Checks to see whether an agent's purchased cards and collected gems can cover a given resource cost.
     # If it can, return the combination of gems to be returned, if any. If it can't, return False.
     def resources_sufficient(self, agent, costs):
-        wild = agent.gems['yellow']
+        wild = agent.gems["yellow"]
         return_combo = {c: 0 for c in COLOURS.values()}
         for colour, cost in costs.items():
             # If a shortfall is found, see if the difference can be made with wild/seal/yellow gems.
@@ -259,7 +281,7 @@ class SplendorGameRule(GameRule):
             gem_shortfall = max(gem_cost - agent.gems[colour], 0)
             # Coloured gems to be returned.
             return_combo[colour] = gem_cost - gem_shortfall
-            return_combo['yellow'] += gem_shortfall  # Wilds to be returned.
+            return_combo["yellow"] += gem_shortfall  # Wilds to be returned.
 
         # Filter out unnecessary colours and return dict specifying combination of gems.
         return dict({i for i in return_combo.items() if i[-1] > 0})
@@ -305,8 +327,11 @@ class SplendorGameRule(GameRule):
             potential_nobles = [None]
 
         # Generate actions (collect up to 3 different gems). Work out all legal combinations. Theoretical max is 10.
-        available_colours = [colour for colour, number in board.gems.items(
-        ) if colour != 'yellow' and number > 0]
+        available_colours = [
+            colour
+            for colour, number in board.gems.items()
+            if colour != "yellow" and number > 0
+        ]
         for combo_length in range(1, min(len(available_colours), 3) + 1):
             for combo in itertools.combinations(available_colours, combo_length):
                 collected_gems = {colour: 1 for colour in combo}
@@ -315,50 +340,62 @@ class SplendorGameRule(GameRule):
                 # combinations will be 51, and max actions generated by the end of this stage will be 510.
                 # Handling this branching factor properly will be crucial for agent performance.
                 # If return_combos comes back False, then taking these gems is invalid and won't be added.
-                return_combos = self.generate_return_combos(
-                    agent.gems, collected_gems)
+                return_combos = self.generate_return_combos(agent.gems, collected_gems)
                 for returned_gems in return_combos:
                     for noble in potential_nobles:
-                        actions.append({'type': 'collect_diff',
-                                        'collected_gems': collected_gems,
-                                        'returned_gems': returned_gems,
-                                        'noble': noble})
+                        actions.append(
+                            {
+                                "type": "collect_diff",
+                                "collected_gems": collected_gems,
+                                "returned_gems": returned_gems,
+                                "noble": noble,
+                            }
+                        )
 
         # Generate actions (collect 2 identical gems). Theoretical max is 5.
-        available_colours = [colour for colour, number in board.gems.items(
-        ) if colour != 'yellow' and number >= 4]
+        available_colours = [
+            colour
+            for colour, number in board.gems.items()
+            if colour != "yellow" and number >= 4
+        ]
         for colour in available_colours:
             collected_gems = {colour: 2}
 
             # Like before, find combos to return, if any. Since the max to be returned is now 2, theoretical max
             # combinations will be 21, and max actions generated here will be 105.
-            return_combos = self.generate_return_combos(
-                agent.gems, collected_gems)
+            return_combos = self.generate_return_combos(agent.gems, collected_gems)
             for returned_gems in return_combos:
                 for noble in potential_nobles:
-                    actions.append({'type': 'collect_same',
-                                    'collected_gems': collected_gems,
-                                    'returned_gems': returned_gems,
-                                    'noble': noble})
+                    actions.append(
+                        {
+                            "type": "collect_same",
+                            "collected_gems": collected_gems,
+                            "returned_gems": returned_gems,
+                            "noble": noble,
+                        }
+                    )
 
         # Generate actions (reserve card). Agent can reserve only if it possesses < 3 cards currently reserved.
         # With a reservation, the agent will receive one seal (yellow), if there are any left. Reservations are stored
         # and displayed under the agent's yellow stack, as they won't generate their true colour until fully purchased.
         # There is a possible 12 cards to be reserved, and if the agent goes over limit, there are max 6 gem colours
         # that can be returned, leading to a theoretical max of 72 actions here.
-        if len(agent.cards['yellow']) < 3:
-            collected_gems = {'yellow': 1} if board.gems['yellow'] > 0 else {}
-            return_combos = self.generate_return_combos(
-                agent.gems, collected_gems)
+        if len(agent.cards["yellow"]) < 3:
+            collected_gems = {"yellow": 1} if board.gems["yellow"] > 0 else {}
+            return_combos = self.generate_return_combos(agent.gems, collected_gems)
             for returned_gems in return_combos:
                 for card in board.dealt_list():
                     if card:
                         for noble in potential_nobles:
-                            actions.append({'type': 'reserve',
-                                            'card': card,
-                                            'collected_gems': collected_gems,
-                                            'returned_gems': returned_gems,
-                                            'noble': noble})
+                            actions.append(
+                                {
+                                    "type": "reserve",
+                                    "card": card,
+                                    "collected_gems": collected_gems,
+                                    "returned_gems": returned_gems,
+                                    "noble": noble,
+                                }
+                            )
 
         # Generate actions (buy card). Agents can buy cards if they can cover its resource cost. Resources can come from
         # an agent's gem and card stacks. Card stacks represent gem factories, or 'permanent gems'; if there are 2 blue
@@ -370,7 +407,7 @@ class SplendorGameRule(GameRule):
         # There is a max 15 actions that can be generated here (15 possible cards to be bought: 12 dealt + 3 reserved).
         # However, in the case that multiple nobles are made candidates for visiting with this move, this number will
         # be multiplied accordingly. This however, is a rare event.
-        for card in board.dealt_list() + agent.cards['yellow']:
+        for card in board.dealt_list() + agent.cards["yellow"]:
             if not card or len(agent.cards[card.colour]) == 7:
                 continue
             # Check if this card is affordable.
@@ -390,16 +427,22 @@ class SplendorGameRule(GameRule):
                 if not new_nobles:
                     new_nobles = [None]
                 for noble in new_nobles:
-                    actions.append({'type': 'buy_reserve' if card in agent.cards['yellow'] else 'buy_available',
-                                    'card': card,
-                                    'returned_gems': returned_gems,
-                                    'noble': noble})
+                    actions.append(
+                        {
+                            "type": "buy_reserve"
+                            if card in agent.cards["yellow"]
+                            else "buy_available",
+                            "card": card,
+                            "returned_gems": returned_gems,
+                            "noble": noble,
+                        }
+                    )
 
         # Return list of actions. If there are no actions (almost impossible), all this player can do is pass.
         # A noble is still permitted to visit if conditions are met.
         if not actions:
             for noble in potential_nobles:
-                actions.append({'type': 'pass', 'noble': noble})
+                actions.append({"type": "pass", "noble": noble})
 
         return actions
 
