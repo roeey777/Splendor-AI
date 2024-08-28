@@ -6,7 +6,7 @@ setup(
     description="Splendor Game Engine",
     license="BSD",
     packages=find_packages(
-        where='Engine',
+        where="Engine",
     ),
     package_dir={"": "Engine"},
     include_package_data=True,

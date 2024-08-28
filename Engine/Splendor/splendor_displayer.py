@@ -326,32 +326,44 @@ class GUIDisplayer(Displayer):
         for card in os.listdir(abspath(join(SPLENDOR_DIR, "resources/cards_large"))):
             colour, code, _ = convert_filename(card)
             self.resources["cards_large"][colour][code] = tkinter.PhotoImage(
-                file=abspath(join(SPLENDOR_DIR, "resources/cards_large/", "{}".format(card)))
+                file=abspath(
+                    join(SPLENDOR_DIR, "resources/cards_large/", "{}".format(card))
+                )
             ).subsample(int(1 / s))
         for card in os.listdir(abspath(join(SPLENDOR_DIR, "resources/cards_small"))):
             colour, code, _ = convert_filename(card)
             self.resources["cards_small"][colour][code] = tkinter.PhotoImage(
-                file=abspath(join(SPLENDOR_DIR, "resources/cards_small/", "{}".format(card)))
+                file=abspath(
+                    join(SPLENDOR_DIR, "resources/cards_small/", "{}".format(card))
+                )
             ).subsample(int(1 / s))
         for gem in os.listdir(abspath(join(SPLENDOR_DIR, "resources/gems_large"))):
             colour, num = convert_filename(gem)
             self.resources["gems_large"][colour][num] = tkinter.PhotoImage(
-                file=abspath(join(SPLENDOR_DIR, "resources/gems_large/", "{}".format(gem)))
+                file=abspath(
+                    join(SPLENDOR_DIR, "resources/gems_large/", "{}".format(gem))
+                )
             ).subsample(int(1 / s))
         for gem in os.listdir(abspath(join(SPLENDOR_DIR, "resources/gems_small"))):
             colour, num = convert_filename(gem)
             self.resources["gems_small"][colour][num] = tkinter.PhotoImage(
-                file=abspath(join(SPLENDOR_DIR, "resources/gems_small/", "{}".format(gem)))
+                file=abspath(
+                    join(SPLENDOR_DIR, "resources/gems_small/", "{}".format(gem))
+                )
             ).subsample(int(1 / s))
         for nobl in os.listdir(abspath(join(SPLENDOR_DIR, "resources/nobles_large"))):
             _, code, _ = convert_filename(nobl)
             self.resources["nobles_large"][code] = tkinter.PhotoImage(
-                file=abspath(join(SPLENDOR_DIR, "resources/nobles_large/", "{}".format(nobl)))
+                file=abspath(
+                    join(SPLENDOR_DIR, "resources/nobles_large/", "{}".format(nobl))
+                )
             ).subsample(int(1 / s))
         for nobl in os.listdir(abspath(join(SPLENDOR_DIR, "resources/nobles_small"))):
             _, code, _ = convert_filename(nobl)
             self.resources["nobles_small"][code] = tkinter.PhotoImage(
-                file=abspath(join(SPLENDOR_DIR, "resources/nobles_small/", "{}".format(nobl)))
+                file=abspath(
+                    join(SPLENDOR_DIR, "resources/nobles_small/", "{}".format(nobl))
+                )
             ).subsample(int(1 / s))
         self.resources["card_sleeve"] = tkinter.PhotoImage(
             file=abspath(join(SPLENDOR_DIR, "resources/card_sleeve.png"))
@@ -425,7 +437,9 @@ class GUIDisplayer(Displayer):
             "wm",
             "iconphoto",
             self.sb_window._w,
-            tkinter.PhotoImage(file=abspath(join(SPLENDOR_DIR, "resources/icon_log.png"))),
+            tkinter.PhotoImage(
+                file=abspath(join(SPLENDOR_DIR, "resources/icon_log.png"))
+            ),
         )
         self.sb_window.geometry("640x455")
         self.sb_frame = tkinter.Frame(self.sb_window)
