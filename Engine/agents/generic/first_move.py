@@ -1,4 +1,4 @@
-from template import Agent
+from Engine.template import Agent
 
 
 class myAgent(Agent):

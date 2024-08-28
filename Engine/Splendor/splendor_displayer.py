@@ -6,11 +6,16 @@
 
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
+import os
+from os.path import realpath, abspath, join
 
 import tkinter, copy, time, os, time
 from collections import defaultdict
 from Splendor.splendor_utils import *
-from template import Displayer
+from Engine.template import Displayer
+
+
+SPLENDOR_DIR = os.path.dirname(realpath(__file__))
 
 
 # CLASS DEF ----------------------------------------------------------------------------------------------------------#
@@ -297,7 +302,7 @@ class GUIDisplayer(Displayer):
             "wm",
             "iconphoto",
             self.root._w,
-            tkinter.PhotoImage(file="Splendor/resources/icon.png"),
+            tkinter.PhotoImage(file=abspath(join(SPLENDOR_DIR, "resources/icon.png"))),
         )
         self.root.geometry("{}x{}".format(int(CNVS_DIM[0]), int(CNVS_DIM[1])))
         self.maximised = False
@@ -309,7 +314,7 @@ class GUIDisplayer(Displayer):
         # Load image resources.
         self.resources = {
             "background": tkinter.PhotoImage(
-                file="Splendor/resources/background.png"
+                file=abspath(join(SPLENDOR_DIR, "resources/background.png"))
             ).subsample(int(1 / s)),
             "cards_large": {c: {} for c in COLOURS.values()},
             "cards_small": {c: {} for c in COLOURS.values()},
@@ -318,41 +323,41 @@ class GUIDisplayer(Displayer):
             "nobles_large": {},
             "nobles_small": {},
         }
-        for card in os.listdir("Splendor/resources/cards_large"):
+        for card in os.listdir(abspath(join(SPLENDOR_DIR, "resources/cards_large"))):
             colour, code, _ = convert_filename(card)
             self.resources["cards_large"][colour][code] = tkinter.PhotoImage(
-                file="Splendor/resources/cards_large/{}".format(card)
+                file=abspath(join(SPLENDOR_DIR, "resources/cards_large/", "{}".format(card)))
             ).subsample(int(1 / s))
-        for card in os.listdir("Splendor/resources/cards_small"):
+        for card in os.listdir(abspath(join(SPLENDOR_DIR, "resources/cards_small"))):
             colour, code, _ = convert_filename(card)
             self.resources["cards_small"][colour][code] = tkinter.PhotoImage(
-                file="Splendor/resources/cards_small/{}".format(card)
+                file=abspath(join(SPLENDOR_DIR, "resources/cards_small/", "{}".format(card)))
             ).subsample(int(1 / s))
-        for gem in os.listdir("Splendor/resources/gems_large"):
+        for gem in os.listdir(abspath(join(SPLENDOR_DIR, "resources/gems_large"))):
             colour, num = convert_filename(gem)
             self.resources["gems_large"][colour][num] = tkinter.PhotoImage(
-                file="Splendor/resources/gems_large/{}".format(gem)
+                file=abspath(join(SPLENDOR_DIR, "resources/gems_large/", "{}".format(gem)))
             ).subsample(int(1 / s))
-        for gem in os.listdir("Splendor/resources/gems_small"):
+        for gem in os.listdir(abspath(join(SPLENDOR_DIR, "resources/gems_small"))):
             colour, num = convert_filename(gem)
             self.resources["gems_small"][colour][num] = tkinter.PhotoImage(
-                file="Splendor/resources/gems_small/{}".format(gem)
+                file=abspath(join(SPLENDOR_DIR, "resources/gems_small/", "{}".format(gem)))
             ).subsample(int(1 / s))
-        for nobl in os.listdir("Splendor/resources/nobles_large"):
+        for nobl in os.listdir(abspath(join(SPLENDOR_DIR, "resources/nobles_large"))):
             _, code, _ = convert_filename(nobl)
             self.resources["nobles_large"][code] = tkinter.PhotoImage(
-                file="Splendor/resources/nobles_large/{}".format(nobl)
+                file=abspath(join(SPLENDOR_DIR, "resources/nobles_large/", "{}".format(nobl)))
             ).subsample(int(1 / s))
-        for nobl in os.listdir("Splendor/resources/nobles_small"):
+        for nobl in os.listdir(abspath(join(SPLENDOR_DIR, "resources/nobles_small"))):
             _, code, _ = convert_filename(nobl)
             self.resources["nobles_small"][code] = tkinter.PhotoImage(
-                file="Splendor/resources/nobles_small/{}".format(nobl)
+                file=abspath(join(SPLENDOR_DIR, "resources/nobles_small/", "{}".format(nobl)))
             ).subsample(int(1 / s))
         self.resources["card_sleeve"] = tkinter.PhotoImage(
-            file="Splendor/resources/card_sleeve.png"
+            file=abspath(join(SPLENDOR_DIR, "resources/card_sleeve.png"))
         ).subsample(int(1 / s))
         self.resources["card_dull"] = tkinter.PhotoImage(
-            file="Splendor/resources/card_dull.png"
+            file=abspath(join(SPLENDOR_DIR, "resources/card_dull.png"))
         ).subsample(int(1 / s))
 
         # Initialise canvas and place background table image.
@@ -420,7 +425,7 @@ class GUIDisplayer(Displayer):
             "wm",
             "iconphoto",
             self.sb_window._w,
-            tkinter.PhotoImage(file="Splendor/resources/icon_log.png"),
+            tkinter.PhotoImage(file=abspath(join(SPLENDOR_DIR, "resources/icon_log.png"))),
         )
         self.sb_window.geometry("640x455")
         self.sb_frame = tkinter.Frame(self.sb_window)
@@ -498,13 +503,19 @@ class GUIDisplayer(Displayer):
             t = (
                 "Collect up to 3 different gemstones"
                 if t == "collect_diff"
-                else "Collect 2 identical gemstones"
-                if t == "collect_same"
-                else "Reserve a card from the table"
-                if t == "reserve"
-                else "Buy a card from the table"
-                if t == "buy_available"
-                else "Buy a previously reserved card"
+                else (
+                    "Collect 2 identical gemstones"
+                    if t == "collect_same"
+                    else (
+                        "Reserve a card from the table"
+                        if t == "reserve"
+                        else (
+                            "Buy a card from the table"
+                            if t == "buy_available"
+                            else "Buy a previously reserved card"
+                        )
+                    )
+                )
             )
             self.action_box.insert(tkinter.END, t)
         self.prime_action_box()
