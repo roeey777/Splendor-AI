@@ -63,10 +63,10 @@ def loadAgent(file_list, name_list, superQuiet=True):
                 )
         else:
             agents[i] = DummyAgent(i)
-            load_errs[
-                error_index[i]
-            ] = "[Error] Agent {} team {} agent {} cannot be loaded".format(
-                i, name_list[i], ".".join((file_list[i]).split(".")[-2:])
+            load_errs[error_index[i]] = (
+                "[Error] Agent {} team {} agent {} cannot be loaded".format(
+                    i, name_list[i], ".".join((file_list[i]).split(".")[-2:])
+                )
             )
 
     return agents, load_errs

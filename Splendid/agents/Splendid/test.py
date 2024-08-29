@@ -363,7 +363,6 @@ import math
 
 
 class MultiArmedBandit:
-
     """
     Select an action given Q-values for each action.
     """
@@ -821,9 +820,11 @@ class SplendorGameRule2(SplendorGameRule):
                 for noble in new_nobles:
                     actions.append(
                         {
-                            "type": "buy_reserve"
-                            if card in agent.cards["yellow"]
-                            else "buy_available",
+                            "type": (
+                                "buy_reserve"
+                                if card in agent.cards["yellow"]
+                                else "buy_available"
+                            ),
                             "card": card,
                             "returned_gems": returned_gems,
                             "noble": noble,

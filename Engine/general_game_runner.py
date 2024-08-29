@@ -24,8 +24,8 @@ import shutil
 import logging
 import pytz
 import json
-from template import Agent as DummyAgent
-from game import Game, GameReplayer
+from .template import Agent as DummyAgent
+from .game import Game, GameReplayer
 from optparse import OptionParser
 
 
@@ -637,7 +637,7 @@ def loadParameter():
 # MAIN ---------------------------------------------------------------------------------------------------------------#
 
 
-if __name__ == "__main__":
+def main():
     """
     The main function called when advance_model.py is run
     from the command line:
@@ -653,6 +653,10 @@ if __name__ == "__main__":
     matches = run(options, msg)
     # with open("output/matches.json",'w') as f:
     #     json.dump(matches,f)
+
+
+if __name__ == "__main__":
+    main()
 
 
 # END FILE -----------------------------------------------------------------------------------------------------------#
