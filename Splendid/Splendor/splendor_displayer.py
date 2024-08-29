@@ -498,13 +498,19 @@ class GUIDisplayer(Displayer):
             t = (
                 "Collect up to 3 different gemstones"
                 if t == "collect_diff"
-                else "Collect 2 identical gemstones"
-                if t == "collect_same"
-                else "Reserve a card from the table"
-                if t == "reserve"
-                else "Buy a card from the table"
-                if t == "buy_available"
-                else "Buy a previously reserved card"
+                else (
+                    "Collect 2 identical gemstones"
+                    if t == "collect_same"
+                    else (
+                        "Reserve a card from the table"
+                        if t == "reserve"
+                        else (
+                            "Buy a card from the table"
+                            if t == "buy_available"
+                            else "Buy a previously reserved card"
+                        )
+                    )
+                )
             )
             self.action_box.insert(tkinter.END, t)
         self.prime_action_box()
