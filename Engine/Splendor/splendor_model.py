@@ -149,7 +149,8 @@ class SplendorGameRule(GameRule):
         return SplendorState(self.num_of_agent)
 
     def generatePredecessor(self, state, action, agent_id):
-        agent, board = state.agents[agent_id], state.board
+        agent = state.agents[agent_id]
+        board = state.board
         agent.last_action = action  # Record last action such that other agents can make use of this information.
         score = 0
 
@@ -172,10 +173,8 @@ class SplendorGameRule(GameRule):
                 bought_card = board.dealt[i][j]
                 board.decks[bought_card.deck_id].append(bought_card)
                 # Remove card from reserved cards
-                for i in range(len(agent.cards["yellow"])):
-                    if agent.cards["yellow"][i].code == card.code:
-                        del agent.cards["yellow"][i]
-                        break
+                agent.cards["yellow"].remove(card)
+                board.dealt[i][j] = card
 
         elif "buy" in action["type"]:
             # Increment player gem stacks by returned_gems. Decrement board gem stacks by returned_gems.
@@ -198,7 +197,7 @@ class SplendorGameRule(GameRule):
             score -= card.points
 
 
-        if action["noble"]:
+        if action["noble"] is not None:
             # Remove noble from board. Add noble to player's stack. Like cards, nobles aren't hashable due to possessing
             # dictionaries (i.e. resource costs). Therefore, locate and delete the noble via unique code.
             # Add noble's points to agent score.
@@ -523,8 +522,8 @@ class SplendorGameRule(GameRule):
         # There is a max 15 actions that can be generated here (15 possible cards to be bought: 12 dealt + 3 reserved).
         # However, in the case that multiple nobles are made candidates for visiting with this move, this number will
         # be multiplied accordingly. This however, is a rare event.
-        for row, deck in enumerate(board.dealt):
-            for col, card in enumerate(deck + agent.cards["yellow"]):
+        for row, deck in enumerate(board.dealt + [agent.cards["yellow"]]):
+            for col, card in enumerate(deck):
                 if not card or len(agent.cards[card.colour]) == 7:
                     continue
                 returned_gems = self.resources_sufficient(
