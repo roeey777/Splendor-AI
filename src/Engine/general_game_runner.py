@@ -263,10 +263,11 @@ def run(options, msg):
 
     # import GameRule
     try:
-        model = importlib.import_module(f"{game_name}.{game_name.lower()}_model")
+        model_name = f"Engine.{game_name}.{game_name.lower()}_model"
+        model = importlib.import_module(model_name)
         GameRule = getattr(model, f"{game_name}GameRule")
         displayer = importlib.import_module(
-            f"{game_name}.{game_name.lower()}_displayer"
+            f"Engine.{game_name}.{game_name.lower()}_displayer"
         )
         TextDisplayer = getattr(displayer, "TextDisplayer")
         GUIDisplayer = getattr(displayer, "GUIDisplayer")
@@ -486,7 +487,7 @@ def loadParameter():
         "-a",
         "--agents",
         help="A list of the agents, etc, agents.myteam.player",
-        default="agents.generic.random,agents.generic.random",
+        default="Engine.agents.generic.random,Engine.agents.generic.random",
     )
 
     # parser.add_option('--redName', help='Red agent name', default='Red')

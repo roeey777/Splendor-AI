@@ -1,3 +1,1 @@
-graft Engine/Splendor/resources
-# graft Engine/img
-# graft Engine/wiki-template
+graft src/Engine/Splendor/resources
