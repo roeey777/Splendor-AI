@@ -7,9 +7,6 @@ from template import Agent
 DEPTH = 2
 
 class myAgent(Agent):
-    def __init__(self, _id):
-        super().__init__(_id)
-
     def SelectAction(self, actions, game_state, game_rule):
         assert len(game_state.agents) == 2
         return self.select_action_recursion(game_state, game_rule, DEPTH)[0]
@@ -44,13 +41,15 @@ class myAgent(Agent):
                 if action_value > best_value:
                     best_value = action_value
                     best_action = action
-                if best_value >= beta:
+                alpha = max(alpha, best_value)
+                if beta <= alpha:
                     break
             else:
                 if action_value < best_value:
                     best_value = action_value
                     best_action = action
-                if best_value <= alpha:
+                beta = min(beta, best_value)
+                if beta <= alpha:
                     break
 
         return best_action, best_value
@@ -64,10 +63,12 @@ class myAgent(Agent):
         color_cost_factor = 0.1
         reward = 0
 
-        if agent_state.score >= 15:
-            return 99999 + agent_state.score
-        if state.agents[1 - self.id].score >= 15:
-            return -99999 - state.agents[1 - self.id].score
+        max_score = max(agent.score for agent in state.agents)
+        if max_score >= 15:
+            reward = 99999 + max_score
+            if max_score > agent_state.score:
+                reward *= -1
+            return reward
         if sum(agent_state.gems.values()) >= 8:
             gems_factor = -0.7
         gems_var = np.var(list(agent_state.gems.values()))
