@@ -7,7 +7,4 @@ dependencies:
   - python=3.12.5
   - pip=24.2
   - pip:
-      - func_timeout==4.3.5
-      - gitpython==3.1.43
-      - pytz==2024.1
-
+      - -r requirements.txt
