@@ -10,7 +10,7 @@
 import random, itertools, copy
 from .splendor_utils import *
 from Engine.template import GameState, GameRule
-import Splendor.splendor_utils as utils
+# from . import splendor_utils as utils
 
 # CLASS DEF ----------------------------------------------------------------------------------------------------------#
 
