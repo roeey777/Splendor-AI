@@ -121,9 +121,11 @@ class Game:
                     # If this is the agent's first turn, allow warmup time.
                     try:
                         selected = func_timeout(
-                            WARMUP
-                            if action_counter < len(self.agents)
-                            else self.time_limit,
+                            (
+                                WARMUP
+                                if action_counter < len(self.agents)
+                                else self.time_limit
+                            ),
                             agent.SelectAction,
                             args=(actions_copy, gs_copy),
                         )

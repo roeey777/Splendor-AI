@@ -19,13 +19,14 @@ import datetime
 import time
 import pickle
 import random
+import contextlib
 import git
 import shutil
 import logging
 import pytz
 import json
-from template import Agent as DummyAgent
-from game import Game, GameReplayer
+from .template import Agent as DummyAgent
+from .game import Game, GameReplayer
 from optparse import OptionParser
 
 
@@ -163,6 +164,7 @@ def loadAgent(matches, superQuiet=True):
     num_of_agents = len(teams)
     agents = [None] * num_of_agents
     valid_game = True
+
     for i in range(num_of_agents):
         agent_temp = None
         try:
@@ -221,6 +223,16 @@ class HidePrint:
         sys.stderr = sys.stdout
 
 
+@contextlib.contextmanager
+def add_cwd_to_sys_path():
+    try:
+        cwd = os.path.abspath(os.getcwd())
+        sys.path.append(cwd)
+        yield
+    finally:
+        sys.path.remove(cwd)
+
+
 def run(options, msg):
     num_of_agents = options.num_of_agents
 
@@ -263,10 +275,11 @@ def run(options, msg):
 
     # import GameRule
     try:
-        model = importlib.import_module(f"{game_name}.{game_name.lower()}_model")
+        model_name = f"Engine.{game_name}.{game_name.lower()}_model"
+        model = importlib.import_module(model_name)
         GameRule = getattr(model, f"{game_name}GameRule")
         displayer = importlib.import_module(
-            f"{game_name}.{game_name.lower()}_displayer"
+            f"Engine.{game_name}.{game_name.lower()}_displayer"
         )
         TextDisplayer = getattr(displayer, "TextDisplayer")
         GUIDisplayer = getattr(displayer, "GUIDisplayer")
@@ -307,9 +320,17 @@ def run(options, msg):
         # results = {"succ":valid_game}
         for game_num in range(options.multipleGames):
             game = {}
-            loaded_agents, valid_game = loadAgent(
-                matches, superQuiet=options.superQuiet
-            )
+
+            if options.absolute_imports:
+                loaded_agents, valid_game = loadAgent(
+                    matches, superQuiet=options.superQuiet
+                )
+            else:
+                # allow relative imports, add cwd to module search path.
+                with add_cwd_to_sys_path():
+                    loaded_agents, valid_game = loadAgent(
+                        matches, superQuiet=options.superQuiet
+                    )
 
             game.update({"valid_game": valid_game})
             random_seed = seed_list[seed_idx]
@@ -486,7 +507,7 @@ def loadParameter():
         "-a",
         "--agents",
         help="A list of the agents, etc, agents.myteam.player",
-        default="agents.generic.random,agents.generic.random",
+        default="Engine.agents.generic.random,Engine.agents.generic.random",
     )
 
     # parser.add_option('--redName', help='Red agent name', default='Red')
@@ -626,6 +647,12 @@ def loadParameter():
         help="Gives the user control over the Citrine agent's actions",
         default=False,
     )
+    parser.add_option(
+        "--absolute-imports",
+        action="store_true",
+        default=False,
+        help="All agents must be installed, don't allow for relative import of agents.",
+    )
 
     options, otherjunk = parser.parse_args(sys.argv[1:])
     assert len(otherjunk) == 0, "Unrecognized options: " + str(otherjunk)
@@ -637,7 +664,7 @@ def loadParameter():
 # MAIN ---------------------------------------------------------------------------------------------------------------#
 
 
-if __name__ == "__main__":
+def main():
     """
     The main function called when advance_model.py is run
     from the command line:
@@ -653,6 +680,10 @@ if __name__ == "__main__":
     matches = run(options, msg)
     # with open("output/matches.json",'w') as f:
     #     json.dump(matches,f)
+
+
+if __name__ == "__main__":
+    main()
 
 
 # END FILE -----------------------------------------------------------------------------------------------------------#

@@ -1,5 +1,5 @@
-from template import Agent
-import time
+from Engine.template import Agent
+import random
 
 
 class myAgent(Agent):
@@ -7,5 +7,4 @@ class myAgent(Agent):
         super().__init__(_id)
 
     def SelectAction(self, actions, game_state, game_rule):
-        time.sleep(2)
-        return actions[0]
+        return random.choice(actions)

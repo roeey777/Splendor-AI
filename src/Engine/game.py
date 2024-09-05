@@ -7,9 +7,9 @@
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
 import random, copy, time
-from template import GameState
+from .template import GameState
 from func_timeout import func_timeout, FunctionTimedOut
-from template import Agent as DummyAgent
+from .template import Agent as DummyAgent
 
 # CONSTANTS ----------------------------------------------------------------------------------------------------------#
 
@@ -146,9 +146,11 @@ class Game:
                     # If this is the agent's first turn, allow warmup time.
                     try:
                         selected = func_timeout(
-                            WARMUP
-                            if action_counter < len(self.agents)
-                            else self.time_limit,
+                            (
+                                WARMUP
+                                if action_counter < len(self.agents)
+                                else self.time_limit
+                            ),
                             agent.SelectAction,
                             args=(actions_copy, gs_copy, self.game_rule),
                         )

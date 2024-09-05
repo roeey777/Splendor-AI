@@ -8,9 +8,8 @@
 
 
 import random, itertools, copy
-from Splendor.splendor_utils import *
-from template import GameState, GameRule
-import Splendor.splendor_utils as utils
+from .splendor_utils import *
+from Engine.template import GameState, GameRule
 
 # CLASS DEF ----------------------------------------------------------------------------------------------------------#
 

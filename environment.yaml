@@ -1,0 +1,10 @@
+name: splendor
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy=1.26.4
+  - python=3.12.5
+  - pip=24.2
+  - pip:
+      - -r requirements.txt

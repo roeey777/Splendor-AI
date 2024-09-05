@@ -1,4 +1,5 @@
-from template import Agent
+from Engine.template import Agent
+import time
 
 
 class myAgent(Agent):
@@ -6,4 +7,5 @@ class myAgent(Agent):
         super().__init__(_id)
 
     def SelectAction(self, actions, game_state, game_rule):
+        time.sleep(2)
         return actions[0]
