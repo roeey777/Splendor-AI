@@ -61,7 +61,7 @@ class Agent(object):
     # Given a set of available actions for the agent to execute, and
     # a copy of the current game state (including that of the agent),
     # select one of the actions to execute.
-    def SelectAction(self, actions, game_state):
+    def SelectAction(self, actions, game_state, game_rule):
         return random.choice(actions)
 
 

@@ -10,7 +10,6 @@
 import random, itertools, copy
 from .splendor_utils import *
 from Engine.template import GameState, GameRule
-import Splendor.splendor_utils as utils
 
 # CLASS DEF ----------------------------------------------------------------------------------------------------------#
 
@@ -89,7 +88,7 @@ class SplendorState(GameState):
 
         def deal(self, deck_id):
             if len(self.decks[deck_id]):
-                random.shuffle(self.decks[deck_id])
+                # random.shuffle(self.decks[deck_id])
                 return self.decks[deck_id].pop()
             return None
 
@@ -147,6 +146,71 @@ class SplendorGameRule(GameRule):
 
     def initialGameState(self):
         return SplendorState(self.num_of_agent)
+
+    def generatePredecessor(self, state, action, agent_id):
+        agent = state.agents[agent_id]
+        board = state.board
+        agent.last_action = action  # Record last action such that other agents can make use of this information.
+        score = 0
+
+        if "card" in action:
+            card = action["card"]
+
+        if "collect" in action["type"] or action["type"] == "reserve":
+            # Increment board gem stacks by collected_gems. Decrement player gem stacks by collected_gems.
+            for colour, count in action["collected_gems"].items():
+                board.gems[colour] += count
+                agent.gems[colour] -= count
+            # Increment player gem stacks by returned_gems. Decrement board gem stacks by returned_gems.
+            for colour, count in action["returned_gems"].items():
+                agent.gems[colour] += count
+                board.gems[colour] -= count
+
+            if action["type"] == "reserve":
+                i, j = action["card_position"]
+                # Card drawn from deck, will be returned to it
+                bought_card = board.dealt[i][j]
+                board.decks[bought_card.deck_id].append(bought_card)
+                # Remove card from reserved cards
+                agent.cards["yellow"].remove(card)
+                board.dealt[i][j] = card
+
+        elif "buy" in action["type"]:
+            # Increment player gem stacks by returned_gems. Decrement board gem stacks by returned_gems.
+            for colour, count in action["returned_gems"].items():
+                agent.gems[colour] += count
+                board.gems[colour] -= count
+            # If buying one of the available cards on the board, set removed card slot to new dealt card.
+            # Since the board may have None cards (empty slots that cannot be filled), check cards first.
+            if "available" in action["type"]:
+                i, j = action["card_position"]
+                bought_card = board.dealt[i][j]
+                board.decks[bought_card.deck_id].append(bought_card)
+                board.dealt[i][j] = card
+
+            # Else, agent bought a reserved card. Return card to player's yellow stack.
+            else:
+                agent.cards["yellow"].append(card)
+
+            agent.cards[card.colour].remove(card)
+            score -= card.points
+
+
+        if action["noble"] is not None:
+            # Remove noble from board. Add noble to player's stack. Like cards, nobles aren't hashable due to possessing
+            # dictionaries (i.e. resource costs). Therefore, locate and delete the noble via unique code.
+            # Add noble's points to agent score.
+            board.nobles.append(action["noble"])
+            agent.nobles.remove(action["noble"])
+            score -= 3
+
+        # Log this turn's action and any resultant score. Return updated gamestate.
+        # agent.agent_trace.action_reward.remove((action, -score))
+        # Removing last one because I belive it is more reliable
+        agent.agent_trace.action_reward.pop()
+        agent.score += score    # score is negative
+        agent.passed = action["type"] == "pass"
+        return state
 
     def generateSuccessor(self, state, action, agent_id):
         agent, board = state.agents[agent_id], state.board
@@ -432,18 +496,20 @@ class SplendorGameRule(GameRule):
             collected_gems = {"yellow": 1} if board.gems["yellow"] > 0 else {}
             return_combos = self.generate_return_combos(agent.gems, collected_gems)
             for returned_gems in return_combos:
-                for card in board.dealt_list():
-                    if card:
-                        for noble in potential_nobles:
-                            actions.append(
-                                {
-                                    "type": "reserve",
-                                    "card": card,
-                                    "collected_gems": collected_gems,
-                                    "returned_gems": returned_gems,
-                                    "noble": noble,
-                                }
-                            )
+                for row, deck in enumerate(board.dealt):
+                    for col, card in enumerate(deck):
+                        if card:
+                            for noble in potential_nobles:
+                                actions.append(
+                                    {
+                                        "type": "reserve",
+                                        "card": card,
+                                        "card_position": (row, col),
+                                        "collected_gems": collected_gems,
+                                        "returned_gems": returned_gems,
+                                        "noble": noble,
+                                    }
+                                )
 
         # Generate actions (buy card). Agents can buy cards if they can cover its resource cost. Resources can come from
         # an agent's gem and card stacks. Card stacks represent gem factories, or 'permanent gems'; if there are 2 blue
@@ -455,39 +521,39 @@ class SplendorGameRule(GameRule):
         # There is a max 15 actions that can be generated here (15 possible cards to be bought: 12 dealt + 3 reserved).
         # However, in the case that multiple nobles are made candidates for visiting with this move, this number will
         # be multiplied accordingly. This however, is a rare event.
-        for card in board.dealt_list() + agent.cards["yellow"]:
-            if not card or len(agent.cards[card.colour]) == 7:
-                continue
-            returned_gems = self.resources_sufficient(
-                agent, card.cost
-            )  # Check if this card is affordable.
-            if (
-                type(returned_gems) == dict
-            ):  # If a dict was returned, this means the agent possesses sufficient resources.
-                # Check to see if the acquisition of a new card has meant new nobles becoming candidates to visit.
-                new_nobles = []
-                for noble in board.nobles:
-                    agent_post_action = copy.deepcopy(agent)
-                    # Give the card featured in this action to a copy of the agent.
-                    agent_post_action.cards[card.colour].append(card)
-                    # Use this copied agent to check whether this noble can visit.
-                    if self.noble_visit(agent_post_action, noble):
-                        new_nobles.append(noble)  # If so, add noble to the new list.
-                if not new_nobles:
-                    new_nobles = [None]
-                for noble in new_nobles:
-                    actions.append(
-                        {
-                            "type": (
-                                "buy_reserve"
+        for row, deck in enumerate(board.dealt + [agent.cards["yellow"]]):
+            for col, card in enumerate(deck):
+                if not card or len(agent.cards[card.colour]) == 7:
+                    continue
+                returned_gems = self.resources_sufficient(
+                    agent, card.cost
+                )  # Check if this card is affordable.
+                if (
+                    type(returned_gems) == dict
+                ):  # If a dict was returned, this means the agent possesses sufficient resources.
+                    # Check to see if the acquisition of a new card has meant new nobles becoming candidates to visit.
+                    new_nobles = []
+                    for noble in board.nobles:
+                        agent_post_action = copy.deepcopy(agent)
+                        # Give the card featured in this action to a copy of the agent.
+                        agent_post_action.cards[card.colour].append(card)
+                        # Use this copied agent to check whether this noble can visit.
+                        if self.noble_visit(agent_post_action, noble):
+                            new_nobles.append(noble)  # If so, add noble to the new list.
+                    if not new_nobles:
+                        new_nobles = [None]
+                    for noble in new_nobles:
+                        actions.append(
+                            {
+                                "type": "buy_reserve"
                                 if card in agent.cards["yellow"]
-                                else "buy_available"
-                            ),
-                            "card": card,
-                            "returned_gems": returned_gems,
-                            "noble": noble,
-                        }
-                    )
+                                else "buy_available",
+                                "card": card,
+                                "card_position": (row, col),
+                                "returned_gems": returned_gems,
+                                "noble": noble,
+                            }
+                        )
 
         # Return list of actions. If there are no actions (almost impossible), all this player can do is pass.
         # A noble is still permitted to visit if conditions are met.

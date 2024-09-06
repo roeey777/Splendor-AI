@@ -10,8 +10,8 @@ from dataclasses import dataclass
 from typing import List, Literal, Dict
 from numbers import Number
 
-from .splendor_model import Card, SplendorState
-from .splendor_utils import COLOURS
+from Engine.splendor_model import Card, SplendorState
+from Engine.splendor_utils import COLOURS
 
 
 @dataclass
