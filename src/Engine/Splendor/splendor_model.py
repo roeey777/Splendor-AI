@@ -147,6 +147,25 @@ class SplendorGameRule(GameRule):
     def initialGameState(self):
         return SplendorState(self.num_of_agent)
 
+    def get_potential_nobles(self, state, agent_id):
+        """
+        Return a list of all potential nobles who can visit a specific agent.
+        In case when no noble can visit the specified agent the following list
+        will be returned [None].
+        """
+        agent = state.agents[agent_id]
+        board = state.board
+
+        potential_nobles = []
+        for noble in board.nobles:
+            if self.noble_visit(agent, noble):
+                potential_nobles.append(noble)
+
+        if len(potential_nobles) == 0:
+            potential_nobles = [None]
+
+        return potential_nobles
+
     def generatePredecessor(self, state, action, agent_id):
         agent = state.agents[agent_id]
         board = state.board
@@ -195,7 +214,6 @@ class SplendorGameRule(GameRule):
             agent.cards[card.colour].remove(card)
             score -= card.points
 
-
         if action["noble"] is not None:
             # Remove noble from board. Add noble to player's stack. Like cards, nobles aren't hashable due to possessing
             # dictionaries (i.e. resource costs). Therefore, locate and delete the noble via unique code.
@@ -208,7 +226,7 @@ class SplendorGameRule(GameRule):
         # agent.agent_trace.action_reward.remove((action, -score))
         # Removing last one because I belive it is more reliable
         agent.agent_trace.action_reward.pop()
-        agent.score += score    # score is negative
+        agent.score += score  # score is negative
         agent.passed = action["type"] == "pass"
         return state
 
@@ -419,12 +437,14 @@ class SplendorGameRule(GameRule):
         # this, and in the exceedingly rare case that there are multiple nobles waiting (meaning that, at the last turn,
         # this agent had the choice of at least 3 nobles), multiply all generated actions by these nobles to allow the
         # agent to choose again.
-        potential_nobles = []
-        for noble in board.nobles:
-            if self.noble_visit(agent, noble):
-                potential_nobles.append(noble)
-        if len(potential_nobles) == 0:
-            potential_nobles = [None]
+
+        # potential_nobles = []
+        # for noble in board.nobles:
+        #     if self.noble_visit(agent, noble):
+        #         potential_nobles.append(noble)
+        # if len(potential_nobles) == 0:
+        #     potential_nobles = [None]
+        potential_nobles = self.get_potential_nobles(game_state, agent_id)
 
         # Generate actions (collect up to 3 different gems). Work out all legal combinations. Theoretical max is 10.
         available_colours = [
@@ -539,7 +559,9 @@ class SplendorGameRule(GameRule):
                         agent_post_action.cards[card.colour].append(card)
                         # Use this copied agent to check whether this noble can visit.
                         if self.noble_visit(agent_post_action, noble):
-                            new_nobles.append(noble)  # If so, add noble to the new list.
+                            new_nobles.append(
+                                noble
+                            )  # If so, add noble to the new list.
                     if not new_nobles:
                         new_nobles = [None]
                     for noble in new_nobles:
