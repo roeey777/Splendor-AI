@@ -170,7 +170,8 @@ class SplendorGameRule(GameRule):
                 i, j = action["card_position"]
                 # Card drawn from deck, will be returned to it
                 bought_card = board.dealt[i][j]
-                board.decks[bought_card.deck_id].append(bought_card)
+                if bought_card is not None:
+                    board.decks[bought_card.deck_id].append(bought_card)
                 # Remove card from reserved cards
                 agent.cards["yellow"].remove(card)
                 board.dealt[i][j] = card
@@ -185,7 +186,8 @@ class SplendorGameRule(GameRule):
             if "available" in action["type"]:
                 i, j = action["card_position"]
                 bought_card = board.dealt[i][j]
-                board.decks[bought_card.deck_id].append(bought_card)
+                if bought_card is not None:
+                    board.decks[bought_card.deck_id].append(bought_card)
                 board.dealt[i][j] = card
 
             # Else, agent bought a reserved card. Return card to player's yellow stack.
