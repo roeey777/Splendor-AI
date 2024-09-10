@@ -1,4 +1,3 @@
-from copy import deepcopy
 from pathlib import Path
 
 from Engine.Splendor.features import extract_metrics
@@ -9,65 +8,78 @@ from genes import ManagerGene, StrategyGene
 
 
 
-MANAGER_PATH = "manager.npy"
-STRATEGY_1_PATH = "strategy1.npy"
-STRATEGY_2_PATH = "strategy2.npy"
-STRATEGY_3_PATH = "strategy3.npy"
-
-
-
 class GeneAlgoAgent(Agent):
+    """
+    Agent which plays according to a "plan" reached by genetic algorithm.
+    This agent is also used to represent an individual in the evolution
+    process.
+    We decided to describe an agents plan using 4 genes: 3 of them are used to
+    evaluate actions and choose one from an available actions list and the
+    forth used to assess the current situation and choose one of the 3
+    strategies.
+    """
+    MANAGER_PATH = Path(__file__).parent / "manager.npy"
+    STRATEGY_1_PATH = Path(__file__).parent / "strategy1.npy"
+    STRATEGY_2_PATH = Path(__file__).parent / "strategy2.npy"
+    STRATEGY_3_PATH = Path(__file__).parent / "strategy3.npy"
+
+
     def __init__(self, _id, manager=None,
                  strategy1=None, strategy2=None, strategy3=None):
         super().__init__(_id)
 
         if manager is None:
-            self._manager_gene = ManagerGene.load(MANAGER_PATH)
+            self._manager_gene = ManagerGene.load(self.MANAGER_PATH)
         else:
             self._manager_gene = manager
 
         if strategy1 is None:
-            self._strategy_gene_1 = StrategyGene.load(STRATEGY_1_PATH)
+            self._strategy_gene_1 = StrategyGene.load(self.STRATEGY_1_PATH)
         else:
             self._strategy_gene_1 = strategy1
 
         if strategy2 is None:
-            self._strategy_gene_2 = StrategyGene.load(STRATEGY_2_PATH)
+            self._strategy_gene_2 = StrategyGene.load(self.STRATEGY_2_PATH)
         else:
             self._strategy_gene_2 = strategy2
 
         if strategy3 is None:
-            self._strategy_gene_3 = StrategyGene.load(STRATEGY_3_PATH)
+            self._strategy_gene_3 = StrategyGene.load(self.STRATEGY_3_PATH)
         else:
             self._strategy_gene_3 = strategy3
 
-        self._strategies = [
+        self._strategies = (
             self._strategy_gene_1,
             self._strategy_gene_2,
             self._strategy_gene_3,
-        ]
+        )
 
 
     def __hash__(self):
+        """
+        Basically hash on the identity of the object.
+        Used when evaluating an individual.
+        """
         return hash(f"{id(self)}:{id(self._strategies)}")
 
 
     def save(self, folder: Path):
-        self._manager_gene.save(folder / MANAGER_PATH)
-        self._strategy_gene_1.save(folder / STRATEGY_1_PATH)
-        self._strategy_gene_2.save(folder / STRATEGY_2_PATH)
-        self._strategy_gene_3.save(folder / STRATEGY_3_PATH)
+        """
+        Saves the genes of the given agent to the provided folder.
+        Used for evolution.
+        """
+        self._manager_gene.save(folder / self.MANAGER_PATH.name)
+        self._strategy_gene_1.save(folder / self.STRATEGY_1_PATH.name)
+        self._strategy_gene_2.save(folder / self.STRATEGY_2_PATH.name)
+        self._strategy_gene_3.save(folder / self.STRATEGY_3_PATH.name)
 
 
     def evaluate_action(self, strategy, action, game_state, game_rule):
-        # Fix this - use `game_rule.generate_predecessor` or an optimized metric
-        #            extraction method which gets both the action and the state.
-        original_agent_state = deepcopy(game_state.agents[self.id])
-        original_board = deepcopy(game_state.board)
-
+        """
+        Evaluates an `action` by the metrcis of the game's state after the
+        action. The `strategy` is used to evaluate the state.
+        """
         next_state = game_rule.generateSuccessor(game_state, action, self.id)
-        # game_state.agents[agent_id] = original_agent_state
-        # game_state.board = original_board
         next_metrics = extract_metrics(next_state, self.id)
         evaluation = strategy.evaluate_state(next_metrics)
         game_rule.generatePredecessor(game_state, action, self.id)
@@ -76,6 +88,9 @@ class GeneAlgoAgent(Agent):
 
 
     def SelectAction(self, actions, game_state, game_rule):
+        """
+        Method used by the game's engine when running a game with this agent.
+        """
         if not actions:
             raise Exception("Cannot play, no actions")
 
@@ -95,4 +110,5 @@ class GeneAlgoAgent(Agent):
         return best_action
 
 
+# Required for the game engine to use this agent
 myAgent = GeneAlgoAgent
