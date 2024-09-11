@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from csv import writer as csv_writer
 from datetime import datetime
 from multiprocessing import cpu_count, Pool
 from pathlib import Path
@@ -24,6 +25,21 @@ FOLDER_FORMAT = '%y-%m-%d_%H-%M-%S'
 # RETURN_SIZE = (POPULATION_SIZE // 12) or 1
 WINNER_BONUS = 10
 MAX_PROCESS = cpu_count() // 2
+STATS_FILE = "stats.csv"
+STATS_HEADERS = (
+    "generation",
+    "players_count",
+    "rounds_count",
+    "nobles_taken",
+    "scores_mean",
+    "player1_score",
+    "player2_score",
+    "player3_score",
+    "player4_score",
+    "tier1_left",
+    "tier2_left",
+    "tier3_left",
+)
 
 
 class MyGameRule(SplendorGameRule):
@@ -178,6 +194,7 @@ def evaluate(
     other. Each individual plays in 3 games with 1,2 and 3 rivals.
     """
     pool = list()
+    games_stats = list()
     evaluation = [0] * len(population)
 
     for players_count in PLAYERS_OPTIONS:
@@ -196,7 +213,23 @@ def evaluate(
                 if result["scores"][agent.id] == max_score:
                     evaluation[agent.population_id] += WINNER_BONUS
 
-    return evaluation
+            stats = [
+                players_count,
+                len(result["actions"]) // players_count,
+                players_count + 1 - len(game.game_rule.current_game_state.board.nobles),
+                np.mean(tuple(result["scores"].values()))
+            ]
+            stats.extend(result["scores"].get(i, "None")
+                         for i in range(FOUR_PLAYERS))
+            cards_in_play = zip(
+                game.game_rule.current_game_state.board.decks,
+                game.game_rule.current_game_state.board.dealt
+            )
+            stats.extend(len(deck) + len(tuple(filter(None, dealt)))
+                         for deck, dealt in cards_in_play)
+            games_stats.append(stats)
+
+    return evaluation, games_stats
 
 
 def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAgent]:
@@ -228,14 +261,14 @@ def sort_by_fitness(
     message: str,
     quiet: bool,
     multiprocess: bool,
-):
+) -> list[list]:
     if not quiet:
         print(message)
 
     for i, agent in enumerate(population):
         agent.population_id = i
 
-    evaluation = evaluate(population, quiet, multiprocess)
+    evaluation, games_stats = evaluate(population, quiet, multiprocess)
     population.sort(key=lambda agent: evaluation[agent.population_id],
                     reverse=True)
 
@@ -244,6 +277,8 @@ def sort_by_fitness(
               f'({evaluation[population[0].population_id]})')
     folder.mkdir()
     population[0].save(folder)
+
+    return games_stats
 
 
 def evolve(
@@ -275,23 +310,39 @@ def evolve(
         print(f"    selection:  {selection_size}")
     population = generate_initial_population(population_size)
 
-    for generation in range(generations):
-        progress = generation / generations
-        generation += 1
-        sort_by_fitness(population,
-                        folder / str(generation),
-                        f'Gen {generation}',
-                        quiet,
-                        multiprocess)
+    with open(folder / STATS_FILE, "w", newline="\n") as stats_file:
+        stats_csv = csv_writer(stats_file)
+        stats_csv.writerow(STATS_HEADERS)
 
-        parents = population[:selection_size]
-        np.random.shuffle(parents)
-        children = mate(parents, population_size)
-        population = parents + children
-        np.random.shuffle(population)
-        mutate_population(population, progress, mutation_rate)
+        for generation in range(generations):
+            progress = generation / generations
+            generation += 1
+            games_stats = sort_by_fitness(population,
+                                          folder / str(generation),
+                                          f'Gen {generation}',
+                                          quiet,
+                                          multiprocess)
 
-    sort_by_fitness(population, folder / "final", "Final", quiet, multiprocess)
+            for stats in games_stats:
+                stats.insert(0, generation)
+                stats_csv.writerow(stats)
+
+            parents = population[:selection_size]
+            np.random.shuffle(parents)
+            children = mate(parents, population_size)
+            population = parents + children
+            np.random.shuffle(population)
+            mutate_population(population, progress, mutation_rate)
+
+        games_stats = sort_by_fitness(population,
+                                      folder / "final",
+                                      "Final",
+                                      quiet,
+                                      multiprocess)
+        for stats in games_stats:
+            stats.insert(0, "final")
+            stats_csv.writerow(stats)
+
     if not quiet:
         print(f"Done (run time was {datetime.now() - start_time})")
     return population[:return_size]
