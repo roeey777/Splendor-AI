@@ -2,12 +2,12 @@ from argparse import ArgumentParser
 from datetime import datetime
 from pathlib import Path
 
+from Engine.agents.our_agents.genetic_algorithm.genes import Gene, ManagerGene, StrategyGene
+from Engine.agents.our_agents.genetic_algorithm.genetic_algorithem_agent import GeneAlgoAgent
 from Engine.game import Game
 from Engine.Splendor.splendor_model import SplendorGameRule
 import numpy as np
 
-from genes import Gene, ManagerGene, StrategyGene
-from genetic_algorithem_agent import GeneAlgoAgent
 
 
 POPULATION_SIZE = 24 # 60

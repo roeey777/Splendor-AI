@@ -1,10 +1,10 @@
 from pathlib import Path
 
+from Engine.agents.our_agents.genetic_algorithm.genes import ManagerGene, StrategyGene
 from Engine.Splendor.features import extract_metrics
 from Engine.template import Agent
 import numpy as np
 
-from genes import ManagerGene, StrategyGene 
 
 
 
