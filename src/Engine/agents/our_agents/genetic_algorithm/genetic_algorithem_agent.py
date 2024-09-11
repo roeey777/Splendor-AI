@@ -98,15 +98,16 @@ class GeneAlgoAgent(Agent):
         strategy = self._manager_gene.select_strategy(metrics,
                                                       self._strategies)
         best_action = None
-        best_action_value = None
+        best_action_value = -np.inf
 
         for action in actions:
             action_value = self.evaluate_action(strategy, action, game_state, game_rule)
 
-            if best_action is None or action_value > best_action_value:
+            if action_value > best_action_value:
                 best_action = action
                 best_action_value = action_value
 
+        assert best_action is not None
         return best_action
 
 
