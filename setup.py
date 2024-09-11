@@ -13,6 +13,7 @@ setup(
     entry_points={
         "console_scripts": [
             "splendor = Engine.general_game_runner:main",
+            "evolve = Engine.agents.our_agents.genetic_algorithm.evolve:main",
         ],
     },
 )
