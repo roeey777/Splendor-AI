@@ -133,8 +133,7 @@ class Game:
                 # If freedom is given to agents, let them return any action in any time period, at the risk of breaking
                 # the simulation. This can be useful for debugging purposes.
                 if FREEDOM:
-                    selected = agent.SelectAction(actions_copy, gs_copy,
-                                                  self.game_rule)
+                    selected = agent.SelectAction(actions_copy, gs_copy, self.game_rule)
                 else:
                     # "Gamemaster" agent has an agent index equal to the number of player agents in the game.
                     # If the gamemaster acts (e.g. to start or end a round in Azul), let it do so uninhibited.

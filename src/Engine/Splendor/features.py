@@ -57,8 +57,9 @@ def get_agent(game_state: SplendorState, agent_index: int) -> SplendorState.Agen
 
 
 def agent_buying_power(agent) -> Dict[Color, int]:
-    return {color: agent.gems[color] + len(agent.cards[color])
-            for color in NORMAL_COLORS}
+    return {
+        color: agent.gems[color] + len(agent.cards[color]) for color in NORMAL_COLORS
+    }
 
 
 def find_missing_gems(
@@ -387,10 +388,14 @@ def distance_to_noble(
     return max(0, distance)
 
 
-def missing_gems_to_card(card: Card, buying_power: Dict[Color, int]) -> [Dict[Color, int]]:
-    return {color: cost - buying_power[color]
-            for color, cost in card.cost.items()
-            if cost - buying_power[color] > 0}
+def missing_gems_to_card(
+    card: Card, buying_power: Dict[Color, int]
+) -> [Dict[Color, int]]:
+    return {
+        color: cost - buying_power[color]
+        for color, cost in card.cost.items()
+        if cost - buying_power[color] > 0
+    }
 
 
 def turns_to_buy_card(missing_gems: ValuesView[int]) -> int:
@@ -399,9 +404,7 @@ def turns_to_buy_card(missing_gems: ValuesView[int]) -> int:
     return max(np.ceil(sum(missing_gems) / 3), *missing_gems)
 
 
-def extract_metrics(
-    game_state: SplendorState, agent_index: int
-) -> np.array:
+def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
     agent = get_agent(game_state, agent_index)
     wild_gems = agent.gems[WILDCARD]
     buying_power = agent_buying_power(agent)
@@ -432,9 +435,7 @@ def extract_metrics(
         card_missing_gems = missing_gems_to_card(card, buying_power)
         distance_in_gems = sum(card_missing_gems.values())
         reserved_distances_in_gems[i] = distance_in_gems
-        reserved_distances_in_turns[i] = turns_to_buy_card(
-            card_missing_gems.values()
-        )
+        reserved_distances_in_turns[i] = turns_to_buy_card(card_missing_gems.values())
         card_distance_per_color[card.colour].append(distance_in_gems)
 
     for distances in card_distance_per_color.values():
@@ -443,9 +444,11 @@ def extract_metrics(
     nobles_distances_in_cards = [MAX_NOBLE_DISTANCE] * MAX_NOBLES
     nobles_distances_in_gems = [MAX_NOBLE_DISTANCE] * MAX_NOBLES
     for i, (_, noble_cost) in enumerate(game_state.board.nobles):
-        missing_cards = {color: cost - len(agent.cards[color])
-                         for color, cost in noble_cost.items()
-                         if cost - len(agent.cards[color]) > 0}
+        missing_cards = {
+            color: cost - len(agent.cards[color])
+            for color, cost in noble_cost.items()
+            if cost - len(agent.cards[color]) > 0
+        }
         nobles_distances_in_cards[i] = sum(missing_cards.values())
         distance_in_gems = 0
         for color, count in missing_cards.items():
@@ -462,48 +465,52 @@ def extract_metrics(
         elif i > agent_index:
             rivals_scores_2[i - 1] = rival.score
 
-    return np.fromiter(chain(
-        [
-            len(agent.agent_trace.action_reward),
-            agent.score,
-            WINNING_MULTIPLIER if agent.score >= WINNING_SCORE_TRESHOLD else 0,
-            owned_cards,
-            len(agent.cards[RESERVED]),
-            np.var(list(buying_power.values())),
-            wild_gems,
-        ],
-        buying_power.values(),
-        map(diminish_return, buying_power.values()),
-        rivals_scores_1,
-        rivals_scores_2,
-        cards_distances_in_gems,
-        cards_distances_in_turns,
-        reserved_distances_in_gems,
-        reserved_distances_in_turns,
-        nobles_distances_in_gems,
-        nobles_distances_in_cards,
-    ), float)
+    return np.fromiter(
+        chain(
+            [
+                len(agent.agent_trace.action_reward),
+                agent.score,
+                WINNING_MULTIPLIER if agent.score >= WINNING_SCORE_TRESHOLD else 0,
+                owned_cards,
+                len(agent.cards[RESERVED]),
+                np.var(list(buying_power.values())),
+                wild_gems,
+            ],
+            buying_power.values(),
+            map(diminish_return, buying_power.values()),
+            rivals_scores_1,
+            rivals_scores_2,
+            cards_distances_in_gems,
+            cards_distances_in_turns,
+            reserved_distances_in_gems,
+            reserved_distances_in_turns,
+            nobles_distances_in_gems,
+            nobles_distances_in_cards,
+        ),
+        float,
+    )
+
 
 METRICS_SHAPE = (
-    1, # agent's turns count
-    1, # agent's score
-    1, # agent has crossed 15 points
-    1, # agent's owned cards count
-    1, # agent's reserved cards count
-    1, # variance of buying power
-    1, # agent's wild gems count
-    len(NORMAL_COLORS), # agent's buying power (without wild gems)
-    len(NORMAL_COLORS), # agent's dimishing buying power (without wild gems)
-    MAX_RIVALS, # scores of rivals that play before agent
-    MAX_RIVALS, # scores of rivals that play after agent
-    MAX_TIER_CARDS, # distances to cards on tier 1 in gems
-    MAX_TIER_CARDS, # distances to cards on tier 2 in gems
-    MAX_TIER_CARDS, # distances to cards on tier 3 in gems
-    MAX_TIER_CARDS, # distances to cards on tier 1 in turns
-    MAX_TIER_CARDS, # distances to cards on tier 2 in turns
-    MAX_TIER_CARDS, # distances to cards on tier 3 in turns
-    MAX_RESERVED, # distances to reserved cards in gems
-    MAX_RESERVED, # distances to reserved cards in turns
-    MAX_NOBLES, # distances to nobles in gems
-    MAX_NOBLES, # distances to nobles in cards
+    1,  # agent's turns count
+    1,  # agent's score
+    1,  # agent has crossed 15 points
+    1,  # agent's owned cards count
+    1,  # agent's reserved cards count
+    1,  # variance of buying power
+    1,  # agent's wild gems count
+    len(NORMAL_COLORS),  # agent's buying power (without wild gems)
+    len(NORMAL_COLORS),  # agent's dimishing buying power (without wild gems)
+    MAX_RIVALS,  # scores of rivals that play before agent
+    MAX_RIVALS,  # scores of rivals that play after agent
+    MAX_TIER_CARDS,  # distances to cards on tier 1 in gems
+    MAX_TIER_CARDS,  # distances to cards on tier 2 in gems
+    MAX_TIER_CARDS,  # distances to cards on tier 3 in gems
+    MAX_TIER_CARDS,  # distances to cards on tier 1 in turns
+    MAX_TIER_CARDS,  # distances to cards on tier 2 in turns
+    MAX_TIER_CARDS,  # distances to cards on tier 3 in turns
+    MAX_RESERVED,  # distances to reserved cards in gems
+    MAX_RESERVED,  # distances to reserved cards in turns
+    MAX_NOBLES,  # distances to nobles in gems
+    MAX_NOBLES,  # distances to nobles in cards
 )

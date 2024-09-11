@@ -1,1 +1,2 @@
 graft src/Engine/Splendor/resources
+graft src/Engine/agents/our_agents/genetic_algorithm
