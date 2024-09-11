@@ -80,7 +80,7 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
 
 def mutate(gene: Gene, progress: float, mutate_rate: float):
     """
-    Matates a single gene.
+    Mutates a single gene.
     """
     def _mutate(value):
         """
@@ -200,9 +200,9 @@ def evolve(
     seed: int = None,
 ):
     """
-    Gentic algorithm evolution process.
+    Genetic algorithm evolution process.
     In each generation `selection_size` are kept and used for mating.
-    Returns the top `return_size` individuls of the last generation.
+    Returns the top `return_size` individuals of the last generation.
     """
     if seed is not None:
         np.random.seed(seed)
@@ -266,9 +266,9 @@ def main():
         raise ValueError("To work properly, population size should be a "
                          f"multiple of 12 (not {options.population_size})")
     if options.generations <= 0:
-        raise ValueError(f"Ivalid amount of generations {options.generations}")
+        raise ValueError(f"Invalid amount of generations {options.generations}")
     if not 0 <= options.mutation_rate <= 1:
-        raise ValueError(f"Ivalid mutation rate value {options.mutation_rate}")
+        raise ValueError(f"Invalid mutation rate value {options.mutation_rate}")
 
     return evolve(**options.__dict__)
 
