@@ -2,11 +2,11 @@ from Engine.Splendor.features import METRICS_SHAPE
 import numpy as np
 
 
-
 class Gene:
     """
     A generic gene representation class.
     """
+
     LOWER_BOUND = -10
     UPPER_BOUND = 10
     SHAPE = None
@@ -33,16 +33,12 @@ class Gene:
 
         return self._prepared_dna
 
-
     @classmethod
     def random(cls):
         """
         Initiat a gene with random DNA.
         """
-        return cls(np.random.uniform(cls.LOWER_BOUND,
-                                     cls.UPPER_BOUND,
-                                     cls.SHAPE))
-
+        return cls(np.random.uniform(cls.LOWER_BOUND, cls.UPPER_BOUND, cls.SHAPE))
 
     @classmethod
     def load(cls, path_or_file):
@@ -51,13 +47,11 @@ class Gene:
         """
         return cls(np.load(path_or_file))
 
-
     def save(self, path_or_file):
         """
         Saves a gene's DNA to a file.
         """
         np.save(path_or_file, self._dna)
-
 
     def mutate(self, mutate_rate: float, mutator):
         """
@@ -71,11 +65,11 @@ class Gene:
         self._prepared_dna = None
 
 
-
 class StrategyGene(Gene):
     """
     Represent a gene that helps to choose an action each turn.
     """
+
     SHAPE = (len(METRICS_SHAPE),)
 
     def evaluate_state(self, state_metrics):
@@ -85,20 +79,22 @@ class StrategyGene(Gene):
         return np.matmul(state_metrics, self.dna)
 
 
-
 class ManagerGene(Gene):
     """
     Represent a gene that helps to choose a strategy to follow (from 3 options)
     """
+
     SHAPE = (len(METRICS_SHAPE), 3)
 
-    def select_strategy(self, state_metrics, strategies: tuple[StrategyGene]) -> StrategyGene:
+    def select_strategy(
+        self, state_metrics, strategies: tuple[StrategyGene]
+    ) -> StrategyGene:
         # output = np.exp(np.matmul(state_metrics, self.dna))
         # softmax_out = output / np.sum(output)
         # assert len(output) == len(strategies), "Mismatching lengths"
         # index = max(range(len(output)), key = lambda i: softmax_out[i])
         output = np.matmul(state_metrics, self.dna)
         assert len(output) == len(strategies), "Mismatching lengths"
-        index = max(range(len(output)), key = lambda i: output[i])
+        index = max(range(len(output)), key=lambda i: output[i])
 
         return strategies[index]

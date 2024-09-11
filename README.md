@@ -87,3 +87,31 @@ just add the ```-t``` option, for example:
 ```
 splendor -a Engine.agents.generic.random,Engine.agents.generic.first_move --agent_names=random,first_move -t
 ```
+
+### Using Our Agents
+Interactively play against the trained genetic algorithm agent:
+```
+splendor -a Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent --agent_names=genetic,human --interactive
+```
+
+Let the genetic algorithm agent play against minimax (with alpha-beta pruning) agent:
+```
+splendor -a Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent,Engine.agents.our_agents.minmax --agent_names=genetic,minimax
+```
+
+Let the genetic algorithm agent play against minimax (with alpha-beta pruning) agent for 10 consecutive games (only text display):
+```
+splendor -a Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent,Engine.agents.our_agents.minmax --agent_names=genetic,minimax -t -m 10
+```
+
+## Training Our Agents:
+### Training The Genetic Algorithm Agent:
+In order to train the genetic algorithm agent with the following hyper-parameters:
+1. Specify the population size in each generation to be 24 (should be a multiple of 12).
+2. Train for 20 generations.
+3. Fix the mutation rate chance to be 0.1(%).
+4. Use a fixed random seed.
+Use the following command:
+```
+evolve --population-size 24 --generations 20 --mutation-rate 0.1 --seed 1234
+```
