@@ -55,14 +55,6 @@ class GeneAlgoAgent(Agent):
         )
 
 
-    def __hash__(self):
-        """
-        Basically hash on the identity of the object.
-        Used when evaluating an individual.
-        """
-        return hash(f"{id(self)}:{id(self._strategies)}")
-
-
     def save(self, folder: Path):
         """
         Saves the genes of the given agent to the provided folder.

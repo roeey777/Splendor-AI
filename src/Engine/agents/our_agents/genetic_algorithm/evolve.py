@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from datetime import datetime
+from multiprocessing import cpu_count, Pool
 from pathlib import Path
 
 from Engine.agents.our_agents.genetic_algorithm.genes import Gene, ManagerGene, StrategyGene
@@ -22,7 +23,7 @@ FOLDER_FORMAT = '%y-%m-%d_%H-%M-%S'
 # SELECTION = (POPULATION_SIZE // 3) or 2
 # RETURN_SIZE = (POPULATION_SIZE // 12) or 1
 WINNER_BONUS = 10
-
+MAX_PROCESS = cpu_count() // 2
 
 
 class MyGameRule(SplendorGameRule):
@@ -106,7 +107,7 @@ def mutate_population(population: list[GeneAlgoAgent],
         mutate(agent._strategy_gene_3, progress, mutation_rate)
 
 
-def single_game(agents):
+def single_game(agents) -> tuple[Game, dict]:
     """
     Runs a single game of Splendor (with the Engine) using the given agents.
     """
@@ -118,40 +119,82 @@ def single_game(agents):
     game = Game(MyGameRule, agents, len(agents),
                 seed=np.random.randint(1e8, dtype=int),
                 agents_namelist=names)
-    return game.Run()
+    return game, game.Run()
 
 
 def generate_initial_population(population_size: int):
     """
     Creates agents with random genes.
     """
-    return [GeneAlgoAgent(0, ManagerGene.random(), StrategyGene.random(),
+    return [GeneAlgoAgent(-1, ManagerGene.random(), StrategyGene.random(),
                           StrategyGene.random(), StrategyGene.random())
             for _ in range(population_size)]
 
 
-def evaluate(population: GeneAlgoAgent) -> dict[GeneAlgoAgent, int]:
+def _evalute_multiprocess(
+    population: list[GeneAlgoAgent], players_count: int,
+) -> list[tuple[Game, dict]]:
+    """
+    """
+    games = len(population) // players_count
+    if players_count == FOUR_PLAYERS:
+        agents_generator = (population[i : i + FOUR_PLAYERS]
+                            for i in range(0, len(population), FOUR_PLAYERS))
+    else:
+        agents_generator = (population[i::games]
+                            for i in range(games))
+
+    with Pool(MAX_PROCESS) as pool:
+        return pool.map(single_game, agents_generator)
+
+
+def _evalute(
+    population: list[GeneAlgoAgent], players_count: int, quiet: bool,
+) -> list[tuple[Game, dict]]:
+    """
+    """
+    results = list()
+    games = len(population) // players_count
+
+    for i in range(games):
+        if not quiet:
+            print(f"        game number {i+1} "
+                  f"({datetime.now().strftime(FOLDER_FORMAT)})")
+
+        if players_count == FOUR_PLAYERS:
+            agents = population[i * FOUR_PLAYERS: (i + 1) * FOUR_PLAYERS]
+        else:
+            agents = population[i::games]
+        results.append(single_game(agents))
+
+    return results
+
+
+def evaluate(
+    population: list[GeneAlgoAgent], quiet: bool, multiprocess: bool,
+) -> dict[GeneAlgoAgent, int]:
     """
     Measures the fitness of each individual by having them play against each
     other. Each individual plays in 3 games with 1,2 and 3 rivals.
     """
-    evaluation = dict.fromkeys(population, 0)
+    pool = list()
+    evaluation = [0] * len(population)
+
     for players_count in PLAYERS_OPTIONS:
-        games = len(population) // players_count
-        print(f"    evaluating games of {players_count} players")
-        for i in range(games):
-            print(f"        game number {i+1} "
-                  f"({datetime.now().strftime(FOLDER_FORMAT)})")
-            if players_count == FOUR_PLAYERS:
-                agents = population[i * FOUR_PLAYERS: (i + 1) * FOUR_PLAYERS]
-            else:
-                agents = population[i::games]
-            result = single_game(agents)
+        if not quiet:
+            print(f"    evaluating games of {players_count} players")
+
+        if multiprocess:
+            results = _evalute_multiprocess(population, players_count)
+        else:
+            results = _evalute(population, players_count, quiet)
+
+        for game, result in results:
             max_score = max(result["scores"].values())
-            for agent in agents:
-                evaluation[agent] += result["scores"][agent.id]
+            for agent in game.agents:
+                evaluation[agent.population_id] += result["scores"][agent.id]
                 if result["scores"][agent.id] == max_score:
-                    evaluation[agent] += WINNER_BONUS
+                    evaluation[agent.population_id] += WINNER_BONUS
 
     return evaluation
 
@@ -173,21 +216,32 @@ def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAge
         strategies_2 = crossover(mom._strategy_gene_2, dad._strategy_gene_2)
         strategies_3 = crossover(mom._strategy_gene_3, dad._strategy_gene_3)
         for i in range(CHILDREN_PER_MATING):
-            children.append(GeneAlgoAgent(0, managers[i], strategies_1[i],
+            children.append(GeneAlgoAgent(-1, managers[i], strategies_1[i],
                                           strategies_2[i], strategies_3[i]))
 
     return children
 
 
 def sort_by_fitness(
-    population: list[GeneAlgoAgent], message: str, folder: Path,
+    population: list[GeneAlgoAgent],
+    folder: Path,
+    message: str,
+    quiet: bool,
+    multiprocess: bool,
 ):
-    print(message)
+    if not quiet:
+        print(message)
 
-    evaluation = evaluate(population)
-    population.sort(key=lambda agent: evaluation[agent], reverse=True)
+    for i, agent in enumerate(population):
+        agent.population_id = i
 
-    print(f'    Saving the best agent ({evaluation[population[0]]})')
+    evaluation = evaluate(population, quiet, multiprocess)
+    population.sort(key=lambda agent: evaluation[agent.population_id],
+                    reverse=True)
+
+    if not quiet:
+        print('    Saving the best agent '
+              f'({evaluation[population[0].population_id]})')
     folder.mkdir()
     population[0].save(folder)
 
@@ -198,31 +252,37 @@ def evolve(
     mutation_rate: float = MUTATION_RATE,
     working_dir: Path = WORKING_DIR,
     seed: int = None,
+    quiet: bool = False,
+    multiprocess: bool = False,
 ):
     """
     Genetic algorithm evolution process.
     In each generation `selection_size` are kept and used for mating.
     Returns the top `return_size` individuals of the last generation.
     """
+    start_time = datetime.now()
     if seed is not None:
         np.random.seed(seed)
 
     selection_size = (population_size // 3) or 2
     return_size = (population_size // 12) or 1
 
-    folder = working_dir / datetime.now().strftime(FOLDER_FORMAT)
+    folder = working_dir / start_time.strftime(FOLDER_FORMAT)
     folder.mkdir()
-    print(f"({folder.name}) Starting evolution with")
-    print(f"    population: {population_size}")
-    print(f"    selection:  {selection_size}")
+    if not quiet:
+        print(f"({folder.name}) Starting evolution with")
+        print(f"    population: {population_size}")
+        print(f"    selection:  {selection_size}")
     population = generate_initial_population(population_size)
 
     for generation in range(generations):
         progress = generation / generations
         generation += 1
         sort_by_fitness(population,
+                        folder / str(generation),
                         f'Gen {generation}',
-                        folder / str(generation))
+                        quiet,
+                        multiprocess)
 
         parents = population[:selection_size]
         np.random.shuffle(parents)
@@ -231,7 +291,9 @@ def evolve(
         np.random.shuffle(population)
         mutate_population(population, progress, mutation_rate)
 
-    sort_by_fitness(population, "Final", folder / "final")
+    sort_by_fitness(population, folder / "final", "Final", quiet, multiprocess)
+    if not quiet:
+        print(f"Done (run time was {datetime.now() - start_time})")
     return population[:return_size]
 
 
@@ -261,6 +323,12 @@ def main():
         "-s", "--seed", type=int,
         help="Seed to set for numpy's random number generator",
     )
+    parser.add_argument(
+        "--multiprocess", action='store_true',
+        help="Use multiprocessing to evolve faster",
+    )
+    parser.add_argument('-q', '--quiet', action='store_true')
+
     options = parser.parse_args()
     if options.population_size <= 0 or (options.population_size % 12):
         raise ValueError("To work properly, population size should be a "
@@ -270,7 +338,7 @@ def main():
     if not 0 <= options.mutation_rate <= 1:
         raise ValueError(f"Invalid mutation rate value {options.mutation_rate}")
 
-    return evolve(**options.__dict__)
+    evolve(**options.__dict__)
 
 
 if __name__ == '__main__':
