@@ -197,7 +197,6 @@ class SplendorGameRule(GameRule):
             agent.cards[card.colour].remove(card)
             score -= card.points
 
-
         if action["noble"] is not None:
             # Remove noble from board. Add noble to player's stack. Like cards, nobles aren't hashable due to possessing
             # dictionaries (i.e. resource costs). Therefore, locate and delete the noble via unique code.
@@ -210,7 +209,7 @@ class SplendorGameRule(GameRule):
         # agent.agent_trace.action_reward.remove((action, -score))
         # Removing last one because I belive it is more reliable
         agent.agent_trace.action_reward.pop()
-        agent.score += score    # score is negative
+        agent.score += score  # score is negative
         agent.passed = action["type"] == "pass"
         return state
 
@@ -541,7 +540,9 @@ class SplendorGameRule(GameRule):
                         agent_post_action.cards[card.colour].append(card)
                         # Use this copied agent to check whether this noble can visit.
                         if self.noble_visit(agent_post_action, noble):
-                            new_nobles.append(noble)  # If so, add noble to the new list.
+                            new_nobles.append(
+                                noble
+                            )  # If so, add noble to the new list.
                     if not new_nobles:
                         new_nobles = [None]
                     for noble in new_nobles:
