@@ -46,6 +46,7 @@ STATS_HEADERS = (
     "tier3_left",
 )
 
+
 class MyGameRule(SplendorGameRule):
     """
     Wraps `SplendorGameRule`.
@@ -63,6 +64,36 @@ class MyGameRule(SplendorGameRule):
             return True
 
         return super().gameEnds()
+
+
+def mutate(gene: Gene, progress: float, mutate_rate: float):
+    """
+    Mutates a single gene.
+    """
+
+    def _mutate(value):
+        """
+        Mutation method is based on the following article (page 112)
+        http://web.ist.utl.pt/adriano.simoes/tese/referencias/Michalewicz%20Z.%20Genetic%20Algorithms%20+%20Data%20Structures%20=%20Evolution%20Programs%20%283ed%29.PDF
+        """
+        diff = value - np.random.choice((gene.LOWER_BOUND, gene.UPPER_BOUND))
+        power = (1 - progress) ** DEPENDECY_DEGREE
+        return value - diff * (1 - np.random.rand() ** power)
+
+    gene.mutate(mutate_rate, _mutate)
+
+
+def mutate_population(
+    population: list[GeneAlgoAgent], progress: float, mutation_rate: float
+):
+    """
+    Mutates the genes of the population.
+    """
+    for agent in population:
+        mutate(agent._manager_gene, progress, mutation_rate)
+        mutate(agent._strategy_gene_1, progress, mutation_rate)
+        mutate(agent._strategy_gene_2, progress, mutation_rate)
+        mutate(agent._strategy_gene_3, progress, mutation_rate)
 
 
 def _crossover(dna1: np.array, dna2: np.array) -> tuple[np.array, np.array]:
@@ -102,34 +133,30 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
     raise ValueError(f"Unsupported DNA shape for crossover {cls.SHAPE}")
 
 
-def mutate(gene: Gene, progress: float, mutate_rate: float):
+def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAgent]:
     """
-    Mutates a single gene.
+    Creates new individual by randomly choosing 2 parents and mating them till
+    we got enough individuals.
     """
+    CHILDREN_PER_MATING = 2
+    PARENTS_PER_MATING = 2
 
-    def _mutate(value):
-        """
-        Mutation method is based on the following article (page 112)
-        http://web.ist.utl.pt/adriano.simoes/tese/referencias/Michalewicz%20Z.%20Genetic%20Algorithms%20+%20Data%20Structures%20=%20Evolution%20Programs%20%283ed%29.PDF
-        """
-        diff = value - np.random.choice((gene.LOWER_BOUND, gene.UPPER_BOUND))
-        power = (1 - progress) ** DEPENDECY_DEGREE
-        return value - diff * (1 - np.random.rand() ** power)
+    children = list()
+    matings = (population_size - len(parents)) // CHILDREN_PER_MATING
+    for _ in range(matings):
+        mom, dad = np.random.choice(parents, PARENTS_PER_MATING, False)
+        managers = crossover(mom._manager_gene, dad._manager_gene)
+        strategies_1 = crossover(mom._strategy_gene_1, dad._strategy_gene_1)
+        strategies_2 = crossover(mom._strategy_gene_2, dad._strategy_gene_2)
+        strategies_3 = crossover(mom._strategy_gene_3, dad._strategy_gene_3)
+        for i in range(CHILDREN_PER_MATING):
+            children.append(
+                GeneAlgoAgent(
+                    0, managers[i], strategies_1[i], strategies_2[i], strategies_3[i]
+                )
+            )
 
-    gene.mutate(mutate_rate, _mutate)
-
-
-def mutate_population(
-    population: list[GeneAlgoAgent], progress: float, mutation_rate: float
-):
-    """
-    Mutates the genes of the population.
-    """
-    for agent in population:
-        mutate(agent._manager_gene, progress, mutation_rate)
-        mutate(agent._strategy_gene_1, progress, mutation_rate)
-        mutate(agent._strategy_gene_2, progress, mutation_rate)
-        mutate(agent._strategy_gene_3, progress, mutation_rate)
+    return children
 
 
 def single_game(agents) -> tuple[Game, dict]:
@@ -149,22 +176,6 @@ def single_game(agents) -> tuple[Game, dict]:
         agents_namelist=names,
     )
     return game, game.Run()
-
-
-def generate_initial_population(population_size: int):
-    """
-    Creates agents with random genes.
-    """
-    return [
-        GeneAlgoAgent(
-            0,
-            ManagerGene.random(),
-            StrategyGene.random(),
-            StrategyGene.random(),
-            StrategyGene.random(),
-        )
-        for _ in range(population_size)
-    ]
 
 
 def _evaluate_multiprocess(
@@ -254,32 +265,6 @@ def evaluate(
     return evaluation, games_stats
 
 
-def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAgent]:
-    """
-    Creates new individual by randomly choosing 2 parents and mating them till
-    we got enough individuals.
-    """
-    CHILDREN_PER_MATING = 2
-    PARENTS_PER_MATING = 2
-
-    children = list()
-    matings = (population_size - len(parents)) // CHILDREN_PER_MATING
-    for _ in range(matings):
-        mom, dad = np.random.choice(parents, PARENTS_PER_MATING, False)
-        managers = crossover(mom._manager_gene, dad._manager_gene)
-        strategies_1 = crossover(mom._strategy_gene_1, dad._strategy_gene_1)
-        strategies_2 = crossover(mom._strategy_gene_2, dad._strategy_gene_2)
-        strategies_3 = crossover(mom._strategy_gene_3, dad._strategy_gene_3)
-        for i in range(CHILDREN_PER_MATING):
-            children.append(
-                GeneAlgoAgent(
-                    0, managers[i], strategies_1[i], strategies_2[i], strategies_3[i]
-                )
-            )
-
-    return children
-
-
 def sort_by_fitness(
     population: list[GeneAlgoAgent],
     folder: Path,
@@ -306,6 +291,22 @@ def sort_by_fitness(
     population[0].save(folder)
 
     return games_stats
+
+
+def generate_initial_population(population_size: int):
+    """
+    Creates agents with random genes.
+    """
+    return [
+        GeneAlgoAgent(
+            0,
+            ManagerGene.random(),
+            StrategyGene.random(),
+            StrategyGene.random(),
+            StrategyGene.random(),
+        )
+        for _ in range(population_size)
+    ]
 
 
 def evolve(
