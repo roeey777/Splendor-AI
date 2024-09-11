@@ -16,7 +16,7 @@ pip install .
 ### Install Splendor using ```pip```:
 Execute the following (in the repo's top directory):
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 pip install .
 ```
 
