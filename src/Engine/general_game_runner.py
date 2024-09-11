@@ -34,7 +34,7 @@ from optparse import OptionParser
 
 
 # team_indexs   = ["red_team","blue_team"]
-DEFAULT_AGENT = "agents.generic.random"
+DEFAULT_AGENT = "Engine.agents.generic.random"
 DEFAULT_AGENT_NAME = "default"
 # NUM_AGENTS    = 2
 GIT_TOKEN_PATH = "configs/token.txt"
