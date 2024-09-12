@@ -1,3 +1,7 @@
+"""
+Implementation of Splendor as a gym.Env
+"""
+
 import random
 
 from itertools import cycle
@@ -91,7 +95,7 @@ class SplendorEnv(gym.Env):
             self.fixed_turn is not None
             and self.fixed_turn not in range(self.number_of_players)
         ):
-            self.my_turn = random.randint(0, self.number_of_players - 1)
+            self.my_turn = np.random.randint(0, self.number_of_players - 1)
         else:
             my_turn = self.fixed_turn
 
@@ -99,10 +103,7 @@ class SplendorEnv(gym.Env):
 
         self._set_opponents_ids()
 
-        self.turn = next(self.turns_gen)
-        self.state = state
-
-        _, self.state = self._simulate_opponents()
+        self._simulate_opponents()
 
         return (
             self._vectorize(self.state, self.observation_space.shape),
@@ -124,25 +125,18 @@ class SplendorEnv(gym.Env):
         if action not in range(len(ALL_ACTIONS)):
             raise ValueError(f"The action {action} isn't a valid action")
 
-        self.turn = next(self.turns_gen)
-        previous_score = self.state.agents[self.turn].score
+        previous_score = self.state.agents[self.my_turn].score
         action_to_take = self.build_action(action)
         legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
         legal_actions_mask: np.array = create_legal_actions_mask(
             legal_actions, self.state, self.my_turn
         )
 
-        # if action_to_take not in legal_actions:
         if legal_actions_mask[action] == 0:
             raise ValueError(f"the action {action} ({action_to_take}) isn't legal!")
 
-        # generateSuccessor return a reference to the same
-        # state object which is updated in-place.
-        next_state = self.game_rule.generateSuccessor(
-            self.state, action_to_take, self.my_turn
-        )
-        self.state = next_state
-        current_score = self.state.agents[self.turn].score
+        self.game_rule.update(action_to_take)
+        current_score = self.state.agents[self.my_turn].score
 
         if current_score >= 15:
             reward = 100
@@ -241,7 +235,14 @@ class SplendorEnv(gym.Env):
             available_actions = self.game_rule.getLegalActions(self.state, self.turn)
             agent = self._get_opponent_by_turn(self.turn)
             action = agent.SelectAction(available_actions, self.state, self.game_rule)
-            self.state = self.game_rule.generateSuccessor(self.state, action, self.turn)
-            self.turn = next(self.turns_gen)
+            self.game_rule.update(action)
 
         return self.game_rule.gameEnds(), self.state
+
+    @property
+    def turn(self):
+        return self.game_rule.current_agent_index
+
+    @property
+    def state(self):
+        return self.game_rule.current_game_state

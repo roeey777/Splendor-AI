@@ -103,18 +103,32 @@ def build_action(
                 "returned_gems": action.returned_gems,
             }
         case ActionType.BUY_AVAILABLE:
+            if card is None:
+                # this might happen when buying a card but with a
+                # wrong index (there is no card at that position).
+                returned_gems = None
+            else:
+                returned_gems = card.cost
+
             action_to_execute = {
                 "type": "buy_available",
                 "noble": noble,
                 "card": card,
-                "returned_gems": card.cost,
+                "returned_gems": returned_gems,
             }
         case ActionType.BUY_RESERVE:
+            if reserved_card is None:
+                # this might happen when buying a reserved card but with a
+                # wrong index.
+                returned_gems = None
+            else:
+                returned_gems = reserved_card.cost
+
             action_to_execute = {
                 "type": "buy_reserve",
                 "noble": noble,
                 "card": reserved_card,
-                "returned_gems": reserved_card.cost,
+                "returned_gems": returned_gems,
             }
 
     return action_to_execute
