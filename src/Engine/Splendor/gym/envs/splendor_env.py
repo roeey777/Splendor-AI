@@ -48,7 +48,7 @@ class SplendorEnv(gym.Env):
                object without losing ones sanity you can use the .unwrapped property which
                returns a reference to the base Env without any wrappers. this could be
                useful when you want to use some custom methods of this Env such as
-               build_action & create_legal_actions_mask.
+               build_action & get_legal_actions_mask.
         """
         self.fixed_turn = fixed_turn
         self.shuffle_turns = shuffle_turns
