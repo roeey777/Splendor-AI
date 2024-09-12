@@ -2,15 +2,20 @@ from argparse import ArgumentParser
 from datetime import datetime
 from pathlib import Path
 
-from Engine.agents.our_agents.genetic_algorithm.genes import Gene, ManagerGene, StrategyGene
-from Engine.agents.our_agents.genetic_algorithm.genetic_algorithem_agent import GeneAlgoAgent
+from Engine.agents.our_agents.genetic_algorithm.genes import (
+    Gene,
+    ManagerGene,
+    StrategyGene,
+)
+from Engine.agents.our_agents.genetic_algorithm.genetic_algorithem_agent import (
+    GeneAlgoAgent,
+)
 from Engine.game import Game
 from Engine.Splendor.splendor_model import SplendorGameRule
 import numpy as np
 
 
-
-POPULATION_SIZE = 24 # 60
+POPULATION_SIZE = 24  # 60
 GENERATIONS = 100
 MUTATION_RATE = 0.2
 ROUNDS_LIMIT = 100
@@ -18,28 +23,29 @@ DEPENDECY_DEGREE = 3
 FOUR_PLAYERS = 4
 PLAYERS_OPTIONS = (2, 3, 4)
 WORKING_DIR = Path().absolute()
-FOLDER_FORMAT = '%y-%m-%d_%H-%M-%S'
+FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
 # SELECTION = (POPULATION_SIZE // 3) or 2
 # RETURN_SIZE = (POPULATION_SIZE // 12) or 1
 WINNER_BONUS = 10
-
 
 
 class MyGameRule(SplendorGameRule):
     """
     Wraps `SplendorGameRule`.
     """
+
     def gameEnds(self):
         """
         Limits the game to `ROUNDS_LIMIT` rounds, so random initial agents
         won't get stuck by accident.
         """
-        if all(len(agent.agent_trace.action_reward) == ROUNDS_LIMIT
-               for agent in self.current_game_state.agents):
+        if all(
+            len(agent.agent_trace.action_reward) == ROUNDS_LIMIT
+            for agent in self.current_game_state.agents
+        ):
             return True
 
         return super().gameEnds()
-
 
 
 def _crossover(dna1: np.array, dna2: np.array) -> tuple[np.array, np.array]:
@@ -52,8 +58,8 @@ def _crossover(dna1: np.array, dna2: np.array) -> tuple[np.array, np.array]:
     diff = dna1[split_point] - dna2[split_point]
     new_value_1 = dna1[split_point] - mix_coefficient * diff
     new_value_2 = dna2[split_point] + mix_coefficient * diff
-    child1 = np.hstack((dna1[:split_point], [new_value_1], dna2[split_point + 1:]))
-    child2 = np.hstack((dna2[:split_point], [new_value_2], dna1[split_point + 1:]))
+    child1 = np.hstack((dna1[:split_point], [new_value_1], dna2[split_point + 1 :]))
+    child2 = np.hstack((dna2[:split_point], [new_value_2], dna1[split_point + 1 :]))
     return child1, child2
 
 
@@ -70,8 +76,9 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
         return cls(child_dna_1), cls(child_dna_2)
 
     elif len(cls.SHAPE) == 2:
-        children_dna = (_crossover(dna1, dna2)
-                        for dna1, dna2 in zip(mom._dna.T, dad._dna.T))
+        children_dna = (
+            _crossover(dna1, dna2) for dna1, dna2 in zip(mom._dna.T, dad._dna.T)
+        )
         child_dna_1, child_dna_2 = zip(*children_dna)
         return cls(np.vstack(child_dna_1).T), cls(np.vstack(child_dna_2).T)
 
@@ -82,6 +89,7 @@ def mutate(gene: Gene, progress: float, mutate_rate: float):
     """
     Matates a single gene.
     """
+
     def _mutate(value):
         """
         Mutation method is based on the following article (page 112)
@@ -94,8 +102,9 @@ def mutate(gene: Gene, progress: float, mutate_rate: float):
     gene.mutate(mutate_rate, _mutate)
 
 
-def mutate_population(population: list[GeneAlgoAgent],
-                      progress: float, mutation_rate: float):
+def mutate_population(
+    population: list[GeneAlgoAgent], progress: float, mutation_rate: float
+):
     """
     Mutates the genes of the population.
     """
@@ -115,9 +124,13 @@ def single_game(agents):
         agent.id = i
         names.append(str(i))
 
-    game = Game(MyGameRule, agents, len(agents),
-                seed=np.random.randint(1e8, dtype=int),
-                agents_namelist=names)
+    game = Game(
+        MyGameRule,
+        agents,
+        len(agents),
+        seed=np.random.randint(1e8, dtype=int),
+        agents_namelist=names,
+    )
     return game.Run()
 
 
@@ -125,9 +138,16 @@ def generate_initial_population(population_size: int):
     """
     Creates agents with random genes.
     """
-    return [GeneAlgoAgent(0, ManagerGene.random(), StrategyGene.random(),
-                          StrategyGene.random(), StrategyGene.random())
-            for _ in range(population_size)]
+    return [
+        GeneAlgoAgent(
+            0,
+            ManagerGene.random(),
+            StrategyGene.random(),
+            StrategyGene.random(),
+            StrategyGene.random(),
+        )
+        for _ in range(population_size)
+    ]
 
 
 def evaluate(population: GeneAlgoAgent) -> dict[GeneAlgoAgent, int]:
@@ -140,10 +160,12 @@ def evaluate(population: GeneAlgoAgent) -> dict[GeneAlgoAgent, int]:
         games = len(population) // players_count
         print(f"    evaluating games of {players_count} players")
         for i in range(games):
-            print(f"        game number {i+1} "
-                  f"({datetime.now().strftime(FOLDER_FORMAT)})")
+            print(
+                f"        game number {i+1} "
+                f"({datetime.now().strftime(FOLDER_FORMAT)})"
+            )
             if players_count == FOUR_PLAYERS:
-                agents = population[i * FOUR_PLAYERS: (i + 1) * FOUR_PLAYERS]
+                agents = population[i * FOUR_PLAYERS : (i + 1) * FOUR_PLAYERS]
             else:
                 agents = population[i::games]
             result = single_game(agents)
@@ -173,21 +195,26 @@ def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAge
         strategies_2 = crossover(mom._strategy_gene_2, dad._strategy_gene_2)
         strategies_3 = crossover(mom._strategy_gene_3, dad._strategy_gene_3)
         for i in range(CHILDREN_PER_MATING):
-            children.append(GeneAlgoAgent(0, managers[i], strategies_1[i],
-                                          strategies_2[i], strategies_3[i]))
+            children.append(
+                GeneAlgoAgent(
+                    0, managers[i], strategies_1[i], strategies_2[i], strategies_3[i]
+                )
+            )
 
     return children
 
 
 def sort_by_fitness(
-    population: list[GeneAlgoAgent], message: str, folder: Path,
+    population: list[GeneAlgoAgent],
+    message: str,
+    folder: Path,
 ):
     print(message)
 
     evaluation = evaluate(population)
     population.sort(key=lambda agent: evaluation[agent], reverse=True)
 
-    print(f'    Saving the best agent ({evaluation[population[0]]})')
+    print(f"    Saving the best agent ({evaluation[population[0]]})")
     folder.mkdir()
     population[0].save(folder)
 
@@ -220,9 +247,7 @@ def evolve(
     for generation in range(generations):
         progress = generation / generations
         generation += 1
-        sort_by_fitness(population,
-                        f'Gen {generation}',
-                        folder / str(generation))
+        sort_by_fitness(population, f"Gen {generation}", folder / str(generation))
 
         parents = population[:selection_size]
         np.random.shuffle(parents)
@@ -241,30 +266,46 @@ def main():
         description="Evolves a Splendor agent using genetic algorithm.",
     )
     parser.add_argument(
-        "-p", "--population-size", default=POPULATION_SIZE, type=int,
+        "-p",
+        "--population-size",
+        default=POPULATION_SIZE,
+        type=int,
         help="Size of the population (should be multiple of 12)",
     )
     parser.add_argument(
-        "-g", "--generations", default=GENERATIONS, type=int,
+        "-g",
+        "--generations",
+        default=GENERATIONS,
+        type=int,
         help="Amount of generations",
     )
     parser.add_argument(
-        "-m", "--mutation-rate", default=MUTATION_RATE, type=float,
+        "-m",
+        "--mutation-rate",
+        default=MUTATION_RATE,
+        type=float,
         help="Probability to mutate (should be in the range [0,1])",
     )
     parser.add_argument(
-        "-w", "--working-dir", default=WORKING_DIR, type=Path,
+        "-w",
+        "--working-dir",
+        default=WORKING_DIR,
+        type=Path,
         help="Path to directory to work in (will create a directory with "
-             "current timestamp for each run)",
+        "current timestamp for each run)",
     )
     parser.add_argument(
-        "-s", "--seed", type=int,
+        "-s",
+        "--seed",
+        type=int,
         help="Seed to set for numpy's random number generator",
     )
     options = parser.parse_args()
     if options.population_size <= 0 or (options.population_size % 12):
-        raise ValueError("To work properly, population size should be a "
-                         f"multiple of 12 (not {options.population_size})")
+        raise ValueError(
+            "To work properly, population size should be a "
+            f"multiple of 12 (not {options.population_size})"
+        )
     if options.generations <= 0:
         raise ValueError(f"Ivalid amount of generations {options.generations}")
     if not 0 <= options.mutation_rate <= 1:
@@ -273,5 +314,5 @@ def main():
     return evolve(**options.__dict__)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

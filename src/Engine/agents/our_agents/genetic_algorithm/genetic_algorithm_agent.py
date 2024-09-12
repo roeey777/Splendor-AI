@@ -6,8 +6,6 @@ from Engine.template import Agent
 import numpy as np
 
 
-
-
 class GeneAlgoAgent(Agent):
     """
     Agent which plays according to a "plan" reached by genetic algorithm.
@@ -18,14 +16,15 @@ class GeneAlgoAgent(Agent):
     forth used to assess the current situation and choose one of the 3
     strategies.
     """
+
     MANAGER_PATH = Path(__file__).parent / "manager.npy"
     STRATEGY_1_PATH = Path(__file__).parent / "strategy1.npy"
     STRATEGY_2_PATH = Path(__file__).parent / "strategy2.npy"
     STRATEGY_3_PATH = Path(__file__).parent / "strategy3.npy"
 
-
-    def __init__(self, _id, manager=None,
-                 strategy1=None, strategy2=None, strategy3=None):
+    def __init__(
+        self, _id, manager=None, strategy1=None, strategy2=None, strategy3=None
+    ):
         super().__init__(_id)
 
         if manager is None:
@@ -54,14 +53,12 @@ class GeneAlgoAgent(Agent):
             self._strategy_gene_3,
         )
 
-
     def __hash__(self):
         """
         Basically hash on the identity of the object.
         Used when evaluating an individual.
         """
         return hash(f"{id(self)}:{id(self._strategies)}")
-
 
     def save(self, folder: Path):
         """
@@ -72,7 +69,6 @@ class GeneAlgoAgent(Agent):
         self._strategy_gene_1.save(folder / self.STRATEGY_1_PATH.name)
         self._strategy_gene_2.save(folder / self.STRATEGY_2_PATH.name)
         self._strategy_gene_3.save(folder / self.STRATEGY_3_PATH.name)
-
 
     def evaluate_action(self, strategy, action, game_state, game_rule):
         """
@@ -86,7 +82,6 @@ class GeneAlgoAgent(Agent):
 
         return evaluation
 
-
     def SelectAction(self, actions, game_state, game_rule):
         """
         Method used by the game's engine when running a game with this agent.
@@ -95,8 +90,7 @@ class GeneAlgoAgent(Agent):
             raise Exception("Cannot play, no actions")
 
         metrics = extract_metrics(game_state, self.id)
-        strategy = self._manager_gene.select_strategy(metrics,
-                                                      self._strategies)
+        strategy = self._manager_gene.select_strategy(metrics, self._strategies)
         best_action = None
         best_action_value = -np.inf
 
