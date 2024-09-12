@@ -1,209 +1,99 @@
 import random
 
-from itertools import cycle, combinations, combinations_with_replacement
+from itertools import cycle
 from typing import Dict, Literal, List, Tuple, Optional, Any
-from enum import Enum, auto
-from dataclasses import dataclass
-from collections import Counter
 
+import numpy as np
 import gymnasium as gym
 
 from Engine.template import Agent
 from Engine.Splendor.splendor_model import SplendorState, SplendorGameRule
 from Engine.Splendor import splendor_utils
+from Engine.Splendor import features
 
-
-NUMBER_OF_NOBLES = 3
-NUMBER_OF_DECKS = 3
-MAX_NUMBER_OF_CARDS_FROM_DECK = 4
-MAX_NUMBER_OF_RESERVED_CARDS = 3
-RESERVED = "yellow"
-COLORS = [c for c in splendor_utils.COLOURS.values() if c != RESERVED]
-NOBLES_INDICES = list(range(NUMBER_OF_NOBLES))
-# ColorType = Literal[*COLORS]
-
-GemsDict = Dict[str, int]
-
-
-class ActionType(Enum):
-    PASS = auto()
-    COLLECT_SAME = auto()
-    COLLECT_DIFF = auto()
-    RESERVE = auto()
-    BUY_AVAILABLE = auto()
-    BUY_RESERVE = auto()
-
-
-@dataclass
-class CardPosition:
-    tier: int
-    card_index: int
-    reserved_index: int
-
-
-@dataclass
-class Action:
-    type: ActionType
-    collected_gems: Optional[GemsDict] = None
-    returned_gems: Optional[GemsDict] = None
-    position: Optional[CardPosition] = None
-    noble_index: Optional[int] = None
-
-
-def card_gen():
-    for deck_num in range(NUMBER_OF_DECKS):
-        for card_num in range(MAX_NUMBER_OF_CARDS_FROM_DECK):
-            yield CardPosition(deck_num, card_num, -1)
-
-
-def generate_all_reserve_card_actions():
-    for position in card_gen():
-        for noble_index in [None] + NOBLES_INDICES:
-            # reserve a card, without collecting the yellow gem.
-            yield Action(
-                type=ActionType.RESERVE,
-                collected_gems={},
-                returned_gems={},
-                position=position,
-                noble_index=noble_index,
-            )
-            # reserve a card, collect a yellow gem
-            yield Action(
-                type=ActionType.RESERVE,
-                collected_gems={"yellow": 1},
-                returned_gems={},
-                position=position,
-                noble_index=noble_index,
-            )
-            for c in COLORS:
-                # reserve a card, collect a yellow gem, and return a gem.
-                yield Action(
-                    type=ActionType.RESERVE,
-                    collected_gems={"yellow": 1},
-                    returned_gems={c: 1},
-                    position=position,
-                    noble_index=noble_index,
-                )
-
-
-def generate_all_collect_same_actions():
-    for c in COLORS:
-        for noble_index in [None] + NOBLES_INDICES:
-            # no gems are returned.
-            yield Action(
-                type=ActionType.COLLECT_SAME,
-                noble_index=noble_index,
-                collected_gems={c: 2},
-                returned_gems={},
-            )
-            # return 2 gems of different colors.
-            for c1, c2 in combinations(filter(lambda x: x != c, COLORS), 2):
-                yield Action(
-                    type=ActionType.COLLECT_SAME,
-                    noble_index=noble_index,
-                    collected_gems={c: 2},
-                    returned_gems={c1: 1, c2: 1},
-                )
-            # return gems of the same color.
-            for num_gems_to_return in [1, 2]:
-                for c_other in filter(lambda x: x != c, COLORS):
-                    yield Action(
-                        type=ActionType.COLLECT_SAME,
-                        noble_index=noble_index,
-                        collected_gems={c: 2},
-                        returned_gems={c_other: num_gems_to_return},
-                    )
-
-
-def generate_all_collect_different_actions():
-    for c1, c2, c3 in combinations(COLORS, 3):
-        for noble_index in [None] + NOBLES_INDICES:
-            # no gems are returned.
-            yield Action(
-                type=ActionType.COLLECT_DIFF,
-                noble_index=noble_index,
-                collected_gems={c1: 1, c2: 1, c3: 1},
-                returned_gems={},
-            )
-            for num_gems_to_return in [1, 2, 3]:
-                for to_return in combinations_with_replacement(
-                    filter(lambda x: x not in [c1, c2, c3], COLORS),
-                    num_gems_to_return,
-                ):
-                    yield Action(
-                        type=ActionType.COLLECT_DIFF,
-                        noble_index=noble_index,
-                        collected_gems={c1: 1, c2: 1, c3: 1},
-                        returned_gems=dict(Counter(to_return)),
-                    )
-
-
-def generate_all_buy_reserve_card_actions():
-    for reserved_index in range(MAX_NUMBER_OF_RESERVED_CARDS):
-        for noble_index in [None] + NOBLES_INDICES:
-            yield Action(
-                type=ActionType.BUY_AVAILABLE,
-                noble_index=noble_index,
-                position=CardPosition(-1, -1, reserved_index),
-            )
-
-
-def generate_all_buy_available_card_actions():
-    for position in card_gen():
-        for noble_index in [None] + NOBLES_INDICES:
-            yield Action(
-                type=ActionType.BUY_AVAILABLE,
-                noble_index=noble_index,
-                position=position,
-            )
-
-
-ALL_ACTIONS = [
-    # Do nothing.
-    Action(type=ActionType.PASS),
-    # Only acquire a noble.
-    *[Action(type=ActionType.PASS, noble_index=noble) for noble in NOBLES_INDICES],
-    # Reserve a card
-    *list(generate_all_reserve_card_actions()),
-    # Collect 2 stones of the same color.
-    *list(generate_all_collect_same_actions()),
-    # Collect 3 stones of different colors.
-    *list(generate_all_collect_different_actions()),
-    # Buy a Reserved Card.
-    *list(generate_all_buy_reserve_card_actions()),
-    # Buy an Available Card.
-    *list(generate_all_buy_available_card_actions()),
-]
+from .actions import ALL_ACTIONS, ActionType, Action, CardPosition
+from .utils import build_action, create_legal_actions_mask
 
 
 class SplendorEnv(gym.Env):
-    def __init__(self, agents: List[Agent], *args, **kwargs):
+    def __init__(
+        self,
+        agents: List[Agent],
+        shuffle_turns: bool = True,
+        fixed_turn: Optional[int] = None,
+        *args,
+        **kwargs,
+    ):
         """
-        Create a new environment.
+        Create a new environment, which simulates the game of Splendor by
+        using SplendorGameRule.
 
         :param agents: a list of all the opponents.
+        :param shuffle_turns: whether or not to shuffle the order of turns
+                              every time reset() is called.
+        :param fixed_turn: fix the turn of the player, if isn't supplied or
+                           out of range the turn of the player would be
+                           randomly chosen during reset().
+
+        :note: when using this environment one can use gymnasium.spaces.utils.flatdim
+               in order to understand the dimensions of the environment.
+               for example:
+                    from gymnasium.spaces.utils import flatdim
+                    num_actions = flatdim(env.action_space)
+                    flatten_state_features_length = flatdim(env.observation_space)
+               useful later for the DQN in order to define it's input & output dimensions.
+
+               when creating an env using gym.make(...) gymnasium will automatically wrap
+               the Env object with some wrappers. in order for you to access the base Env
+               object without losing ones sanity you can use the .unwrapped property which
+               returns a reference to the base Env without any wrappers. this could be
+               useful when you want to use some custom methods of this Env such as
+               build_action & create_legal_actions_mask.
         """
+        self.fixed_turn = fixed_turn
+        self.shuffle_turns = shuffle_turns
         self.agents = agents
         self.number_of_players = len(self.agents) + 1
         self.game_rule = SplendorGameRule(self.number_of_players)
 
+        # define the action_space to be composed of len(ALL_ACTIONS)
+        # unique actions.
         self.action_space = gym.spaces.Discrete(len(ALL_ACTIONS))
-        self.observation_space = gym.spaces.Discrete(1)
 
-        self.state: SplendorState = self.reset()
+        # define the observation_space to be a vector of continues values of length
+        # of np.sum(features.METRICS_SHAPE).
+        self.observation_space = gym.spaces.Box(
+            low=-np.inf, high=np.inf, shape=(np.sum(features.METRICS_SHAPE),)
+        )
 
-    def reset(self) -> Tuple[SplendorState, Dict[str, int]]:
+    def reset(
+        self, seed: Optional[int] = None, options: Optional[Dict] = None
+    ) -> Tuple[SplendorState, Dict[str, int]]:
         """
         Reset the environment - Create a new game.
 
+        :param seed: the seed to use in np_random.
+        :param options: ignored, both this parameter & seed are passed in
+                        order to comply with gym.Env signature.
         :return: the initial state of a new game and the id (turn) of
                  my agent.
         :note: the order of turns in randomly chosen each time reset is called.
         """
+        # We need the following line to seed self.np_random
+        super().reset(seed=seed)
+
         state = self.game_rule.initialGameState()
 
-        random.shuffle(self.agents)
-        self.my_turn = random.randint(0, self.number_of_players - 1)
+        if self.shuffle_turns:
+            random.shuffle(self.agents)
+
+        if self.fixed_turn is None or (
+            self.fixed_turn is not None
+            and self.fixed_turn not in range(self.number_of_players)
+        ):
+            self.my_turn = random.randint(0, self.number_of_players - 1)
+        else:
+            my_turn = self.fixed_turn
 
         self.turns_gen = cycle(range(self.number_of_players))
 
@@ -214,7 +104,10 @@ class SplendorEnv(gym.Env):
 
         _, self.state = self._simulate_opponents()
 
-        return (self.state, {"my_id": self.my_turn})
+        return (
+            self._vectorize(self.state, self.observation_space.shape),
+            {"my_id": self.my_turn},
+        )
 
     def step(self, action: int) -> Tuple[Any, float, bool, bool, Dict]:
         """
@@ -233,12 +126,20 @@ class SplendorEnv(gym.Env):
 
         self.turn = next(self.turns_gen)
         previous_score = self.state.agents[self.turn].score
-        action_to_take = self._build_action(action)
+        action_to_take = self.build_action(action)
+        legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
+        legal_actions_mask: np.array = create_legal_actions_mask(
+            legal_actions, self.state, self.my_turn
+        )
+
+        # if action_to_take not in legal_actions:
+        if legal_actions_mask[action] == 0:
+            raise ValueError(f"the action {action} ({action_to_take}) isn't legal!")
 
         # generateSuccessor return a reference to the same
         # state object which is updated in-place.
         next_state = self.game_rule.generateSuccessor(
-            self.state, action_to_take, self.turn
+            self.state, action_to_take, self.my_turn
         )
         self.state = next_state
         current_score = self.state.agents[self.turn].score
@@ -255,56 +156,19 @@ class SplendorEnv(gym.Env):
         terminated_by_opponents, next_state = self._simulate_opponents()
         terminated = terminated_by_me or terminated_by_opponents
 
-        # TODO: return feature-vector of next_state (as np.array) instead of SplendorState.
-        #       this will also remove a gym warning specifically about that.
-
-        return (next_state, reward, terminated, False, {})
+        return (
+            self._vectorize(next_state, self.observation_space.shape),
+            reward,
+            terminated,
+            False,
+            {},
+        )
 
     def render(self):
         # Don't render anything.
         pass
 
-    def _set_opponents_ids(self):
-        ids = list(range(self.number_of_players))
-        ids.remove(self.my_turn)
-
-        for agent, agent_id in zip(self.agents, ids):
-            agent.id = agent_id
-
-    def _simulate_opponents(self) -> Tuple[bool, SplendorState]:
-        """
-        Simulate the opponents moves from the current turn until self.my_turn
-
-        :return: whether or not the game has ended prior to the turn of self.my_turn
-        """
-        while self.turn != self.my_turn and not self.game_rule.gameEnds():
-            available_actions = self.game_rule.getLegalActions(self.state, self.turn)
-            action = self.agents[self.turn].SelectAction(
-                available_actions, self.state, self.game_rule
-            )
-            self.state = self.game_rule.generateSuccessor(self.state, action, self.turn)
-            self.turn = next(self.turns_gen)
-
-        return self.game_rule.gameEnds(), self.state
-
-    def _valid_position(self, state: SplendorState, position: CardPosition) -> bool:
-        if position.tier not in range(NUMBER_OF_DECKS):
-            return False
-        if (
-            position.card_index not in range(MAX_NUMBER_OF_CARDS_FROM_DECK)
-            or state.board.dealt[position.tier][position.card_index] is None
-        ):
-            return False
-        return True
-
-    def _valid_reserved_position(
-        self, state: SplendorState, position: CardPosition, agent_index: int
-    ) -> bool:
-        return position.reserved_index in range(
-            len(state.agents[agent_index].cards[RESERVED])
-        )
-
-    def _build_action(
+    def build_action(
         self,
         action_index: int,
         state: Optional[SplendorState] = None,
@@ -324,68 +188,60 @@ class SplendorEnv(gym.Env):
         if agent_index is None:
             agent_index = self.turn
 
-        action = ALL_ACTIONS[action_index]
+        return build_action(action_index, self.game_rule, state, agent_index)
 
-        potential_nobles = self.game_rule.get_potential_nobles(state, agent_index)
-        noble = (
-            state.board.nobles[action.noble_index]
-            if action.noble_index
-            and action.noble_index in range(len(state.board.nobles))
-            else None
-        )
-        card = (
-            state.board.dealt[action.position.tier][action.position.card_index]
-            if action.position and self._valid_position(state, action.position)
-            else None
-        )
-        reserved_card = (
-            state.agents[agent_index].cards[RESERVED][action.position.reserved_index]
-            if action.position
-            and self._valid_reserved_position(state, action.position, agent_index)
-            else None
+    def get_legal_actions_mask(self) -> np.array:
+        """
+        Create an array of shape (len(ALL_ACTIONS),) whose values are 0's or 1's.
+        If the at the i'th index the mask[i] == 1 then the i'th action is legal,
+        otherwise it's illegal (The legal actions are based on SplendorGameRule).
+        """
+        legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
+        legal_actions_mask: np.array = create_legal_actions_mask(
+            legal_actions, self.state, self.my_turn
         )
 
-        match action.type:
-            case ActionType.PASS:
-                action_to_execute = {
-                    "type": "pass",
-                    "noble": noble,
-                }
-            case ActionType.COLLECT_SAME:
-                action_to_execute = {
-                    "type": "collect_same",
-                    "noble": noble,
-                    "collected_gems": action.collected_gems,
-                    "returned_gems": action.returned_gems,
-                }
-            case ActionType.COLLECT_DIFF:
-                action_to_execute = {
-                    "type": "collect_diff",
-                    "noble": noble,
-                    "collected_gems": action.collected_gems,
-                    "returned_gems": action.returned_gems,
-                }
-            case ActionType.RESERVE:
-                action_to_execute = {
-                    "type": "reserve",
-                    "noble": noble,
-                    "card": card,
-                    "collected_gems": action.collected_gems,
-                    "returned_gems": action.returned_gems,
-                }
-            case ActionType.BUY_AVAILABLE:
-                action_to_execute = {
-                    "type": "buy_available",
-                    "noble": noble,
-                    "card": card,
-                    "returned_gems": card.cost,
-                }
-            case ActionType.BUY_RESERVE:
-                action_to_execute = {
-                    "type": "buy_reserve",
-                    "noble": noble,
-                    "card": reserved_card,
-                    "returned_gems": reserved_card.cost,
-                }
+        return legal_actions_mask
 
-        return action_to_execute
+    def _get_opponent_by_turn(self, turn: int) -> Agent:
+        """
+        :return: the agent whose ID is equal to turn.
+        """
+        for agent in self.agents:
+            if agent.id == turn:
+                return agent
+
+    @staticmethod
+    def _vectorize(state, shape) -> np.array:
+        """
+        extract the features vector out of the given state.
+        """
+        # TODO: return feature-vector of next_state (as np.array) instead of SplendorState.
+        #       this will also remove a gym warning specifically about that.
+        return np.random.randn(*shape).astype(dtype=np.float32)
+
+    def _set_opponents_ids(self):
+        """
+        assign IDs to all the agents of the opponents according to the turns
+        ordering.
+        """
+        ids = list(range(self.number_of_players))
+        ids.remove(self.my_turn)
+
+        for agent, agent_id in zip(self.agents, ids):
+            agent.id = agent_id
+
+    def _simulate_opponents(self) -> Tuple[bool, SplendorState]:
+        """
+        Simulate the opponents moves from the current turn until self.my_turn
+
+        :return: whether or not the game has ended prior to the turn of self.my_turn
+        """
+        while self.turn != self.my_turn and not self.game_rule.gameEnds():
+            available_actions = self.game_rule.getLegalActions(self.state, self.turn)
+            agent = self._get_opponent_by_turn(self.turn)
+            action = agent.SelectAction(available_actions, self.state, self.game_rule)
+            self.state = self.game_rule.generateSuccessor(self.state, action, self.turn)
+            self.turn = next(self.turns_gen)
+
+        return self.game_rule.gameEnds(), self.state
