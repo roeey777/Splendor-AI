@@ -1,3 +1,4 @@
+import shutil
 from argparse import ArgumentParser
 from csv import writer as csv_writer
 from datetime import datetime
@@ -13,6 +14,7 @@ from Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent import (
     GeneAlgoAgent,
 )
 from Engine.game import Game
+from Engine.Splendor import features
 from Engine.Splendor.splendor_model import SplendorGameRule
 import numpy as np
 
@@ -20,7 +22,6 @@ import numpy as np
 POPULATION_SIZE = 24  # 60
 GENERATIONS = 100
 MUTATION_RATE = 0.2
-ROUNDS_LIMIT = 100
 DEPENDECY_DEGREE = 3
 FOUR_PLAYERS = 4
 PLAYERS_OPTIONS = (2, 3, 4)
@@ -58,7 +59,7 @@ class MyGameRule(SplendorGameRule):
         won't get stuck by accident.
         """
         if all(
-            len(agent.agent_trace.action_reward) == ROUNDS_LIMIT
+            len(agent.agent_trace.action_reward) == features.ROUNDS_LIMIT
             for agent in self.current_game_state.agents
         ):
             return True
@@ -324,18 +325,20 @@ def evolve(
     Returns the top `return_size` individuals of the last generation.
     """
     start_time = datetime.now()
+    selection_size = (population_size // 3) or 2
+    return_size = (population_size // 12) or 1
     if seed is not None:
         np.random.seed(seed)
 
-    selection_size = (population_size // 3) or 2
-    return_size = (population_size // 12) or 1
-
     folder = working_dir / start_time.strftime(FOLDER_FORMAT)
     folder.mkdir()
+    shutil.copy(features.__file__, folder)
+
     if not quiet:
         print(f"({folder.name}) Starting evolution with")
         print(f"    population: {population_size}")
         print(f"    selection:  {selection_size}")
+
     population = generate_initial_population(population_size)
 
     with open(folder / STATS_FILE, "w", newline="\n") as stats_file:
@@ -358,9 +361,9 @@ def evolve(
             parents = population[:selection_size]
             np.random.shuffle(parents)
             children = mate(parents, population_size)
+            mutate_population(children, progress, mutation_rate)
             population = parents + children
             np.random.shuffle(population)
-            mutate_population(population, progress, mutation_rate)
 
         games_stats = sort_by_fitness(population,
                                       folder / "final",

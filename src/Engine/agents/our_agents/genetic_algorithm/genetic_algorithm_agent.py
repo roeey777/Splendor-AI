@@ -1,7 +1,9 @@
 from pathlib import Path
 
-from Engine.agents.our_agents.genetic_algorithm.genes import ManagerGene, StrategyGene
-from Engine.Splendor.features import extract_metrics
+from Engine.agents.our_agents.genetic_algorithm.genes import (
+    ManagerGene, StrategyGene,
+)
+from Engine.Splendor.features import extract_metrics, normalize_metrics
 from Engine.template import Agent
 import numpy as np
 
@@ -71,7 +73,7 @@ class GeneAlgoAgent(Agent):
         action. The `strategy` is used to evaluate the state.
         """
         next_state = game_rule.generateSuccessor(game_state, action, self.id)
-        next_metrics = extract_metrics(next_state, self.id)
+        next_metrics = normalize_metrics(extract_metrics(next_state, self.id))
         evaluation = strategy.evaluate_state(next_metrics)
         game_rule.generatePredecessor(game_state, action, self.id)
 
@@ -85,7 +87,7 @@ class GeneAlgoAgent(Agent):
         if not actions:
             raise Exception("Cannot play, no actions")
 
-        metrics = extract_metrics(game_state, self.id)
+        metrics = normalize_metrics(extract_metrics(game_state, self.id))
         strategy = self._manager_gene.select_strategy(metrics, self._strategies)
         best_action = None
         best_action_value = -np.inf

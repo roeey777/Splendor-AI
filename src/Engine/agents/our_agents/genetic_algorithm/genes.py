@@ -1,4 +1,4 @@
-from Engine.Splendor.features import METRICS_SHAPE
+from Engine.Splendor.features import METRICS_SHAPE, build_array
 import numpy as np
 
 
@@ -25,11 +25,7 @@ class Gene:
         multiple time (according to the instructions of `METRICS_SHAPE`).
         """
         if self._prepared_dna is None:
-            arr = np.empty((0, self.SHAPE[1] if len(self.SHAPE) == 2 else 1))
-            for repetition, value in zip(METRICS_SHAPE, self._dna, strict=True):
-                stack = [value for _ in range(repetition)]
-                arr = np.vstack([arr] + stack)
-            self._prepared_dna = arr
+            self._prepared_dna = build_array(self._dna, METRICS_SHAPE)
 
         return self._prepared_dna
 
@@ -94,7 +90,7 @@ class ManagerGene(Gene):
         # assert len(output) == len(strategies), "Mismatching lengths"
         # index = max(range(len(output)), key = lambda i: softmax_out[i])
         output = np.matmul(state_metrics, self.dna)
-        assert len(output) == len(strategies), "Mismatching lengths"
+        assert len(output) == len(strategies), f"Mismatching lengths ({output.shape})"
         index = max(range(len(output)), key=lambda i: output[i])
 
         return strategies[index]
