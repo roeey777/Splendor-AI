@@ -29,7 +29,7 @@ WORKING_DIR = Path().absolute()
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
 # SELECTION = (POPULATION_SIZE // 3) or 2
 # RETURN_SIZE = (POPULATION_SIZE // 12) or 1
-WINNER_BONUS = 10
+WINNER_BONUS = 0
 MAX_PROCESS = cpu_count() // 2
 STATS_FILE = "stats.csv"
 STATS_HEADERS = (
@@ -164,6 +164,7 @@ def single_game(agents) -> tuple[Game, dict]:
     """
     Runs a single game of Splendor (with the Engine) using the given agents.
     """
+    np.random.shuffle(agents)
     names = list()
     for i, agent in enumerate(agents):
         agent.id = i
