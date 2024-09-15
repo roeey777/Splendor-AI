@@ -1,3 +1,5 @@
+from typing import Dict
+
 import numpy as np
 
 from Engine.Splendor.splendor_model import SplendorState, SplendorGameRule
@@ -45,7 +47,7 @@ def build_action(
     game_rule: SplendorGameRule,
     state: SplendorState,
     agent_index: int,
-):
+) -> Dict:
     """
     Construct the action to be taken from it's action index in the ALL_ACTION list.
     :return: the corresponding action to the action_index, in the format required

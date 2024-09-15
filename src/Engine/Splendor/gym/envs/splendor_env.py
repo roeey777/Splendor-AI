@@ -65,9 +65,11 @@ class SplendorEnv(gym.Env):
         self.action_space = gym.spaces.Discrete(len(ALL_ACTIONS))
 
         # define the observation_space to be a vector of continues values of length
-        # of np.sum(features.METRICS_SHAPE).
+        # of features.METRICS_WITH_CARDS_SIZE.
         self.observation_space = gym.spaces.Box(
-            low=-np.inf, high=np.inf, shape=(np.sum(features.METRICS_SHAPE),)
+            low=-np.inf,
+            high=np.inf,
+            shape=features.METRICS_WITH_CARDS_SHAPE,
         )
 
     def reset(
@@ -106,11 +108,11 @@ class SplendorEnv(gym.Env):
         self._simulate_opponents()
 
         return (
-            self._vectorize(self.state, self.observation_space.shape),
+            self._vectorize(self.state, self.observation_space.shape, self.my_turn),
             {"my_id": self.my_turn},
         )
 
-    def step(self, action: int) -> Tuple[Any, float, bool, bool, Dict]:
+    def step(self, action: int) -> Tuple[np.array, float, bool, bool, Dict]:
         """
         Run one time-step of the environment's dynamics.
 
@@ -151,7 +153,7 @@ class SplendorEnv(gym.Env):
         terminated = terminated_by_me or terminated_by_opponents
 
         return (
-            self._vectorize(next_state, self.observation_space.shape),
+            self._vectorize(next_state, self.observation_space.shape, self.my_turn),
             reward,
             terminated,
             False,
@@ -167,7 +169,7 @@ class SplendorEnv(gym.Env):
         action_index: int,
         state: Optional[SplendorState] = None,
         agent_index: Optional[int] = None,
-    ):
+    ) -> Dict:
         """
         Construct the action to be taken from it's action index in the ALL_ACTION list.
         :return: the corresponding action to the action_index, in the format required
@@ -206,13 +208,11 @@ class SplendorEnv(gym.Env):
                 return agent
 
     @staticmethod
-    def _vectorize(state, shape) -> np.array:
+    def _vectorize(state: SplendorState, shape: Tuple[int, ...], turn: int) -> np.array:
         """
         extract the features vector out of the given state.
         """
-        # TODO: return feature-vector of next_state (as np.array) instead of SplendorState.
-        #       this will also remove a gym warning specifically about that.
-        return np.random.randn(*shape).astype(dtype=np.float32)
+        return features.extract_metrics_with_cards(state, turn).astype(np.float32)
 
     def _set_opponents_ids(self):
         """
