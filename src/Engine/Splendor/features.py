@@ -5,7 +5,7 @@ BEWARE: THIS IS UNTESTED!!!!
 """
 
 from dataclasses import dataclass
-from itertools import chain
+from itertools import chain, repeat
 from numbers import Number
 from typing import Dict, Iterable, List, Literal, Optional, ValuesView
 
@@ -28,19 +28,31 @@ NORMAL_COLORS = list(color for color in COLOURS.values() if color != WILDCARD)
 MAX_TIER_CARDS = 4
 MAX_NOBLES = 5
 MAX_RESERVED = 3
+MAX_WILDCARDS = 5
+MAX_GEMS = 10
 WINNING_SCORE_TRESHOLD = 15
+MAX_SCORE = 22
 MAX_RIVALS = 3
-
+ROUNDS_LIMIT = 100
+MAX_STONES = (4, 5, 7)
+MAX_CARD_GEMS_DIST_1 = 5
+MAX_CARD_GEMS_DIST_2 = 8
+MAX_CARD_GEMS_DIST_3 = 14
+MAX_CARD_TURNS_DIST_1 = 4
+MAX_CARD_TURNS_DIST_2 = 6
+MAX_CARD_TURNS_DIST_3 = 7
+MAX_NOBLE_CARDS_DISTANCE = 9
+MAX_NOBLE_GEMS_DISTANCE = MAX_CARD_GEMS_DIST_3 * MAX_NOBLE_CARDS_DISTANCE
 ### RANDOM VALUES (change?) ###
-MAX_NOBLE_DISTANCE = 100
-MAX_CARD_DISTANCE = 20
+MAX_CARDS_PER_COLOR = 8 # normal value is 5
+MAX_TOTAL_CARDS = MAX_CARDS_PER_COLOR * 3 # normal value is 20
+MAX_VARIANCE = 20
+MAX_BUYING_POWER = 10
 MISSING_CARD_GEMS_DEFAULT = 0
 MISSING_CARD_TURNS_DEFAULT = 0
-MISSING_NOBEL_GEMS_DEFAULT = 0
-MISSING_NOBEL_TURNS_DEFAULT = 0
+MISSING_NOBLE_GEMS_DISTANCE = 0
+MISSING_NOBLE_CARDS_DISTANCE = 0
 MISSING_RIVAL_DEFAULT = 0
-DIMINISHING_MULTIPLIER = 2.5
-WINNING_MULTIPLIER = 4
 
 
 # ********************************
@@ -56,42 +68,22 @@ def get_agent(game_state: SplendorState, agent_index: int) -> SplendorState.Agen
     return game_state.agents[agent_index]
 
 
-def agent_buying_power(agent) -> Dict[Color, int]:
+def agent_buying_power(agent: SplendorState.AgentState) -> Dict[Color, int]:
     return {
-        color: agent.gems[color] + len(agent.cards[color]) for color in NORMAL_COLORS
+        color: agent.gems[color] + len(agent.cards[color])
+        for color in NORMAL_COLORS
     }
 
 
-def find_missing_gems(
-    game_state: SplendorState, agent_index: int, card: Card
-) -> Dict[Color, int]:
-    """
-    calculate which gems are required to be obtained by an agent in order
-    to purchase a specific card.
-    """
-    agent = get_agent(game_state, agent_index)
-    permanent_gems = permanent_buying_power(game_state, agent_index)
-
-    for color, cost in card.cost.items():
-        missing_gems[color] = max(0, cost - agent.gems[color] - permanent_gems[color])
-
-    return missing_gems
-
-
-def get_wildcard_gems(game_state: SplendorState, agent_index: int) -> int:
-    """
-    Find the amount of wildcard (yellow) gems a specific agent have in his
-    disposel.
-    """
-    agent = get_agent(game_state, agent_index)
-    return agent.gems[WILDCARD]
-
-
 def diminish_return(value: Number) -> float:
-    return DIMINISHING_MULTIPLIER * np.log(1 + value)
+    return np.log(1 + value)
 
 
-def missing_card_to_nobel(
+def agent_won(agent: SplendorState.AgentState) -> bool:
+    return agent.score >= WINNING_SCORE_TRESHOLD
+
+
+def missing_card_to_noble(
     game_state: SplendorState, agent_index: int, noble: Noble
 ) -> Dict[Color, int]:
     """
@@ -107,285 +99,11 @@ def missing_card_to_nobel(
     return missing_cards
 
 
-# ********************************
-# Features Extraction Functions
-# ********************************
-def turns_made_by_agent(game_state: SplendorState, agent_index: int) -> int:
+def turns_made_by_agent(agent: SplendorState.AgentState) -> int:
     """
     Extract the number of turns made by a given agent.
     """
-    return len(get_agent(game_state, agent_index).agent_trace.action_reward)
-
-
-def score_of_agent(game_state: SplendorState, agent_index: int) -> int:
-    """
-    Extract the score (number of victory points) of a single player.
-    """
-    return get_agent(game_state, agent_index).score
-
-
-def distance_in_gems_to_card(
-    game_state: SplendorState, agent_index: int, card: Card
-) -> int:
-    """
-    Calculate the distance (required amount of gems) of an agent from
-    purchesing a given card.
-    """
-    return max(
-        0,
-        sum(find_missing_gems(game_state, agent_index, card).values())
-        - get_wildcard_gems(game_state, agent_index),
-    )
-
-
-def distance_to_card(game_state: SplendorState, agent_index: int, card: Card) -> int:
-    """
-    Calculate the distance (minimal amount of turns) of an agent from
-    purchesing a given card.
-    """
-    wildcard_gems = get_wildcard_gems(game_state, agent_index)
-    missing_gems = find_missing_gems(game_state, agent_index, card)
-    return max(0, max(missing_gems.values()) - wildcard_gems)
-
-
-def buying_power_of_color(
-    game_state: SplendorState,
-    agent_index: int,
-    color: Color,
-    diminishing_return: bool = True,
-) -> float:
-    """
-    Calculate the buying power of a specific color.
-    Allow the calculation of the buying power with diminishing return.
-    """
-    agent_buying_power = get_agent(game_state, agent_index).gems[color]
-
-    if diminishing_return:
-        return diminish_return(agent_buying_power)
-    else:
-        return agent_buying_power
-
-
-def buying_power(
-    game_state: SplendorState,
-    agent_index: int,
-    diminishing_return: bool = True,
-) -> Dict[Color, float]:
-    """
-    Calculate the buying power for all possible colors.
-    Allow the calculation of the buying power with diminishing return.
-    """
-    power: Dict[Color, float] = {}
-    permanent_gems = permanent_buying_power(
-        game_state, agent_index, diminishing_return=False
-    )
-
-    for color in COLOURS.values():
-        power[color] = buying_power_of_color(
-            game_state, agent_index, color, diminishing_return=False
-        )
-        power[color] += permanent_gems[color]
-
-        if diminishing_return:
-            power[color] = diminish_return(power[color])
-
-    return power
-
-
-def total_buying_power(
-    game_state: SplendorState,
-    agent_index: int,
-    diminishing_return: bool = True,
-) -> float:
-    """
-    Calculate the total (sum) buying power of a specific agent.
-    """
-    return sum(buying_power(game_state, agent_index, diminishing_return).values())
-
-
-def buying_power_variance(
-    game_state: SplendorState,
-    agent_index: int,
-    diminishing_return: bool = True,
-) -> float:
-    """
-    Calculate the variance of buying power among the different gems colors
-    held by a specific agent.
-    """
-    return np.var(
-        list(buying_power(game_state, agent_index, diminishing_return).values())
-    )
-
-
-def cards_owned_by_agent(game_state: SplendorState, agent_index: int) -> int:
-    """
-    Count the amount of cards owned by a specific agent.
-    """
-    return len(
-        filter(
-            get_agent(game_state, agent_index).cards,
-            lambda card: card.colour != RESERVED,
-        )
-    )
-
-
-def cards_reserved_by_agent(game_state: SplendorState, agent_index: int) -> int:
-    """
-    Count the amount of cards reserved by a specific agent.
-    """
-    return len(
-        filter(
-            get_agent(game_state, agent_index).cards,
-            lambda card: card.colour == RESERVED,
-        )
-    )
-
-
-def permanent_buying_power_of_color(
-    game_state: SplendorState,
-    agent_index: int,
-    color: Color,
-    diminishing_return: bool = True,
-) -> float:
-    """
-    Calculate the buying power of the permanent gems of specific color gained
-    from the cards owned by a specific agent.
-    Allow the calculation of the buying power with diminishing return.
-    """
-    permanent_gems = sum(
-        list(
-            filter(
-                get_agent(game_state, agent_index).cards,
-                lambda card: card.colour == color,
-            )
-        )
-    )
-
-    if diminishing_return:
-        return diminish_return(permanent_gems)
-    else:
-        return permanent_gems
-
-
-def permanent_buying_power(
-    game_state: SplendorState,
-    agent_index: int,
-    diminishing_return: bool = True,
-) -> Dict[Color, float]:
-    """
-    Calculate the permanent buying power for all possible colors.
-    Allow the calculation of the buying power with diminishing return.
-    """
-    permanent_power: Dict[Color, float] = {}
-
-    color: Color
-    for color in filter(COLOURS.values(), lambda color: color != RESERVED):
-        permanent_power[color] = permanent_buying_power_of_color(
-            game_state, agent_index, color, diminishing_return
-        )
-
-    return permanent_power
-
-
-def total_permanent_buying_power(
-    game_state: SplendorState,
-    agent_index: int,
-    diminishing_return: bool = True,
-) -> float:
-    """
-    Calculate the total (sum) of permanent buying power of a specific agent.
-    """
-    return sum(
-        permanent_buying_power(game_state, agent_index, diminishing_return).values()
-    )
-
-
-def card_score_to_distance_ratio(
-    game_state: SplendorState, agent_index: int, card: Card
-) -> float:
-    """
-    calculate the ratio between the card earned victory points to it's distance
-    from a specific agent.
-    """
-    score = card.points
-    distance = distance_in_gems_to_card(game_state, agent_index, card)
-
-    return score / distance
-
-
-def distance_to_noble_in_cards(
-    game_state: SplendorState, agent_index: int, noble: Noble
-) -> int:
-    """
-    Calculate the distance (in missing cards) of an agent from being
-    visited by a specific noble.
-    """
-    missing_permanent_gems = missing_card_to_nobel(game_state, agent_index, noble)
-
-    return sum(missing_permanent_gems.values())
-
-
-def distance_to_noble_k_minimal(
-    game_state: SplendorState, agent_index: int, noble: Noble
-) -> float:
-    """
-    Calculate the distance (sum of k-minimal card's distances) of an agent
-    from being visited by a specific noble.
-    """
-    agent = get_agent(game_state, agent_index)
-    missing_permanent_gems = missing_card_to_nobel(game_state, agent_index, noble)
-    reserved_cards = agent.cards[RESERVED]
-    potential_cards: Dict[Color, List[Card]] = {
-        color: [] for color in filter(COLOURS.values(), lambda color: color != RESERVED)
-    }
-
-    for card in reserved_cards + game_state.board.dealt_list():
-        potential_cards[card.colour].append(
-            distance_to_card(game_state, agent_index, card)
-        )
-
-    for l in potential_cards.values():
-        l.sort()
-
-    distance = 0.0
-    for color, missing in missing_permanent_gems.items():
-        if len(potential_cards[color]) < missing:
-            return MAX_NOBLE_DISTANCE
-
-        distance += potential_cards[color][missing]
-
-    return max(0, distance)
-
-
-def distance_to_noble(
-    game_state: SplendorState, agent_index: int, noble: Noble
-) -> float:
-    """
-    Calculate the distance of an agent from being visited by a specific noble.
-    """
-    agent = get_agent(game_state, agent_index)
-    missing_permanent_gems = missing_card_to_nobel(game_state, agent_index, noble)
-    reserved_cards = agent.cards[RESERVED]
-    potential_cards: Dict[Color, List[Card]] = {
-        color: [] for color in filter(COLOURS.values(), lambda color: color != RESERVED)
-    }
-
-    for card in reserved_cards + game_state.board.dealt_list():
-        potential_cards[card.colour].append(
-            distance_to_card(game_state, agent_index, card)
-        )
-
-    for l in potential_cards.values():
-        l.sort()
-
-    distance = 0.0
-    for color, missing in missing_permanent_gems.items():
-        if len(potential_cards[color]) < missing:
-            return MAX_NOBLE_DISTANCE
-
-        distance += sum(potential_cards[color][: missing + 1])
-
-    return max(0, distance)
+    return len(agent.agent_trace.action_reward)
 
 
 def missing_gems_to_card(
@@ -404,9 +122,81 @@ def turns_to_buy_card(missing_gems: ValuesView[int]) -> int:
     return max(np.ceil(sum(missing_gems) / 3), *missing_gems)
 
 
+def build_array(base_array: np.array, instruction: tuple[int]) -> np.array:
+    building_blocks = zip(base_array, instruction, strict=True)
+    iters = (repeat(value, times) for value, times in building_blocks)
+    match len(base_array.shape):
+        case 1:
+            return np.hstack(tuple(chain(*iters)), dtype=base_array.dtype)
+        case 2:
+            return np.vstack(tuple(chain(*iters)), dtype=base_array.dtype)
+        case _:
+            raise ValueError(f"unsupported array shape '{base_array.shape}'")
+
+
+# ********************************
+# Features Extraction Functions
+# ********************************
+METRICS_SHAPE : tuple[int] = (
+    1,  # constant (hopefully would be used by the manager)
+    1,  # agent's turns count
+    1,  # agent's score
+    1,  # agent has crossed 15 points
+    1,  # agent's owned cards count
+    1,  # agent's reserved cards count
+    1,  # variance of buying power
+    1,  # agent's golden gems count
+    1,  # agent's total gems count
+    len(NORMAL_COLORS),  # agent's cards per color
+    len(NORMAL_COLORS),  # agent's buying power (without wild gems)
+    len(NORMAL_COLORS),  # agent's diminishing buying power (without wild gems)
+    MAX_RIVALS,  # scores of rivals that play before agent
+    MAX_RIVALS,  # scores of rivals that play after agent
+    MAX_TIER_CARDS,  # distances to cards on tier 1 in gems
+    MAX_TIER_CARDS,  # distances to cards on tier 2 in gems
+    MAX_TIER_CARDS,  # distances to cards on tier 3 in gems
+    MAX_TIER_CARDS,  # distances to cards on tier 1 in turns
+    MAX_TIER_CARDS,  # distances to cards on tier 2 in turns
+    MAX_TIER_CARDS,  # distances to cards on tier 3 in turns
+    MAX_RESERVED,  # distances to reserved cards in gems
+    MAX_RESERVED,  # distances to reserved cards in turns
+    MAX_NOBLES,  # distances to nobles in gems
+    MAX_NOBLES,  # distances to nobles in cards
+)
+
+METRIC_NORMALIZATION = np.array(
+    [
+        1,             # constant (hopefully would be used by the manager)
+        ROUNDS_LIMIT,  # agent's turns count
+        MAX_SCORE,     # agent's score
+        1,             # agent has crossed 15 points
+        MAX_TOTAL_CARDS,  # agent's owned cards count
+        MAX_RESERVED,   # agent's reserved cards count
+        MAX_VARIANCE,   # variance of buying power
+        MAX_WILDCARDS,  # agent's golden gems count
+        MAX_GEMS,       # agent's total gems count
+        MAX_CARDS_PER_COLOR,  # agent's cards per color
+        MAX_BUYING_POWER,     # agent's buying power (without wild gems)
+        diminish_return(MAX_BUYING_POWER),  # agent's diminishing buying power
+        MAX_SCORE,  # scores of rivals that play before agent
+        WINNING_SCORE_TRESHOLD - 1,  # scores of rivals that play after agent
+        MAX_CARD_GEMS_DIST_1,   # distances to cards on tier 1 in gems
+        MAX_CARD_GEMS_DIST_2,   # distances to cards on tier 2 in gems
+        MAX_CARD_GEMS_DIST_3,   # distances to cards on tier 3 in gems
+        MAX_CARD_TURNS_DIST_1,  # distances to cards on tier 1 in turns
+        MAX_CARD_TURNS_DIST_2,  # distances to cards on tier 2 in turns
+        MAX_CARD_TURNS_DIST_3,  # distances to cards on tier 3 in turns
+        MAX_CARD_GEMS_DIST_3,   # distances to reserved cards in gems
+        MAX_CARD_TURNS_DIST_3,  # distances to reserved cards in turns
+        MAX_NOBLE_GEMS_DISTANCE,  # distances to nobles in gems
+        MAX_NOBLE_CARDS_DISTANCE,  # distances to nobles in cards
+    ],
+    dtype=float,
+)
+
+
 def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
     agent = get_agent(game_state, agent_index)
-    wild_gems = agent.gems[WILDCARD]
     buying_power = agent_buying_power(agent)
     owned_cards = sum(len(agent.cards[color]) for color in NORMAL_COLORS)
 
@@ -414,7 +204,6 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
 
     cards_distances_in_gems: list[int] = list()
     cards_distances_in_turns: list[int] = list()
-    # rival_cards_turns_diff = list()
     for card in chain(*game_state.board.dealt):
         if card is None:
             cards_distances_in_gems.append(MISSING_CARD_GEMS_DEFAULT)
@@ -441,8 +230,8 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
     for distances in card_distance_per_color.values():
         distances.sort()
 
-    nobles_distances_in_cards = [MAX_NOBLE_DISTANCE] * MAX_NOBLES
-    nobles_distances_in_gems = [MAX_NOBLE_DISTANCE] * MAX_NOBLES
+    nobles_distances_in_cards = [MISSING_NOBLE_CARDS_DISTANCE] * MAX_NOBLES
+    nobles_distances_in_gems = [MISSING_NOBLE_GEMS_DISTANCE] * MAX_NOBLES
     for i, (_, noble_cost) in enumerate(game_state.board.nobles):
         missing_cards = {
             color: cost - len(agent.cards[color])
@@ -454,11 +243,11 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
         for color, count in missing_cards.items():
             distance_in_gems += sum(card_distance_per_color[color][:count])
             more_cards = count - len(card_distance_per_color[color])
-            distance_in_gems += MAX_CARD_DISTANCE * max(more_cards, 0)
+            distance_in_gems += MAX_CARD_GEMS_DIST_3 * max(more_cards, 0)
         nobles_distances_in_gems[i] = distance_in_gems
 
-    rivals_scores_1 = [0] * MAX_RIVALS
-    rivals_scores_2 = [0] * MAX_RIVALS
+    rivals_scores_1 = [MISSING_RIVAL_DEFAULT] * MAX_RIVALS
+    rivals_scores_2 = [MISSING_RIVAL_DEFAULT] * MAX_RIVALS
     for i, rival in enumerate(game_state.agents):
         if i < agent_index:
             rivals_scores_1[i] = rival.score
@@ -468,14 +257,17 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
     return np.fromiter(
         chain(
             [
-                len(agent.agent_trace.action_reward),
+                1,
+                turns_made_by_agent(agent),
                 agent.score,
-                WINNING_MULTIPLIER if agent.score >= WINNING_SCORE_TRESHOLD else 0,
+                1 if agent_won(agent) else 0,
                 owned_cards,
                 len(agent.cards[RESERVED]),
                 np.var(list(buying_power.values())),
-                wild_gems,
+                agent.gems[WILDCARD],
+                sum(agent.gems.values()),
             ],
+            (len(agent.cards[color]) for color in NORMAL_COLORS),
             buying_power.values(),
             map(diminish_return, buying_power.values()),
             rivals_scores_1,
@@ -491,26 +283,7 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
     )
 
 
-METRICS_SHAPE = (
-    1,  # agent's turns count
-    1,  # agent's score
-    1,  # agent has crossed 15 points
-    1,  # agent's owned cards count
-    1,  # agent's reserved cards count
-    1,  # variance of buying power
-    1,  # agent's wild gems count
-    len(NORMAL_COLORS),  # agent's buying power (without wild gems)
-    len(NORMAL_COLORS),  # agent's dimishing buying power (without wild gems)
-    MAX_RIVALS,  # scores of rivals that play before agent
-    MAX_RIVALS,  # scores of rivals that play after agent
-    MAX_TIER_CARDS,  # distances to cards on tier 1 in gems
-    MAX_TIER_CARDS,  # distances to cards on tier 2 in gems
-    MAX_TIER_CARDS,  # distances to cards on tier 3 in gems
-    MAX_TIER_CARDS,  # distances to cards on tier 1 in turns
-    MAX_TIER_CARDS,  # distances to cards on tier 2 in turns
-    MAX_TIER_CARDS,  # distances to cards on tier 3 in turns
-    MAX_RESERVED,  # distances to reserved cards in gems
-    MAX_RESERVED,  # distances to reserved cards in turns
-    MAX_NOBLES,  # distances to nobles in gems
-    MAX_NOBLES,  # distances to nobles in cards
-)
+def normalize_metrics(metrics: np.array) -> np.array:
+    normalizer = build_array(METRIC_NORMALIZATION, METRICS_SHAPE)
+    normalized = metrics / normalizer
+    return normalized.clip(-1, 1)
