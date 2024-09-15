@@ -1,5 +1,12 @@
 # Splendor
 
+---
+**NOTE**
+
+Some of the features here will require python `3.11` or higher.
+
+---
+
 ## Installation of Splendor
 There are 2 possible ways to install the requirements of splendor.
 1. using ```conda```.

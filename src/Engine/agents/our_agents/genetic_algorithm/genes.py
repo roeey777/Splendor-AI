@@ -1,4 +1,4 @@
-from Engine.Splendor.features import METRICS_SHAPE
+from Engine.Splendor.features import METRICS_SHAPE, build_array
 import numpy as np
 
 
@@ -7,8 +7,8 @@ class Gene:
     A generic gene representation class.
     """
 
-    LOWER_BOUND = -10
-    UPPER_BOUND = 10
+    LOWER_BOUND = -20
+    UPPER_BOUND = 20
     SHAPE = None
 
     def __init__(self, dna: np.array):
@@ -25,25 +25,21 @@ class Gene:
         multiple time (according to the instructions of `METRICS_SHAPE`).
         """
         if self._prepared_dna is None:
-            arr = np.empty((0, self.SHAPE[1] if len(self.SHAPE) == 2 else 1))
-            for repetition, value in zip(METRICS_SHAPE, self._dna, strict=True):
-                stack = [value for _ in range(repetition)]
-                arr = np.vstack([arr] + stack)
-            self._prepared_dna = arr
+            self._prepared_dna = build_array(self._dna, METRICS_SHAPE)
 
         return self._prepared_dna
 
     @classmethod
     def random(cls):
         """
-        Initiat a gene with random DNA.
+        Initiate a gene with random DNA.
         """
         return cls(np.random.uniform(cls.LOWER_BOUND, cls.UPPER_BOUND, cls.SHAPE))
 
     @classmethod
     def load(cls, path_or_file):
         """
-        Intiat a gene with DNA from a saved file.
+        Initiate a gene with DNA from a saved file.
         """
         return cls(np.load(path_or_file))
 
@@ -89,12 +85,10 @@ class ManagerGene(Gene):
     def select_strategy(
         self, state_metrics, strategies: tuple[StrategyGene]
     ) -> StrategyGene:
-        # output = np.exp(np.matmul(state_metrics, self.dna))
-        # softmax_out = output / np.sum(output)
-        # assert len(output) == len(strategies), "Mismatching lengths"
-        # index = max(range(len(output)), key = lambda i: softmax_out[i])
         output = np.matmul(state_metrics, self.dna)
-        assert len(output) == len(strategies), "Mismatching lengths"
+        assert len(output) == len(strategies), f"Mismatching lengths ({output.shape})"
         index = max(range(len(output)), key=lambda i: output[i])
+        # with open("shit.txt", 'a') as f:
+        #     print(index, file=f)
 
         return strategies[index]

@@ -3,6 +3,12 @@ from setuptools import setup, find_packages
 setup(
     name="splendor",
     version="0.0.2",
+    python_requires=">=3.11",
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+    ],
     description="Splendor Game Engine",
     license="BSD",
     packages=find_packages(
