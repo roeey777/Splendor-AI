@@ -43,15 +43,11 @@ MAX_CARD_TURNS_DIST_2 = 6
 MAX_CARD_TURNS_DIST_3 = 7
 MAX_NOBLE_CARDS_DISTANCE = 9
 MAX_NOBLE_GEMS_DISTANCE = MAX_CARD_GEMS_DIST_3 * MAX_NOBLE_CARDS_DISTANCE
-# guesses
+### RANDOM VALUES (change?) ###
 MAX_CARDS_PER_COLOR = 8 # normal value is 5
 MAX_TOTAL_CARDS = MAX_CARDS_PER_COLOR * 3 # normal value is 20
 MAX_VARIANCE = 20
 MAX_BUYING_POWER = 10
-
-
-### RANDOM VALUES (change?) ###
-MAX_NOBLE_DISTANCE = 100
 MISSING_CARD_GEMS_DEFAULT = 0
 MISSING_CARD_TURNS_DEFAULT = 0
 MISSING_NOBLE_GEMS_DISTANCE = 0
@@ -151,6 +147,7 @@ METRICS_SHAPE : tuple[int] = (
     1,  # variance of buying power
     1,  # agent's golden gems count
     1,  # agent's total gems count
+    len(NORMAL_COLORS),  # agent's cards per color
     len(NORMAL_COLORS),  # agent's buying power (without wild gems)
     len(NORMAL_COLORS),  # agent's diminishing buying power (without wild gems)
     MAX_RIVALS,  # scores of rivals that play before agent
@@ -178,8 +175,9 @@ METRIC_NORMALIZATION = np.array(
         MAX_VARIANCE,   # variance of buying power
         MAX_WILDCARDS,  # agent's golden gems count
         MAX_GEMS,       # agent's total gems count
-        MAX_BUYING_POWER,  # agent's buying power (without wild gems)
-        diminish_return(MAX_BUYING_POWER),  # agent's diminishing buying power (without wild gems)
+        MAX_CARDS_PER_COLOR,  # agent's cards per color
+        MAX_BUYING_POWER,     # agent's buying power (without wild gems)
+        diminish_return(MAX_BUYING_POWER),  # agent's diminishing buying power
         MAX_SCORE,  # scores of rivals that play before agent
         WINNING_SCORE_TRESHOLD - 1,  # scores of rivals that play after agent
         MAX_CARD_GEMS_DIST_1,   # distances to cards on tier 1 in gems
@@ -240,7 +238,7 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
             for color, cost in noble_cost.items()
             if cost - len(agent.cards[color]) > 0
         }
-        nobles_distances_in_cards[i] = sum(missing_cards.values()) / 9
+        nobles_distances_in_cards[i] = sum(missing_cards.values())
         distance_in_gems = 0
         for color, count in missing_cards.items():
             distance_in_gems += sum(card_distance_per_color[color][:count])
@@ -256,9 +254,6 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
         elif i > agent_index:
             rivals_scores_2[i - 1] = rival.score
 
-    capped_buying_power = tuple(min(v, MAX_BUYING_POWER)
-                                for v in buying_power.values())
-
     return np.fromiter(
         chain(
             [
@@ -266,14 +261,15 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
                 turns_made_by_agent(agent),
                 agent.score,
                 1 if agent_won(agent) else 0,
-                min(owned_cards, MAX_TOTAL_CARDS),
+                owned_cards,
                 len(agent.cards[RESERVED]),
-                min(np.var(list(buying_power.values())), MAX_VARIANCE),
+                np.var(list(buying_power.values())),
                 agent.gems[WILDCARD],
                 sum(agent.gems.values()),
             ],
-            capped_buying_power,
-            map(diminish_return, capped_buying_power),
+            (len(agent.cards[color]) for color in NORMAL_COLORS),
+            buying_power.values(),
+            map(diminish_return, buying_power.values()),
             rivals_scores_1,
             rivals_scores_2,
             cards_distances_in_gems,
@@ -289,4 +285,5 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
 
 def normalize_metrics(metrics: np.array) -> np.array:
     normalizer = build_array(METRIC_NORMALIZATION, METRICS_SHAPE)
-    return metrics / normalizer
+    normalized = metrics / normalizer
+    return normalized.clip(-1, 1)
