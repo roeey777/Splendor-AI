@@ -6,7 +6,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import torch.distributions as distributions
+from pathlib import Path
 from typing import List, Dict
+
 # typing.Literal was added in python3.8
 # so this is backward compatible.
 try:
@@ -14,9 +16,19 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
+import Engine.Splendor.gym
+# Oponents
+# from Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent import \
+#     GeneAlgoAgent
+from Engine.agents.generic.random import myAgent as random_agent
+
+opponents = [random_agent(0)]#GeneAlgoAgent]
+
 SEED = 1234
+HUGE_NEG = -1e8
+DROPOUT = 0.2
 LEARNING_RATE = 0.01
-MAX_EPISODES = 500
+MAX_EPISODES = 1000
 DISCOUNT_FACTOR = 0.99
 N_TRIALS = 25
 REWARD_THRESHOLD = 475
@@ -28,22 +40,36 @@ Trace = List[Dict[Literal["policy", "value", "total_policy", "total_value",
 float]]
 
 
-class MLP(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, dropout=0.5):
+class PPO(nn.Module):
+    HIDDEN_DIM = 128
+
+    def __init__(self, input_dim, output_dim, dropout=0.5):
         super().__init__()
-        self.fc_1 = nn.Linear(input_dim, hidden_dim)
-        self.fc_2 = nn.Linear(hidden_dim, output_dim)
-        self.dropout = nn.Dropout(dropout)
+        self.net = nn.Sequential(nn.Linear(input_dim, PPO.HIDDEN_DIM),
+                                 nn.Dropout(dropout),
+                                 nn.ReLU(), )
+        self.actor = nn.Linear(PPO.HIDDEN_DIM, output_dim)
+        self.critic = nn.Linear(PPO.HIDDEN_DIM, 1)
+        # self.fc_1 = nn.Linear(input_dim, hidden_dim)
+        # self.fc_2 = nn.Linear(hidden_dim, output_dim)
+        # self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x):
-        x = self.fc_1(x)
-        x = self.dropout(x)
-        x = F.relu(x)
-        x = self.fc_2(x)
-        return x
+    def forward(self, x, action_mask):
+        # x = self.fc_1(x)
+        # x = self.dropout(x)
+        # x = F.relu(x)
+        # x = self.fc_2(x)
+        # return x
+        x = self.net(x)
+        if len(x.shape) == 1:
+            x = x.unsqueeze(0)
+        actor_output = self.actor(x)
+        actor_output[:, action_mask == 0] = HUGE_NEG
+        prob = F.softmax(actor_output, dim=-1)
+        return prob, self.critic(x)
 
 
-class ActorCritic(nn.Module):
+"""class ActorCritic(nn.Module):
     def __init__(self, actor, critic):
         super().__init__()
         self.actor = actor
@@ -52,16 +78,17 @@ class ActorCritic(nn.Module):
     def forward(self, state):
         action_pred = self.actor(state)
         value_pred = self.critic(state)
-        return action_pred, value_pred
+        return action_pred, value_pred"""
 
 
 def init_weights(m):
-    if type(m) == nn.Linear:
+    if isinstance(m, nn.Linear):
         torch.nn.init.xavier_normal_(m.weight)
         m.bias.data.fill_(0)
 
 
-def train_single_epoch(env, policy, optimizer, discount_factor, ppo_steps, ppo_clip):
+def train_single_epoch(env, policy, optimizer, discount_factor, ppo_steps,
+                       ppo_clip):
     policy.train()
 
     states = []
@@ -81,14 +108,8 @@ def train_single_epoch(env, policy, optimizer, discount_factor, ppo_steps, ppo_c
         # append state here, not after we get the next state from env.step()
         states.append(state)
 
-        action_pred, value_pred = policy(state)
-
         action_mask = env.unwrapped.get_legal_actions_mask()
-        if action_mask is not None:
-            action_pred[action_mask == 0] = -1e8  # Huge negative number to
-            # eliminate chance of action being chosen
-
-        action_prob = F.softmax(action_pred, dim=-1)
+        action_prob, value_pred = policy(state, action_mask)
 
         dist = distributions.Categorical(action_prob)
 
@@ -99,7 +120,7 @@ def train_single_epoch(env, policy, optimizer, discount_factor, ppo_steps, ppo_c
         state, reward, done, truncated, _ = env.step(action.item())
 
         actions.append(action)
-        action_masks.append(action_mask)
+        # action_masks.append(action_mask)
         log_prob_actions.append(log_prob_action)
         values.append(value_pred)
         rewards.append(reward)
@@ -108,7 +129,7 @@ def train_single_epoch(env, policy, optimizer, discount_factor, ppo_steps, ppo_c
 
     states = torch.cat(states)
     actions = torch.cat(actions)
-    action_masks = torch.cat(action_masks)
+    # action_masks = torch.cat(action_masks)
     log_prob_actions = torch.cat(log_prob_actions)
     values = torch.cat(values).squeeze(-1)
 
@@ -150,7 +171,7 @@ def calculate_advantages(returns, values, normalize=True):
 
 
 def update_policy(policy, states, actions, action_masks, log_prob_actions,
-                                                    advantages,
+                  advantages,
                   returns, optimizer, ppo_steps, ppo_clip):
     total_policy_loss = 0
     total_value_loss = 0
@@ -161,11 +182,8 @@ def update_policy(policy, states, actions, action_masks, log_prob_actions,
 
     for _ in range(ppo_steps):
         # get new log prob of actions for all input states
-        action_pred, value_pred = policy(states)
+        action_prob, value_pred = policy(states, action_masks)
         value_pred = value_pred.squeeze(-1)
-        action_pred[:, action_masks == 0] = -1e8  # Huge negative number to
-        # eliminate chance of action being chosen
-        action_prob = F.softmax(action_pred, dim=-1)
 
         dist = distributions.Categorical(action_prob)
 
@@ -184,8 +202,8 @@ def update_policy(policy, states, actions, action_masks, log_prob_actions,
 
         optimizer.zero_grad()
 
-        policy_loss.backward()
-        value_loss.backward()
+        policy_loss.backward(retain_graph=True)
+        value_loss.backward(retain_graph=True)
 
         optimizer.step()
 
@@ -208,13 +226,8 @@ def evaluate(env, policy):
         state = torch.FloatTensor(state).unsqueeze(0)
 
         with torch.no_grad():
-            action_pred, _ = policy(state)
             action_mask = env.unwrapped.get_legal_actions_mask()
-            if action_mask is not None:
-                action_prob[action_mask == 0] = -1e8  # Huge negative number to
-                # eliminate chance of action being chosen
-
-            action_prob = F.softmax(action_pred, dim=-1)
+            action_prob, _ = policy(state, action_mask)
 
         action = torch.argmax(action_prob, dim=-1)
 
@@ -228,17 +241,19 @@ def evaluate(env, policy):
 def main():
     np.random.seed(SEED)
     torch.manual_seed(SEED)
-    train_env = gym.make('CartPole-v1')
-    test_env = gym.make('CartPole-v1')  # , render_mode="human")
+    train_env = gym.make("splendor-v1", agents=opponents)  # gym.make(
+    # 'CartPole-v1')
+    test_env = gym.make("splendor-v1", agents=opponents)  # gym.make(
+    # 'CartPole-v1', render_mode="human")
 
-    INPUT_DIM = train_env.observation_space.shape[0]
-    HIDDEN_DIM = 128
-    OUTPUT_DIM = train_env.action_space.n
+    input_dim = train_env.observation_space.shape[0]
+    output_dim = train_env.action_space.n
 
-    actor = MLP(INPUT_DIM, HIDDEN_DIM, OUTPUT_DIM)
-    critic = MLP(INPUT_DIM, HIDDEN_DIM, 1)
+    # actor = MLP(input_dim, hidden_dim, output_dim)
+    # critic = MLP(input_dim, hidden_dim, 1)
 
-    policy = ActorCritic(actor, critic)
+    policy = PPO(input_dim, output_dim, DROPOUT)  # ActorCritic(actor,
+    # critic)
 
     policy.apply(init_weights)
     optimizer = optim.Adam(policy.parameters(), lr=LEARNING_RATE)
@@ -249,8 +264,11 @@ def main():
 
     # Main training loop
     for episode in range(1, MAX_EPISODES + 1):
-        policy_loss, value_loss, train_reward = train_single_epoch(train_env, policy, optimizer,
-                                                                   DISCOUNT_FACTOR, PPO_STEPS,
+        policy_loss, value_loss, train_reward = train_single_epoch(train_env,
+                                                                   policy,
+                                                                   optimizer,
+                                                                   DISCOUNT_FACTOR,
+                                                                   PPO_STEPS,
                                                                    PPO_CLIP)
 
         test_reward = evaluate(test_env, policy)
@@ -272,9 +290,11 @@ def main():
         if episode % PRINT_EVERY == 0:
             print(
                 f'| Episode: {episode:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |')
-        if mean_test_rewards >= REWARD_THRESHOLD:
-            print(f'Reached reward threshold in {episode} episodes')
-            break
+            torch.save(policy, str(Path(__file__).parent /
+                                   f"ppo_model_{episode // PRINT_EVERY}.pth"))
+        # if mean_test_rewards >= REWARD_THRESHOLD:
+        #     print(f'Reached reward threshold in {episode} episodes')
+        #     break
 
     show_figures(train_rewards, test_rewards)
 
