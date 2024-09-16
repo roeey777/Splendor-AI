@@ -1,18 +1,44 @@
 """
 Features extraction from SplendorState
-
-BEWARE: THIS IS UNTESTED!!!!
 """
 
 from dataclasses import dataclass
 from itertools import chain, repeat
 from numbers import Number
 from typing import Dict, Iterable, List, Literal, Optional, ValuesView
+from functools import cache
 
 import numpy as np
 
+from sklearn.preprocessing import OneHotEncoder
+
 from Engine.Splendor.splendor_model import Card, SplendorState
-from Engine.Splendor.splendor_utils import COLOURS
+from Engine.Splendor.splendor_utils import COLOURS, CARDS
+from Engine.Splendor.constants import (
+    Color,
+    WILDCARD,
+    RESERVED,
+    NORMAL_COLORS,
+    NUMBER_OF_TIERS,
+    MAX_TIER_CARDS,
+    MAX_NOBLES,
+    MAX_RESERVED,
+    MAX_WILDCARDS,
+    MAX_GEMS,
+    WINNING_SCORE_TRESHOLD,
+    MAX_SCORE,
+    MAX_RIVALS,
+    ROUNDS_LIMIT,
+    MAX_STONES,
+    MAX_CARD_GEMS_DIST_1,
+    MAX_CARD_GEMS_DIST_2,
+    MAX_CARD_GEMS_DIST_3,
+    MAX_CARD_TURNS_DIST_1,
+    MAX_CARD_TURNS_DIST_2,
+    MAX_CARD_TURNS_DIST_3,
+    MAX_NOBLE_CARDS_DISTANCE,
+    MAX_NOBLE_GEMS_DISTANCE,
+)
 
 
 @dataclass
@@ -21,31 +47,9 @@ class Noble:
     cost: Dict[str, int]
 
 
-Color = Literal[*COLOURS.values()]
-WILDCARD = "yellow"
-RESERVED = WILDCARD
-NORMAL_COLORS = list(color for color in COLOURS.values() if color != WILDCARD)
-MAX_TIER_CARDS = 4
-MAX_NOBLES = 5
-MAX_RESERVED = 3
-MAX_WILDCARDS = 5
-MAX_GEMS = 10
-WINNING_SCORE_TRESHOLD = 15
-MAX_SCORE = 22
-MAX_RIVALS = 3
-ROUNDS_LIMIT = 100
-MAX_STONES = (4, 5, 7)
-MAX_CARD_GEMS_DIST_1 = 5
-MAX_CARD_GEMS_DIST_2 = 8
-MAX_CARD_GEMS_DIST_3 = 14
-MAX_CARD_TURNS_DIST_1 = 4
-MAX_CARD_TURNS_DIST_2 = 6
-MAX_CARD_TURNS_DIST_3 = 7
-MAX_NOBLE_CARDS_DISTANCE = 9
-MAX_NOBLE_GEMS_DISTANCE = MAX_CARD_GEMS_DIST_3 * MAX_NOBLE_CARDS_DISTANCE
 ### RANDOM VALUES (change?) ###
-MAX_CARDS_PER_COLOR = 8 # normal value is 5
-MAX_TOTAL_CARDS = MAX_CARDS_PER_COLOR * 3 # normal value is 20
+MAX_CARDS_PER_COLOR = 8  # normal value is 5
+MAX_TOTAL_CARDS = MAX_CARDS_PER_COLOR * 3  # normal value is 20
 MAX_VARIANCE = 20
 MAX_BUYING_POWER = 10
 MISSING_CARD_GEMS_DEFAULT = 0
@@ -70,12 +74,14 @@ def get_agent(game_state: SplendorState, agent_index: int) -> SplendorState.Agen
 
 def agent_buying_power(agent: SplendorState.AgentState) -> Dict[Color, int]:
     return {
-        color: agent.gems[color] + len(agent.cards[color])
-        for color in NORMAL_COLORS
+        color: agent.gems[color] + len(agent.cards[color]) for color in NORMAL_COLORS
     }
 
 
 def diminish_return(value: Number) -> float:
+    if value <= -1:
+        raise ValueError(f"log(1 + value) isn't defined for the value {value}")
+
     return np.log(1 + value)
 
 
@@ -137,7 +143,7 @@ def build_array(base_array: np.array, instruction: tuple[int]) -> np.array:
 # ********************************
 # Features Extraction Functions
 # ********************************
-METRICS_SHAPE : tuple[int] = (
+METRICS_SHAPE: tuple[int] = (
     1,  # constant (hopefully would be used by the manager)
     1,  # agent's turns count
     1,  # agent's score
@@ -166,27 +172,27 @@ METRICS_SHAPE : tuple[int] = (
 
 METRIC_NORMALIZATION = np.array(
     [
-        1,             # constant (hopefully would be used by the manager)
+        1,  # constant (hopefully would be used by the manager)
         ROUNDS_LIMIT,  # agent's turns count
-        MAX_SCORE,     # agent's score
-        1,             # agent has crossed 15 points
+        MAX_SCORE,  # agent's score
+        1,  # agent has crossed 15 points
         MAX_TOTAL_CARDS,  # agent's owned cards count
-        MAX_RESERVED,   # agent's reserved cards count
-        MAX_VARIANCE,   # variance of buying power
+        MAX_RESERVED,  # agent's reserved cards count
+        MAX_VARIANCE,  # variance of buying power
         MAX_WILDCARDS,  # agent's golden gems count
-        MAX_GEMS,       # agent's total gems count
+        MAX_GEMS,  # agent's total gems count
         MAX_CARDS_PER_COLOR,  # agent's cards per color
-        MAX_BUYING_POWER,     # agent's buying power (without wild gems)
+        MAX_BUYING_POWER,  # agent's buying power (without wild gems)
         diminish_return(MAX_BUYING_POWER),  # agent's diminishing buying power
         MAX_SCORE,  # scores of rivals that play before agent
         WINNING_SCORE_TRESHOLD - 1,  # scores of rivals that play after agent
-        MAX_CARD_GEMS_DIST_1,   # distances to cards on tier 1 in gems
-        MAX_CARD_GEMS_DIST_2,   # distances to cards on tier 2 in gems
-        MAX_CARD_GEMS_DIST_3,   # distances to cards on tier 3 in gems
+        MAX_CARD_GEMS_DIST_1,  # distances to cards on tier 1 in gems
+        MAX_CARD_GEMS_DIST_2,  # distances to cards on tier 2 in gems
+        MAX_CARD_GEMS_DIST_3,  # distances to cards on tier 3 in gems
         MAX_CARD_TURNS_DIST_1,  # distances to cards on tier 1 in turns
         MAX_CARD_TURNS_DIST_2,  # distances to cards on tier 2 in turns
         MAX_CARD_TURNS_DIST_3,  # distances to cards on tier 3 in turns
-        MAX_CARD_GEMS_DIST_3,   # distances to reserved cards in gems
+        MAX_CARD_GEMS_DIST_3,  # distances to reserved cards in gems
         MAX_CARD_TURNS_DIST_3,  # distances to reserved cards in turns
         MAX_NOBLE_GEMS_DISTANCE,  # distances to nobles in gems
         MAX_NOBLE_CARDS_DISTANCE,  # distances to nobles in cards
@@ -287,3 +293,166 @@ def normalize_metrics(metrics: np.array) -> np.array:
     normalizer = build_array(METRIC_NORMALIZATION, METRICS_SHAPE)
     normalized = metrics / normalizer
     return normalized.clip(-1, 1)
+
+
+@cache
+def get_color_encoder() -> OneHotEncoder:
+    """
+    Return an encoder of all the colors (including yellow)
+
+    :note: this function is cached in order to avoid re-creation of this encoder.
+           however this means that we uses the same encoder.
+           use with caution.
+    """
+    encoder = OneHotEncoder(sparse_output=False)
+
+    # sklearn's OneHotEncoder requires it's input to be of a 2-dimensional
+    # array
+    all_colors = np.array(list(COLOURS.values())).reshape(-1, 1)
+
+    encoder.fit(all_colors)
+
+    return encoder
+
+
+@cache
+def get_yellow_gem_index() -> int:
+    """
+    Return the index of the yellow color within the one-hot representation
+    of the colors.
+    """
+    encoder: OneHotEncoder = get_color_encoder()
+
+    # sklearn's OneHotEncoder requires it's input to be of a 2-dimensional
+    # array
+    yellow = np.array(["yellow"]).reshape(-1, 1)
+    onehot_yellow = encoder.transform(yellow)
+
+    # only the index of yellow would be "1", the rest would be "0".
+    return onehot_yellow.argmax()
+
+
+@cache
+def get_indices_access_by_color(color_name: str) -> np.array:
+    """ """
+    encoder: OneHotEncoder = get_color_encoder()
+    yellow_index = get_yellow_gem_index()
+
+    color = np.array([color_name]).reshape(-1, 1)
+    onehot_color = encoder.transform(color).squeeze().astype(bool)
+    indices_access = np.delete(onehot_color, yellow_index)
+
+    return indices_access
+
+
+def vectorize_card(card: Optional[Card]) -> np.array:
+    """
+    Return the vector form a given card.
+    This is required when supplying an agent such as the DQN or PPO
+    with a representation of a state via features vector, that vector must
+    also describe which cards are present.
+
+    :param card: a card to be vectorized.
+    :return: the vector representation of the given card.
+
+    :note: this function can't be cached since Card isn't hashable...
+    """
+    encoder: OneHotEncoder = get_color_encoder()
+
+    if card is None:
+        # return a constant vector of zeros (of the correct shape)
+        shape = encoder.categories_[0].size + len(NORMAL_COLORS) + 1 + 1
+        return np.zeros(shape)
+
+    cost = np.zeros(shape=(len(NORMAL_COLORS),))
+    for color, gems in card.cost.items():
+        indices_access = get_indices_access_by_color(color)
+        cost[indices_access] = gems
+
+    # sklearn's OneHotEncoder requires it's input to be of a 2-dimensional
+    # array
+    color = np.array([card.colour]).reshape(-1, 1)
+
+    # the shape of the output would be (1, <number of unique colors>)
+    # which in our case is (1, 5), after squeeze() it's shape would
+    # be (<number of unique colors>,) and in our case (5,).
+    onehot_color = encoder.transform(color).squeeze()
+
+    # the shape of the returned vector would be
+    # (len(COLOURS) + number_of_unique_colors + 1 + 1,)
+    # which is: (6 + 5 + 1 + 1,) = (13,)
+    return np.hstack((onehot_color, cost, card.deck_id, card.points))
+
+
+def extract_reserved_cards(
+    game_state: SplendorState, agent_index: int
+) -> List[np.array]:
+    """
+    Extract all the vector representations of the cards (only reserved).
+
+    :param game_state: the state of the game.
+    :param agent_index: which agent's reserved cards should be extracted.
+    :return: a vector of all the reserved cards,
+             shape would be (3 * 13,). Each 13 entries slice corresponds to a card.
+
+    :note: the shape of the resulting vector is constant, rather than dependent upon the state.
+           if for example there aren't any reserved cards then the 3 reserved cards slots would
+           be filled with zeros.
+    """
+    agent = get_agent(game_state, agent_index)
+
+    reserved: List[np.array] = []
+    for card in agent.cards[RESERVED]:
+        reserved.append(vectorize_card(card))
+
+    for i in range(MAX_RESERVED - len(reserved)):
+        reserved.append(vectorize_card(None))
+
+    return reserved
+
+
+def extract_cards(game_state: SplendorState, agent_index: int) -> np.array:
+    """
+    Extract all the vector representations of the cards (both dealt & reserved).
+
+    :param game_state: the state of the game - the dealt cards of this state would be
+                       encoded.
+    :param agent_index: which agent's reserved cards should be extracted.
+    :return: a vector of all the cards (both dealt & reserved - 15 in total),
+             shape would be (15 * 13,). Each 13 entries slice corresponds to a card.
+             The order of the cards is as follows:
+             1) the first 12 cards.
+             2) the 3 reserved cards.
+
+    :note: the shape of the resulting vector is constant, rather than dependent upon the state.
+           if for example there aren't any reserved cards then the 3 reserved cards slots would
+           be filled with zeros.
+    """
+    reserved: List[np.array] = extract_reserved_cards(game_state, agent_index)
+
+    dealt: List[np.array] = []
+    for deck in game_state.board.dealt:
+        for card in deck:
+            dealt.append(vectorize_card(card))
+
+    return np.hstack((*dealt, *reserved))
+
+
+def extract_metrics_with_cards(game_state: SplendorState, agent_index: int) -> np.array:
+    """
+    Extract metrics from state & encoded the cards as vectors.
+
+    :return: the long vector representing the full state, both it's features
+             and it's cards.
+    """
+    metrics = extract_metrics(game_state, agent_index)
+    cards_vector = extract_cards(game_state, agent_index)
+
+    return np.hstack((metrics, cards_vector))
+
+
+METRICS_WITH_CARDS_SIZE: int = np.sum(METRICS_SHAPE) + (
+    MAX_RESERVED + MAX_TIER_CARDS * NUMBER_OF_TIERS
+) * (len(COLOURS) + len(NORMAL_COLORS) + 1 + 1)
+
+METRICS_WITH_CARDS_SHAPE: tuple[int] = (METRICS_WITH_CARDS_SIZE,)

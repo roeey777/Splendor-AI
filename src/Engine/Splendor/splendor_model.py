@@ -420,6 +420,7 @@ class SplendorGameRule(GameRule):
         # this, and in the exceedingly rare case that there are multiple nobles waiting (meaning that, at the last turn,
         # this agent had the choice of at least 3 nobles), multiply all generated actions by these nobles to allow the
         # agent to choose again.
+
         potential_nobles = []
         for noble in board.nobles:
             if self.noble_visit(agent, noble):
