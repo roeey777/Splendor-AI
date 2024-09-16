@@ -9,6 +9,7 @@ import gymnasium as gym
 
 from Engine.template import Agent
 from Engine.Splendor.splendor_model import SplendorState, SplendorGameRule
+from Engine.Splendor.utils import LimitRoundsGameRule
 from Engine.Splendor import splendor_utils
 from Engine.Splendor import features
 
@@ -57,7 +58,7 @@ class SplendorEnv(gym.Env):
         self.shuffle_turns = shuffle_turns
         self.agents = agents
         self.number_of_players = len(self.agents) + 1
-        self.game_rule = SplendorGameRule(self.number_of_players)
+        self.game_rule = LimitRoundsGameRule(self.number_of_players)
 
         # define the action_space to be composed of len(ALL_ACTIONS)
         # unique actions.
@@ -87,7 +88,7 @@ class SplendorEnv(gym.Env):
                  my agent.
         :note: the order of turns in randomly chosen each time reset is called.
         """
-        self.game_rule = SplendorGameRule(self.number_of_players)
+        self.game_rule = LimitRoundsGameRule(self.number_of_players)
 
         if self.shuffle_turns:
             np.random.shuffle(self.agents)

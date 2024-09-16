@@ -15,7 +15,8 @@ from Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent import (
 )
 from Engine.game import Game
 from Engine.Splendor import features
-from Engine.Splendor.splendor_model import SplendorGameRule
+from Engine.Splendor.utils import LimitRoundsGameRule
+
 import numpy as np
 
 
@@ -46,25 +47,6 @@ STATS_HEADERS = (
     "tier2_left",
     "tier3_left",
 )
-
-
-class MyGameRule(SplendorGameRule):
-    """
-    Wraps `SplendorGameRule`.
-    """
-
-    def gameEnds(self):
-        """
-        Limits the game to `ROUNDS_LIMIT` rounds, so random initial agents
-        won't get stuck by accident.
-        """
-        if all(
-            len(agent.agent_trace.action_reward) == features.ROUNDS_LIMIT
-            for agent in self.current_game_state.agents
-        ):
-            return True
-
-        return super().gameEnds()
 
 
 def mutate(gene: Gene, progress: float, mutate_rate: float):
@@ -171,7 +153,7 @@ def single_game(agents) -> tuple[Game, dict]:
         names.append(str(i))
 
     game = Game(
-        MyGameRule,
+        LimitRoundsGameRule,
         agents,
         len(agents),
         seed=np.random.randint(1e8, dtype=int),
