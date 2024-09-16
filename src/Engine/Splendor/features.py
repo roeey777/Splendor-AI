@@ -1,7 +1,5 @@
 """
 Features extraction from SplendorState
-
-BEWARE: THIS IS UNTESTED!!!!
 """
 
 from dataclasses import dataclass
