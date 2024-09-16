@@ -392,7 +392,7 @@ def extract_reserved_cards(
     game_state: SplendorState, agent_index: int
 ) -> List[np.array]:
     """
-    Extract all the vector representations of the cards (both dealt & reserved).
+    Extract all the vector representations of the cards (only reserved).
 
     :param game_state: the state of the game.
     :param agent_index: which agent's reserved cards should be extracted.

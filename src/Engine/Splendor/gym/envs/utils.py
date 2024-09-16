@@ -62,7 +62,8 @@ def build_action(
 
     noble = (
         state.board.nobles[action.noble_index]
-        if action.noble_index and action.noble_index in range(len(state.board.nobles))
+        if action.noble_index is not None
+        and action.noble_index in range(len(state.board.nobles))
         else None
     )
     card = (
@@ -133,6 +134,10 @@ def build_action(
                 "card": reserved_card,
                 "returned_gems": returned_gems,
             }
+        case _:
+            raise ValueError(
+                f"Unknown action type: {action.type} of the action {action}"
+            )
 
     return action_to_execute
 

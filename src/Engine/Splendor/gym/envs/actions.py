@@ -68,19 +68,15 @@ class Action:
 
         if action.get("card") is not None:
             card = action["card"]
-            if (
-                action_type == ActionType.RESERVE
-                or action_type == ActionType.BUY_AVAILABLE
-            ):
+            if action_type == ActionType.BUY_RESERVE:
+                position = CardPosition(
+                    -1, -1, state.agents[agent_index].cards[RESERVED].index(card)
+                )
+            else:
                 # available card (for buying or reserving).
                 tier = card.deck_id
                 card_index = state.board.dealt[tier].index(card)
                 position = CardPosition(tier, card_index, -1)
-            else:
-                # buy a reserved card.
-                position = CardPosition(
-                    -1, -1, state.agents[agent_index].cards[RESERVED].index(card)
-                )
 
         if (
             action_type == ActionType.BUY_AVAILABLE

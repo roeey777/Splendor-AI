@@ -71,6 +71,9 @@ class SplendorEnv(gym.Env):
             shape=features.METRICS_WITH_CARDS_SHAPE,
         )
 
+        # this default value will be overridden by reset().
+        self.my_turn: int = -1
+
     def reset(
         self, seed: Optional[int] = None, options: Optional[Dict] = None
     ) -> Tuple[SplendorState, Dict[str, int]]:
@@ -84,14 +87,13 @@ class SplendorEnv(gym.Env):
                  my agent.
         :note: the order of turns in randomly chosen each time reset is called.
         """
-        state = self.game_rule.initialGameState()
+        self.game_rule = SplendorGameRule(self.number_of_players)
 
         if self.shuffle_turns:
             np.random.shuffle(self.agents)
 
         if self.fixed_turn is None or (
-            self.fixed_turn is not None
-            and self.fixed_turn not in range(self.number_of_players)
+            self.fixed_turn not in range(self.number_of_players)
         ):
             self.my_turn = np.random.randint(0, self.number_of_players)
         else:
@@ -131,18 +133,25 @@ class SplendorEnv(gym.Env):
         legal_actions_mask: np.array = self.get_legal_actions_mask()
 
         if legal_actions_mask[action] == 0:
-            raise ValueError(f"the action {action} ({action_to_take}) isn't legal!")
+            raise ValueError(f"the action {action} ({action_to_take}) is illegal!")
 
         self.game_rule.update(action_to_take)
         current_score = self.state.agents[self.my_turn].score
 
-        if current_score >= 15:
+        # simulate opponents until my next turn
+        terminated, next_state = self._simulate_opponents()
+
+        is_leading = (
+            np.array(
+                [self.state.agents[i].score for i in range(self.number_of_players)]
+            ).argmax()
+            == self.my_turn
+        )
+
+        if current_score >= 15 and is_leading:
             reward = 100
         else:
             reward = current_score - previous_score
-
-        # simulate opponents until my next turn
-        terminated, next_state = self._simulate_opponents()
 
         return (
             self._vectorize(next_state, self.observation_space.shape, self.my_turn),
