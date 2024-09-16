@@ -2,9 +2,6 @@
 Implementation of Splendor as a gym.Env
 """
 
-import random
-
-from itertools import cycle
 from typing import Dict, Literal, List, Tuple, Optional, Any
 
 import numpy as np
@@ -25,8 +22,7 @@ class SplendorEnv(gym.Env):
         agents: List[Agent],
         shuffle_turns: bool = True,
         fixed_turn: Optional[int] = None,
-        *args,
-        **kwargs,
+        render_mode: Optional[Any] = None,
     ):
         """
         Create a new environment, which simulates the game of Splendor by
@@ -38,6 +34,7 @@ class SplendorEnv(gym.Env):
         :param fixed_turn: fix the turn of the player, if isn't supplied or
                            out of range the turn of the player would be
                            randomly chosen during reset().
+        :param render_mode: ignored (it's here for compatibility with gym).
 
         :note: when using this environment one can use gymnasium.spaces.utils.flatdim
                in order to understand the dimensions of the environment.
@@ -54,6 +51,8 @@ class SplendorEnv(gym.Env):
                useful when you want to use some custom methods of this Env such as
                build_action & get_legal_actions_mask.
         """
+        super().__init__()
+
         self.fixed_turn = fixed_turn
         self.shuffle_turns = shuffle_turns
         self.agents = agents
@@ -85,23 +84,18 @@ class SplendorEnv(gym.Env):
                  my agent.
         :note: the order of turns in randomly chosen each time reset is called.
         """
-        # We need the following line to seed self.np_random
-        super().reset(seed=seed)
-
         state = self.game_rule.initialGameState()
 
         if self.shuffle_turns:
-            random.shuffle(self.agents)
+            np.random.shuffle(self.agents)
 
         if self.fixed_turn is None or (
             self.fixed_turn is not None
             and self.fixed_turn not in range(self.number_of_players)
         ):
-            self.my_turn = np.random.randint(0, self.number_of_players - 1)
+            self.my_turn = np.random.randint(0, self.number_of_players)
         else:
-            my_turn = self.fixed_turn
-
-        self.turns_gen = cycle(range(self.number_of_players))
+            self.my_turn = self.fixed_turn
 
         self._set_opponents_ids()
 
@@ -134,10 +128,7 @@ class SplendorEnv(gym.Env):
             state=self.state,
             agent_index=self.my_turn,
         )
-        legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
-        legal_actions_mask: np.array = create_legal_actions_mask(
-            legal_actions, self.state, self.my_turn
-        )
+        legal_actions_mask: np.array = self.get_legal_actions_mask()
 
         if legal_actions_mask[action] == 0:
             raise ValueError(f"the action {action} ({action_to_take}) isn't legal!")
@@ -150,12 +141,8 @@ class SplendorEnv(gym.Env):
         else:
             reward = current_score - previous_score
 
-        # this refers to the next_state.
-        terminated_by_me = self.game_rule.gameEnds()
-
         # simulate opponents until my next turn
-        terminated_by_opponents, next_state = self._simulate_opponents()
-        terminated = terminated_by_me or terminated_by_opponents
+        terminated, next_state = self._simulate_opponents()
 
         return (
             self._vectorize(next_state, self.observation_space.shape, self.my_turn),

@@ -57,7 +57,7 @@ class Action:
         """
         Convert an action in SplendorGameRule format to Action.
         """
-        action_type = getattr(ActionType, action["type"].upper())
+        action_type = ActionType[action["type"].upper()]
         collected_gems = action.get("collected_gems")
         returned_gems = action.get("returned_gems")
         noble_index = None
