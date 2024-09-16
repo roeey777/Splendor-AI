@@ -55,6 +55,11 @@ def build_action(
     Construct the action to be taken from it's action index in the ALL_ACTION list.
     :return: the corresponding action to the action_index, in the format required
              by SplendorGameRule.
+
+    :note: when using this function for building a buying action the function doesn't
+           takes into account the wildcard gems (yellow) and the owned cards for the
+           conclusion of the returned_gems - this can lead to a broken state where a
+           player have a negative amount of gems...
     """
     if action_index not in range(len(ALL_ACTIONS)):
         raise ValueError(f"The action {action_index} isn't a valid action")

@@ -124,12 +124,18 @@ class SplendorEnv(gym.Env):
             raise ValueError(f"The action {action} isn't a valid action")
 
         previous_score = self.state.agents[self.my_turn].score
-        action_to_take = build_action(
-            action_index=action,
-            game_rule=self.game_rule,
-            state=self.state,
-            agent_index=self.my_turn,
-        )
+
+        legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
+
+        mapping = {
+            ALL_ACTIONS.index(
+                Action.to_action_element(legal_action, self.state, self.my_turn)
+            ): legal_action
+            for legal_action in legal_actions
+        }
+
+        action_to_take = mapping[action]
+
         legal_actions_mask: np.array = self.get_legal_actions_mask()
 
         if legal_actions_mask[action] == 0:

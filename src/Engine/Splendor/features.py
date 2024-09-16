@@ -81,11 +81,9 @@ def agent_buying_power(agent: SplendorState.AgentState) -> Dict[Color, int]:
 
 
 def diminish_return(value: Number) -> float:
-    # this sometimes generates the following warning:
-    #   RuntimeWarning: invalid value encountered in log
-    #
-    # it's probably happens when value is negative and therefor might
-    # be solved by using np.log(1 + max(0, value))
+    if value <= -1:
+        raise ValueError(f"log(1 + value) isn't defined for the value {value}")
+
     return np.log(1 + value)
 
 
