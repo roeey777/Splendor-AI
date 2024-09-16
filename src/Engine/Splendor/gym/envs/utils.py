@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 
@@ -169,3 +169,20 @@ def create_legal_actions_mask(
         mask[ALL_ACTIONS.index(action_element)] = 1
 
     return mask
+
+
+def create_action_mapping(
+    legal_actions: List[Dict], state: SplendorState, agent_index: int
+) -> Dict:
+    """
+    Create the mapping between action indices to legal actions.
+    This would be in use by both SplendorEnv & by the PPO agent.
+    """
+    mapping = {
+        ALL_ACTIONS.index(
+            Action.to_action_element(legal_action, state, agent_index)
+        ): legal_action
+        for legal_action in legal_actions
+    }
+
+    return mapping

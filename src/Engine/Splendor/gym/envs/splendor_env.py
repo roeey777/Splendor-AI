@@ -14,7 +14,7 @@ from Engine.Splendor import splendor_utils
 from Engine.Splendor import features
 
 from .actions import ALL_ACTIONS, ActionType, Action, CardPosition
-from .utils import build_action, create_legal_actions_mask
+from .utils import create_legal_actions_mask, create_action_mapping
 
 
 class SplendorEnv(gym.Env):
@@ -128,12 +128,7 @@ class SplendorEnv(gym.Env):
 
         legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
 
-        mapping = {
-            ALL_ACTIONS.index(
-                Action.to_action_element(legal_action, self.state, self.my_turn)
-            ): legal_action
-            for legal_action in legal_actions
-        }
+        mapping = create_action_mapping(legal_actions, self.state, self.my_turn)
 
         action_to_take = mapping[action]
 
