@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -11,24 +14,23 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
-
-import matplotlib.pyplot as plt
-import numpy as np
-import gymnasium as gym
-
-train_env = gym.make('CartPole-v1')
-test_env = gym.make('CartPole-v1')#, render_mode="human")
-
 SEED = 1234
-
-np.random.seed(SEED)
-torch.manual_seed(SEED)
+LEARNING_RATE = 0.01
+MAX_EPISODES = 500
+DISCOUNT_FACTOR = 0.99
+N_TRIALS = 25
+REWARD_THRESHOLD = 475
+PRINT_EVERY = 10
+PPO_STEPS = 5
+PPO_CLIP = 0.2
+Trace = List[Dict[Literal["policy", "value", "total_policy", "total_value",
+"train_reward", "test_reward"],
+float]]
 
 
 class MLP(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim, dropout=0.5):
         super().__init__()
-
         self.fc_1 = nn.Linear(input_dim, hidden_dim)
         self.fc_2 = nn.Linear(hidden_dim, output_dim)
         self.dropout = nn.Dropout(dropout)
@@ -44,25 +46,13 @@ class MLP(nn.Module):
 class ActorCritic(nn.Module):
     def __init__(self, actor, critic):
         super().__init__()
-
         self.actor = actor
         self.critic = critic
 
     def forward(self, state):
         action_pred = self.actor(state)
         value_pred = self.critic(state)
-
         return action_pred, value_pred
-
-
-INPUT_DIM = train_env.observation_space.shape[0]
-HIDDEN_DIM = 128
-OUTPUT_DIM = train_env.action_space.n
-
-actor = MLP(INPUT_DIM, HIDDEN_DIM, OUTPUT_DIM)
-critic = MLP(INPUT_DIM, HIDDEN_DIM, 1)
-
-policy = ActorCritic(actor, critic)
 
 
 def init_weights(m):
@@ -71,17 +61,7 @@ def init_weights(m):
         m.bias.data.fill_(0)
 
 
-policy.apply(init_weights)
-
-LEARNING_RATE = 0.01
-
-optimizer = optim.Adam(policy.parameters(), lr=LEARNING_RATE)
-
-Trace = List[Dict[Literal["policy", "value", "total_policy", "total_value",
-"train_reward", "test_reward"],
-float]]
-
-def train(env, policy, optimizer, discount_factor, ppo_steps, ppo_clip):
+def train_single_epoch(env, policy, optimizer, discount_factor, ppo_steps, ppo_clip):
     policy.train()
 
     states = []
@@ -245,29 +225,38 @@ def evaluate(env, policy):
     return episode_reward
 
 
-MAX_EPISODES = 500
-DISCOUNT_FACTOR = 0.99
-N_TRIALS = 25
-REWARD_THRESHOLD = 475
-PRINT_EVERY = 10
-PPO_STEPS = 5
-PPO_CLIP = 0.2
-
 def main():
+    np.random.seed(SEED)
+    torch.manual_seed(SEED)
+    train_env = gym.make('CartPole-v1')
+    test_env = gym.make('CartPole-v1')  # , render_mode="human")
+
+    INPUT_DIM = train_env.observation_space.shape[0]
+    HIDDEN_DIM = 128
+    OUTPUT_DIM = train_env.action_space.n
+
+    actor = MLP(INPUT_DIM, HIDDEN_DIM, OUTPUT_DIM)
+    critic = MLP(INPUT_DIM, HIDDEN_DIM, 1)
+
+    policy = ActorCritic(actor, critic)
+
+    policy.apply(init_weights)
+    optimizer = optim.Adam(policy.parameters(), lr=LEARNING_RATE)
+
     train_rewards = []
     test_rewards = []
     trace: Trace = []
-    for episode in range(1, MAX_EPISODES + 1):
 
-        policy_loss, value_loss, train_reward = train(train_env, policy, optimizer,
-                                                      DISCOUNT_FACTOR, PPO_STEPS,
-                                                      PPO_CLIP)
+    # Main training loop
+    for episode in range(1, MAX_EPISODES + 1):
+        policy_loss, value_loss, train_reward = train_single_epoch(train_env, policy, optimizer,
+                                                                   DISCOUNT_FACTOR, PPO_STEPS,
+                                                                   PPO_CLIP)
 
         test_reward = evaluate(test_env, policy)
 
         train_rewards.append(train_reward)
         test_rewards.append(test_reward)
-
         mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
         mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
 
@@ -285,10 +274,10 @@ def main():
                 f'| Episode: {episode:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |')
         if mean_test_rewards >= REWARD_THRESHOLD:
             print(f'Reached reward threshold in {episode} episodes')
-
             break
 
     show_figures(train_rewards, test_rewards)
+
 
 def show_figures(train_rewards, test_rewards):
     plt.figure(figsize=(12, 8))
@@ -299,6 +288,7 @@ def show_figures(train_rewards, test_rewards):
     plt.hlines(REWARD_THRESHOLD, 0, len(test_rewards), color='r')
     plt.legend(loc='lower right')
     plt.grid()
+
 
 if __name__ == "__main__":
     main()
