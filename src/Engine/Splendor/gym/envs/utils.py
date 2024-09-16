@@ -39,8 +39,9 @@ def _valid_reserved_position(
     check if the given reserved card position is a valid position in the given state.
     useful for validating that a position of a reserved card can be purchased.
     """
-    return position.reserved_index in range(
-        len(state.agents[agent_index].cards[RESERVED])
+    return (
+        position.reserved_index in range(len(state.agents[agent_index].cards[RESERVED]))
+        and state.agents[agent_index].cards[RESERVED][position.reserved_index]
     )
 
 
@@ -110,7 +111,9 @@ def build_action(
             if card is None:
                 # this might happen when buying a card but with a
                 # wrong index (there is no card at that position).
-                returned_gems = None
+                raise ValueError(
+                    f"Can't build action {action} since there is not card to buy!"
+                )
             else:
                 returned_gems = card.cost
 
@@ -124,7 +127,9 @@ def build_action(
             if reserved_card is None:
                 # this might happen when buying a reserved card but with a
                 # wrong index.
-                returned_gems = None
+                raise ValueError(
+                    f"Can't build action {action} since there is not card to buy!"
+                )
             else:
                 returned_gems = reserved_card.cost
 
