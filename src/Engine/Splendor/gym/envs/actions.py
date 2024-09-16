@@ -10,16 +10,18 @@ import numpy as np
 import gymnasium as gym
 
 from Engine.Splendor import splendor_utils
+from Engine.Splendor.constants import (
+    RESERVED,
+    MAX_NOBLES,
+    NUMBER_OF_TIERS,
+    MAX_TIER_CARDS,
+    NORMAL_COLORS,
+    MAX_RESERVED,
+)
 
 
-NUMBER_OF_NOBLES = 3
-NUMBER_OF_DECKS = 3
-MAX_NUMBER_OF_CARDS_FROM_DECK = 4
-MAX_NUMBER_OF_RESERVED_CARDS = 3
-RESERVED = "yellow"
 ALL_GEMS_COLORS = splendor_utils.COLOURS.values()
-COLORS = [c for c in splendor_utils.COLOURS.values() if c != RESERVED]
-NOBLES_INDICES = list(range(NUMBER_OF_NOBLES))
+NOBLES_INDICES = list(range(MAX_NOBLES))
 
 GemsDict = Dict[str, int]
 
@@ -93,8 +95,8 @@ class Action:
 
 
 def card_gen():
-    for deck_num in range(NUMBER_OF_DECKS):
-        for card_num in range(MAX_NUMBER_OF_CARDS_FROM_DECK):
+    for deck_num in range(NUMBER_OF_TIERS):
+        for card_num in range(MAX_TIER_CARDS):
             yield CardPosition(deck_num, card_num, -1)
 
 
@@ -117,7 +119,7 @@ def generate_all_reserve_card_actions():
                 position=position,
                 noble_index=noble_index,
             )
-            for c in COLORS:
+            for c in NORMAL_COLORS:
                 # reserve a card, collect a yellow gem, and return a gem.
                 yield Action(
                     type=ActionType.RESERVE,
@@ -129,7 +131,7 @@ def generate_all_reserve_card_actions():
 
 
 def generate_all_collect_same_actions():
-    for c in COLORS:
+    for c in NORMAL_COLORS:
         for noble_index in [None] + NOBLES_INDICES:
             # no gems are returned.
             yield Action(
@@ -159,7 +161,7 @@ def generate_all_collect_same_actions():
 
 def generate_all_collect_different_actions():
     for combination_length in [1, 2, 3]:
-        for combination in combinations(COLORS, combination_length):
+        for combination in combinations(NORMAL_COLORS, combination_length):
             for noble_index in [None] + NOBLES_INDICES:
                 # no gems are returned.
                 yield Action(
@@ -182,7 +184,7 @@ def generate_all_collect_different_actions():
 
 
 def generate_all_buy_reserve_card_actions():
-    for reserved_index in range(MAX_NUMBER_OF_RESERVED_CARDS):
+    for reserved_index in range(MAX_RESERVED):
         for noble_index in [None] + NOBLES_INDICES:
             yield Action(
                 type=ActionType.BUY_RESERVE,

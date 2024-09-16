@@ -147,25 +147,6 @@ class SplendorGameRule(GameRule):
     def initialGameState(self):
         return SplendorState(self.num_of_agent)
 
-    def get_potential_nobles(self, state, agent_id):
-        """
-        Return a list of all potential nobles who can visit a specific agent.
-        In case when no noble can visit the specified agent the following list
-        will be returned [None].
-        """
-        agent = state.agents[agent_id]
-        board = state.board
-
-        potential_nobles = []
-        for noble in board.nobles:
-            if self.noble_visit(agent, noble):
-                potential_nobles.append(noble)
-
-        if len(potential_nobles) == 0:
-            potential_nobles = [None]
-
-        return potential_nobles
-
     def generatePredecessor(self, state, action, agent_id):
         agent = state.agents[agent_id]
         board = state.board
@@ -440,13 +421,12 @@ class SplendorGameRule(GameRule):
         # this agent had the choice of at least 3 nobles), multiply all generated actions by these nobles to allow the
         # agent to choose again.
 
-        # potential_nobles = []
-        # for noble in board.nobles:
-        #     if self.noble_visit(agent, noble):
-        #         potential_nobles.append(noble)
-        # if len(potential_nobles) == 0:
-        #     potential_nobles = [None]
-        potential_nobles = self.get_potential_nobles(game_state, agent_id)
+        potential_nobles = []
+        for noble in board.nobles:
+            if self.noble_visit(agent, noble):
+                potential_nobles.append(noble)
+        if len(potential_nobles) == 0:
+            potential_nobles = [None]
 
         # Generate actions (collect up to 3 different gems). Work out all legal combinations. Theoretical max is 10.
         available_colours = [

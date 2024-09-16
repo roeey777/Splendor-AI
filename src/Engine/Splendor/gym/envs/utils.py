@@ -3,15 +3,17 @@ from typing import Dict
 import numpy as np
 
 from Engine.Splendor.splendor_model import SplendorState, SplendorGameRule
+from Engine.Splendor.constants import (
+    NUMBER_OF_TIERS,
+    MAX_TIER_CARDS,
+    RESERVED,
+)
 
 from .actions import (
     ALL_ACTIONS,
     ActionType,
     Action,
     CardPosition,
-    NUMBER_OF_DECKS,
-    MAX_NUMBER_OF_CARDS_FROM_DECK,
-    RESERVED,
 )
 
 
@@ -20,10 +22,10 @@ def _valid_position(state: SplendorState, position: CardPosition) -> bool:
     check if the given card position is a valid position in the given state.
     useful for validating that a position of a card can be purchased/reserved.
     """
-    if position.tier not in range(NUMBER_OF_DECKS):
+    if position.tier not in range(NUMBER_OF_TIERS):
         return False
     elif (
-        position.card_index not in range(MAX_NUMBER_OF_CARDS_FROM_DECK)
+        position.card_index not in range(MAX_TIER_CARDS)
         or state.board.dealt[position.tier][position.card_index] is None
     ):
         return False
@@ -58,7 +60,6 @@ def build_action(
 
     action = ALL_ACTIONS[action_index]
 
-    potential_nobles = game_rule.get_potential_nobles(state, agent_index)
     noble = (
         state.board.nobles[action.noble_index]
         if action.noble_index and action.noble_index in range(len(state.board.nobles))

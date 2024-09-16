@@ -128,7 +128,12 @@ class SplendorEnv(gym.Env):
             raise ValueError(f"The action {action} isn't a valid action")
 
         previous_score = self.state.agents[self.my_turn].score
-        action_to_take = self.build_action(action)
+        action_to_take = build_action(
+            action_index=action,
+            game_rule=self.game_rule,
+            state=self.state,
+            agent_index=self.my_turn,
+        )
         legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
         legal_actions_mask: np.array = create_legal_actions_mask(
             legal_actions, self.state, self.my_turn
@@ -164,28 +169,6 @@ class SplendorEnv(gym.Env):
         # Don't render anything.
         pass
 
-    def build_action(
-        self,
-        action_index: int,
-        state: Optional[SplendorState] = None,
-        agent_index: Optional[int] = None,
-    ) -> Dict:
-        """
-        Construct the action to be taken from it's action index in the ALL_ACTION list.
-        :return: the corresponding action to the action_index, in the format required
-                 by SplendorGameRule.
-        """
-        if action_index not in range(len(ALL_ACTIONS)):
-            raise ValueError(f"The action {action_index} isn't a valid action")
-
-        if state is None:
-            state = self.state
-
-        if agent_index is None:
-            agent_index = self.turn
-
-        return build_action(action_index, self.game_rule, state, agent_index)
-
     def get_legal_actions_mask(self) -> np.array:
         """
         Create an array of shape (len(ALL_ACTIONS),) whose values are 0's or 1's.
@@ -206,6 +189,8 @@ class SplendorEnv(gym.Env):
         for agent in self.agents:
             if agent.id == turn:
                 return agent
+
+        raise ValueError(f"Invalid turn ({turn})")
 
     @staticmethod
     def _vectorize(state: SplendorState, shape: Tuple[int, ...], turn: int) -> np.array:

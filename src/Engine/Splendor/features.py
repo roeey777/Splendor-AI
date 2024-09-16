@@ -16,6 +16,31 @@ from sklearn.preprocessing import OneHotEncoder
 
 from Engine.Splendor.splendor_model import Card, SplendorState
 from Engine.Splendor.splendor_utils import COLOURS, CARDS
+from Engine.Splendor.constants import (
+    Color,
+    WILDCARD,
+    RESERVED,
+    NORMAL_COLORS,
+    NUMBER_OF_TIERS,
+    MAX_TIER_CARDS,
+    MAX_NOBLES,
+    MAX_RESERVED,
+    MAX_WILDCARDS,
+    MAX_GEMS,
+    WINNING_SCORE_TRESHOLD,
+    MAX_SCORE,
+    MAX_RIVALS,
+    ROUNDS_LIMIT,
+    MAX_STONES,
+    MAX_CARD_GEMS_DIST_1,
+    MAX_CARD_GEMS_DIST_2,
+    MAX_CARD_GEMS_DIST_3,
+    MAX_CARD_TURNS_DIST_1,
+    MAX_CARD_TURNS_DIST_2,
+    MAX_CARD_TURNS_DIST_3,
+    MAX_NOBLE_CARDS_DISTANCE,
+    MAX_NOBLE_GEMS_DISTANCE,
+)
 
 
 @dataclass
@@ -24,29 +49,6 @@ class Noble:
     cost: Dict[str, int]
 
 
-Color = Literal[*COLOURS.values()]
-WILDCARD = "yellow"
-RESERVED = WILDCARD
-NORMAL_COLORS = list(color for color in COLOURS.values() if color != WILDCARD)
-NUMBER_OF_TIERS = 3
-MAX_TIER_CARDS = 4
-MAX_NOBLES = 5
-MAX_RESERVED = 3
-MAX_WILDCARDS = 5
-MAX_GEMS = 10
-WINNING_SCORE_TRESHOLD = 15
-MAX_SCORE = 22
-MAX_RIVALS = 3
-ROUNDS_LIMIT = 100
-MAX_STONES = (4, 5, 7)
-MAX_CARD_GEMS_DIST_1 = 5
-MAX_CARD_GEMS_DIST_2 = 8
-MAX_CARD_GEMS_DIST_3 = 14
-MAX_CARD_TURNS_DIST_1 = 4
-MAX_CARD_TURNS_DIST_2 = 6
-MAX_CARD_TURNS_DIST_3 = 7
-MAX_NOBLE_CARDS_DISTANCE = 9
-MAX_NOBLE_GEMS_DISTANCE = MAX_CARD_GEMS_DIST_3 * MAX_NOBLE_CARDS_DISTANCE
 ### RANDOM VALUES (change?) ###
 MAX_CARDS_PER_COLOR = 8  # normal value is 5
 MAX_TOTAL_CARDS = MAX_CARDS_PER_COLOR * 3  # normal value is 20
@@ -298,15 +300,6 @@ def normalize_metrics(metrics: np.array) -> np.array:
 
 
 @cache
-def number_of_unique_colors() -> int:
-    """
-    return the number of unique color of cards (not gems, i.e. excludes yellow)
-    """
-    cards_colors = [color for color, _, __, ___ in CARDS.values()]
-    return np.unique(cards_colors).size
-
-
-@cache
 def get_color_encoder() -> OneHotEncoder:
     """
     Return an encoder of all the colors (including yellow)
@@ -372,10 +365,10 @@ def vectorize_card(card: Optional[Card]) -> np.array:
 
     if card is None:
         # return a constant vector of zeros (of the correct shape)
-        shape = encoder.categories_[0].size + number_of_unique_colors() + 1 + 1
+        shape = encoder.categories_[0].size + len(NORMAL_COLORS) + 1 + 1
         return np.zeros(shape)
 
-    cost = np.zeros(shape=(number_of_unique_colors(),))
+    cost = np.zeros(shape=(len(NORMAL_COLORS),))
     for color, gems in card.cost.items():
         indices_access = get_indices_access_by_color(color)
         cost[indices_access] = gems
@@ -444,7 +437,6 @@ def extract_cards(game_state: SplendorState, agent_index: int) -> np.array:
     dealt: List[np.array] = []
     for deck in game_state.board.dealt:
         for card in deck:
-            v = vectorize_card(card)
             dealt.append(vectorize_card(card))
 
     return np.hstack((*dealt, *reserved))
@@ -465,6 +457,6 @@ def extract_metrics_with_cards(game_state: SplendorState, agent_index: int) -> n
 
 METRICS_WITH_CARDS_SIZE: int = np.sum(METRICS_SHAPE) + (
     MAX_RESERVED + MAX_TIER_CARDS * NUMBER_OF_TIERS
-) * (len(COLOURS) + number_of_unique_colors() + 1 + 1)
+) * (len(COLOURS) + len(NORMAL_COLORS) + 1 + 1)
 
 METRICS_WITH_CARDS_SHAPE: tuple[int] = (METRICS_WITH_CARDS_SIZE,)

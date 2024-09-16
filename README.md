@@ -124,9 +124,9 @@ We've made a custom ```gym.Env``` and registered it as one of ```gym``` environm
 2. registering ```SplendorEnv``` to ```gym``` - ```import Engine.Splendor.gym```
 3. define the opponents:
 
-When creating a instance of ```SplendorEnv``` you should tell it which agents will
-be used as opponents to you (the one whom uses the env.).
-For the following example We'll use a single random agent as an opponent.
+When creating an instance of ```SplendorEnv``` you should tell it which agents will
+be used as opponents to you (the one who uses the env.).
+For the following example we'll use a single random agent as an opponent.
 ```
 from Engine.agents.generic.random import myAgent
 
@@ -144,8 +144,7 @@ env = gym.make("splendor-v1", agents=opponents)
 	1. ```state``` - the actual ```SplendorState``` - not the feature vector.
 	2. ```my_turn``` - the turn of the agent, same as the value returned by ```env.reset()```.
 4. ```SplendorEnv``` have several custom methods:
-	1. ```build_action``` - a method for converting the action number into a ```dict``` in the format required by ```SplendorGameRule```.
-	2. ```get_legal_actions_mask``` - a method for getting a mask vector which masks all the illegal action of ALL_ACTIONS.
+	1. ```get_legal_actions_mask``` - a method for getting a mask vector which masks all the illegal action of ALL_ACTIONS.
 
 You can access those like this:
 ```
