@@ -20,6 +20,7 @@ setup(
         "console_scripts": [
             "splendor = Engine.general_game_runner:main",
             "evolve = Engine.agents.our_agents.genetic_algorithm.evolve:main",
+            "ppo = Engine.agents.our_agents.ppo.ppo:main",
         ],
     },
 )
