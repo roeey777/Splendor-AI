@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import matplotlib.pyplot as plt
 import numpy as np
 import gymnasium as gym
@@ -7,7 +9,12 @@ import torch.optim as optim
 import torch.nn.functional as F
 import torch.distributions as distributions
 from pathlib import Path
+from csv import writer as csv_writer
+from itertools import chain
 from typing import List, Dict
+import random
+
+from Engine.Splendor.splendor_model import SplendorState
 
 # typing.Literal was added in python3.8
 # so this is backward compatible.
@@ -17,6 +24,25 @@ except ImportError:
     from typing_extensions import Literal
 
 import Engine.Splendor.gym
+
+WORKING_DIR = Path().absolute()
+FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
+STATS_FILE = "stats.csv"
+STATS_HEADERS = (
+    "episode",
+    "players_count",
+    "rounds_count",
+    "score",
+    "nobles_taken",
+    "tier1_bought",
+    "tier2_bought",
+    "tier3_bought",
+    "policy_loss",
+    "value_loss",
+    "train_reward",
+    "test_reward",
+)
+
 # Oponents
 # from Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent import \
 #     GeneAlgoAgent
@@ -66,6 +92,8 @@ class PPO(nn.Module):
         actor_output = self.actor(x)
         actor_output[:, action_mask == 0] = HUGE_NEG
         prob = F.softmax(actor_output, dim=-1)
+        if prob.isnan().any():
+            breakpoint()
         return prob, self.critic(x)
 
 
@@ -87,8 +115,8 @@ def init_weights(m):
         m.bias.data.fill_(0)
 
 
-def train_single_epoch(env, policy, optimizer, discount_factor, ppo_steps,
-                       ppo_clip):
+def train_single_episode(env, policy, optimizer, discount_factor, ppo_steps,
+                         ppo_clip):
     policy.train()
 
     states = []
@@ -238,9 +266,29 @@ def evaluate(env, policy):
     return episode_reward
 
 
-def main():
+def extract_game_stats(final_game_state: SplendorState, agent_id) -> List:
+    agent_state = final_game_state.agents[agent_id]
+    stats = [
+        len(final_game_state.agents),   # players_count
+        len(agent_state.agent_trace.action_reward),  # "rounds_count",
+        len(agent_state.nobles),    # "nobles_taken",
+        agent_state.score,    # "score",
+        len(list(filter(lambda c: c.deck_id == 1, chain(
+            *agent_state.cards.values())))),
+        len(list(filter(lambda c: c.deck_id == 2, chain(
+            *agent_state.cards.values())))),
+        len(list(filter(lambda c: c.deck_id == 3, chain(
+            *agent_state.cards.values())))),
+    ]
+    return stats
+
+def main(working_dir: Path = WORKING_DIR):
     np.random.seed(SEED)
     torch.manual_seed(SEED)
+    random.seed(SEED)
+    start_time = datetime.now()
+    folder = working_dir / start_time.strftime(FOLDER_FORMAT)
+    folder.mkdir()
     train_env = gym.make("splendor-v1", agents=opponents)  # gym.make(
     # 'CartPole-v1')
     test_env = gym.make("splendor-v1", agents=opponents)  # gym.make(
@@ -262,39 +310,51 @@ def main():
     test_rewards = []
     trace: Trace = []
 
-    # Main training loop
-    for episode in range(1, MAX_EPISODES + 1):
-        policy_loss, value_loss, train_reward = train_single_epoch(train_env,
-                                                                   policy,
-                                                                   optimizer,
-                                                                   DISCOUNT_FACTOR,
-                                                                   PPO_STEPS,
-                                                                   PPO_CLIP)
+    with open(folder / STATS_FILE, "w", newline="\n") as stats_file:
+        stats_csv = csv_writer(stats_file)
+        stats_csv.writerow(STATS_HEADERS)
 
-        test_reward = evaluate(test_env, policy)
+        # Main training loop
+        for episode in range(1, MAX_EPISODES + 1):
+            policy_loss, value_loss, train_reward = train_single_episode(train_env,
+                                                                         policy,
+                                                                         optimizer,
+                                                                         DISCOUNT_FACTOR,
+                                                                         PPO_STEPS,
+                                                                         PPO_CLIP)
 
-        train_rewards.append(train_reward)
-        test_rewards.append(test_reward)
-        mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
-        mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
+            test_reward = evaluate(test_env, policy)
 
-        # update tracking.
-        # current_trace = {"policy": policy_loss,
-        #                  "value": value_loss,
-        #                  "total_policy": ,
-        #                  "total_value": ,
-        #                  "train_reward": train_reward,
-        #                  "test_reward": test_reward,}
-        # trace.append(current_trace)
+            stats = extract_game_stats(train_env.unwrapped.state,
+                                       train_env.unwrapped.my_turn)
+            stats.insert(0, episode)
+            stats.extend([policy_loss, value_loss, train_reward, test_reward])
+            stats_csv.writerow(stats)
 
-        if episode % PRINT_EVERY == 0:
-            print(
-                f'| Episode: {episode:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |')
-            torch.save(policy, str(Path(__file__).parent /
-                                   f"ppo_model_{episode // PRINT_EVERY}.pth"))
-        # if mean_test_rewards >= REWARD_THRESHOLD:
-        #     print(f'Reached reward threshold in {episode} episodes')
-        #     break
+            train_rewards.append(train_reward)
+            test_rewards.append(test_reward)
+            mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
+            mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
+            train_rewards_std = np.std(train_rewards[-N_TRIALS:])
+            test_rewards_std = np.std(test_rewards[-N_TRIALS:])
+
+            # update tracking.
+            # current_trace = {"policy": policy_loss,
+            #                  "value": value_loss,
+            #                  "total_policy": ,
+            #                  "total_value": ,
+            #                  "train_reward": train_reward,
+            #                  "test_reward": test_reward,}
+            # trace.append(current_trace)
+
+            if episode % PRINT_EVERY == 0:
+                print(
+                    f'| Episode: {episode:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |')
+                torch.save(policy, str(Path(__file__).parent /
+                                       f"ppo_model_{episode // PRINT_EVERY}.pth"))
+            # if mean_test_rewards >= REWARD_THRESHOLD:
+            #     print(f'Reached reward threshold in {episode} episodes')
+            #     break
 
     show_figures(train_rewards, test_rewards)
 
