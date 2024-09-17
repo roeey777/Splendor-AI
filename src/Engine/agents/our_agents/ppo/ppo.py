@@ -11,8 +11,10 @@ import torch.distributions as distributions
 from pathlib import Path
 from csv import writer as csv_writer
 from itertools import chain
-from typing import List, Dict
+from typing import List, Dict, Tuple
 import random
+
+from torch.nn.modules.loss import _Loss as Loss_Fn
 
 from Engine.Splendor.splendor_model import SplendorState
 
@@ -53,7 +55,8 @@ opponents = [random_agent(0)]#GeneAlgoAgent]
 SEED = 1234
 HUGE_NEG = -1e8
 DROPOUT = 0.2
-LEARNING_RATE = 0.01
+LEARNING_RATE = 1e-6
+WEIGHT_DECAY = 1e-5
 MAX_EPISODES = 1000
 DISCOUNT_FACTOR = 0.99
 N_TRIALS = 25
@@ -61,6 +64,18 @@ REWARD_THRESHOLD = 475
 PRINT_EVERY = 10
 PPO_STEPS = 5
 PPO_CLIP = 0.2
+
+# use the coefficients from
+# https://github.com/nikhilbarhate99/PPO-PyTorch/blob/728cce83d7ab628fe2634eabcdf3239997eb81dd/PPO.py#L240
+COEFFICIENTS = {
+    "value": 0.5,
+    "entropy": 0.01,
+}
+
+# Global Gradient Norm Clipping as suggested by (bullet #11):
+# https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+MAX_GRADIENT_NORM = 0.5
+
 Trace = List[Dict[Literal["policy", "value", "total_policy", "total_value",
 "train_reward", "test_reward"],
 float]]
@@ -69,59 +84,57 @@ float]]
 class PPO(nn.Module):
     HIDDEN_DIM = 128
 
-    def __init__(self, input_dim, output_dim, dropout=0.5):
+    def __init__(self, input_dim, output_dim, dropout=DROPOUT, num_groups=32):
         super().__init__()
-        self.net = nn.Sequential(nn.Linear(input_dim, PPO.HIDDEN_DIM),
-                                 nn.Dropout(dropout),
-                                 nn.ReLU(), )
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, PPO.HIDDEN_DIM),
+            nn.LayerNorm(PPO.HIDDEN_DIM),
+            # nn.GroupNorm(num_groups, PPO.HIDDEN_DIM),
+            nn.Dropout(dropout),
+            nn.ReLU(),
+            nn.Linear(PPO.HIDDEN_DIM, PPO.HIDDEN_DIM),
+            nn.LayerNorm(PPO.HIDDEN_DIM),
+            # nn.GroupNorm(num_groups, PPO.HIDDEN_DIM),
+            nn.Dropout(dropout),
+            nn.ReLU(),
+        )
         self.actor = nn.Linear(PPO.HIDDEN_DIM, output_dim)
         self.critic = nn.Linear(PPO.HIDDEN_DIM, 1)
-        # self.fc_1 = nn.Linear(input_dim, hidden_dim)
-        # self.fc_2 = nn.Linear(hidden_dim, output_dim)
-        # self.dropout = nn.Dropout(dropout)
 
-    def forward(self, x, action_mask):
-        # x = self.fc_1(x)
-        # x = self.dropout(x)
-        # x = F.relu(x)
-        # x = self.fc_2(x)
-        # return x
-        x = self.net(x)
+        # Initialize weights (recursively)
+        self.apply(self._init_weights)
+        
+    def _init_weights(self, module):
+        """
+        Orthogonal initialization of the weights as suggested by (bullet #2):
+        https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+        """
+        if isinstance(module, nn.Linear):
+            nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
+            module.bias.data.zero_()
+        
+    def forward(self, x: torch.Tensor, action_mask: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         if len(x.shape) == 1:
             x = x.unsqueeze(0)
-        actor_output = self.actor(x)
-        actor_output[:, action_mask == 0] = HUGE_NEG
-        prob = F.softmax(actor_output, dim=-1)
+        x1 = self.net(x)
+        actor_output = self.actor(x1)
+        # masked_actor_output = torch.where(action_mask == 0, -torch.inf, actor_output)
+        masked_actor_output = torch.where(action_mask == 0, HUGE_NEG, actor_output)
+        prob = F.softmax(masked_actor_output, dim=1)
+
         if prob.isnan().any():
-            breakpoint()
-        return prob, self.critic(x)
-
-
-"""class ActorCritic(nn.Module):
-    def __init__(self, actor, critic):
-        super().__init__()
-        self.actor = actor
-        self.critic = critic
-
-    def forward(self, state):
-        action_pred = self.actor(state)
-        value_pred = self.critic(state)
-        return action_pred, value_pred"""
-
-
-def init_weights(m):
-    if isinstance(m, nn.Linear):
-        torch.nn.init.xavier_normal_(m.weight)
-        m.bias.data.fill_(0)
+            from ipdb import set_trace; set_trace()
+        
+        return prob, self.critic(x1)
 
 
 def train_single_episode(env, policy, optimizer, discount_factor, ppo_steps,
-                         ppo_clip):
+                         ppo_clip, loss_fn: Loss_Fn):
     policy.train()
 
     states = []
     actions = []
-    action_masks = []
+    action_mask_history = []
     log_prob_actions = []
     values = []
     rewards = []
@@ -136,7 +149,7 @@ def train_single_episode(env, policy, optimizer, discount_factor, ppo_steps,
         # append state here, not after we get the next state from env.step()
         states.append(state)
 
-        action_mask = env.unwrapped.get_legal_actions_mask()
+        action_mask = torch.from_numpy(env.unwrapped.get_legal_actions_mask()).unsqueeze(0)
         action_prob, value_pred = policy(state, action_mask)
 
         dist = distributions.Categorical(action_prob)
@@ -147,9 +160,9 @@ def train_single_episode(env, policy, optimizer, discount_factor, ppo_steps,
 
         state, reward, done, truncated, _ = env.step(action.item())
 
-        actions.append(action)
-        # action_masks.append(action_mask)
-        log_prob_actions.append(log_prob_action)
+        actions.append(action.unsqueeze(0))
+        action_mask_history.append(action_mask)
+        log_prob_actions.append(log_prob_action.unsqueeze(0))
         values.append(value_pred)
         rewards.append(reward)
 
@@ -157,7 +170,7 @@ def train_single_episode(env, policy, optimizer, discount_factor, ppo_steps,
 
     states = torch.cat(states)
     actions = torch.cat(actions)
-    # action_masks = torch.cat(action_masks)
+    action_mask_history = torch.cat(action_mask_history)
     log_prob_actions = torch.cat(log_prob_actions)
     values = torch.cat(values).squeeze(-1)
 
@@ -165,10 +178,11 @@ def train_single_episode(env, policy, optimizer, discount_factor, ppo_steps,
     advantages = calculate_advantages(returns, values)
 
     policy_loss, value_loss = update_policy(policy, states, actions,
-                                            action_masks,
+                                            action_mask_history,
                                             log_prob_actions, advantages,
                                             returns, optimizer, ppo_steps,
-                                            ppo_clip)
+                                            ppo_clip,
+                                            loss_fn)
 
     return policy_loss, value_loss, episode_reward
 
@@ -193,20 +207,23 @@ def calculate_advantages(returns, values, normalize=True):
     advantages = returns - values
 
     if normalize:
-        advantages = (advantages - advantages.mean()) / advantages.std()
+        # avoid possible division by 0
+        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
 
     return advantages
 
 
 def update_policy(policy, states, actions, action_masks, log_prob_actions,
                   advantages,
-                  returns, optimizer, ppo_steps, ppo_clip):
+                  returns, optimizer, ppo_steps, ppo_clip,
+                  loss_fn: Loss_Fn):
     total_policy_loss = 0
     total_value_loss = 0
 
     advantages = advantages.detach()
     log_prob_actions = log_prob_actions.detach()
     actions = actions.detach()
+    action_masks = action_masks.detach()
 
     for _ in range(ppo_steps):
         # get new log prob of actions for all input states
@@ -224,15 +241,34 @@ def update_policy(policy, states, actions, action_masks, log_prob_actions,
         policy_loss_2 = torch.clamp(policy_ratio, min=1.0 - ppo_clip,
                                     max=1.0 + ppo_clip) * advantages
 
-        policy_loss = - torch.min(policy_loss_1, policy_loss_2).sum()
+        policy_loss = -torch.min(policy_loss_1, policy_loss_2).sum()
+        
+        # value_loss = F.smooth_l1_loss(returns, value_pred).sum()
+        value_loss = loss_fn(returns, value_pred).sum()
 
-        value_loss = F.smooth_l1_loss(returns, value_pred).sum()
+        # clip value loss, as suggested by: (bullet #)
+        #
+        
+        
+        # entropy bonus - use to improve exploration.
+        # as seen here (bullet #10):
+        # https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+        entropy = dist.entropy().mean()
+
+        # final loss of clipped objective PPO
+        # as seen here:
+        # https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/ppo2/model.py#L91
+        loss = (
+            policy_loss
+            + COEFFICIENTS["value"] * value_loss
+            - COEFFICIENTS["entropy"] * entropy
+        )
 
         optimizer.zero_grad()
 
-        policy_loss.backward(retain_graph=True)
-        value_loss.backward(retain_graph=True)
+        loss.backward()
 
+        torch.nn.utils.clip_grad_norm_(policy.parameters(), MAX_GRADIENT_NORM)
         optimizer.step()
 
         total_policy_loss += policy_loss.item()
@@ -254,7 +290,7 @@ def evaluate(env, policy):
         state = torch.FloatTensor(state).unsqueeze(0)
 
         with torch.no_grad():
-            action_mask = env.unwrapped.get_legal_actions_mask()
+            action_mask = torch.from_numpy(env.unwrapped.get_legal_actions_mask())
             action_prob, _ = policy(state, action_mask)
 
         action = torch.argmax(action_prob, dim=-1)
@@ -303,8 +339,12 @@ def main(working_dir: Path = WORKING_DIR):
     policy = PPO(input_dim, output_dim, DROPOUT)  # ActorCritic(actor,
     # critic)
 
-    policy.apply(init_weights)
-    optimizer = optim.Adam(policy.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.Adam(
+        policy.parameters(),
+        lr=LEARNING_RATE,
+        weight_decay=WEIGHT_DECAY,
+    )
+    loss_function = nn.MSELoss()
 
     train_rewards = []
     test_rewards = []
@@ -316,13 +356,14 @@ def main(working_dir: Path = WORKING_DIR):
 
         # Main training loop
         for episode in range(1, MAX_EPISODES + 1):
+            print(f"Episode {episode}")
             policy_loss, value_loss, train_reward = train_single_episode(train_env,
                                                                          policy,
                                                                          optimizer,
                                                                          DISCOUNT_FACTOR,
                                                                          PPO_STEPS,
-                                                                         PPO_CLIP)
-
+                                                                         PPO_CLIP,
+                                                                         loss_function)
             test_reward = evaluate(test_env, policy)
 
             stats = extract_game_stats(train_env.unwrapped.state,

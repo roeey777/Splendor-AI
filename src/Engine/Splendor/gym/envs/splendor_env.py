@@ -121,6 +121,8 @@ class SplendorEnv(gym.Env):
         :note: this method returns 2 redundant variables (truncated & info) only in
                order to comply with gym.Env.step signature.
         """
+        # from ipdb import set_trace; set_trace()
+
         if action not in range(len(ALL_ACTIONS)):
             raise ValueError(f"The action {action} isn't a valid action")
 
