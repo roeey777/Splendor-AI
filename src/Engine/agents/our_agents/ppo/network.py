@@ -7,7 +7,7 @@ import torch.distributions as distributions
 import numpy as np
 
 
-DROPOUT = 0.4
+DROPOUT = 0.2
 HUGE_NEG = -1e8
 
 
