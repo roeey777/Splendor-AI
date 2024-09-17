@@ -13,12 +13,15 @@ from typing import List, Dict, Tuple
 import random
 
 from Engine.Splendor.splendor_model import SplendorState
+from Engine.agents.generic.random import myAgent as random_agent
 
 from .network import PPO, DROPOUT
 from .training import train_single_episode
 
-
+# import this would register splendor as one of gym's environments.
 import Engine.Splendor.gym
+
+opponents = [random_agent(0)]
 
 WORKING_DIR = Path().absolute()
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
@@ -37,10 +40,6 @@ STATS_HEADERS = (
     "train_reward",
     "test_reward",
 )
-
-from Engine.agents.generic.random import myAgent as random_agent
-
-opponents = [random_agent(0)]
 
 SEED = 1234
 LEARNING_RATE = 5e-7

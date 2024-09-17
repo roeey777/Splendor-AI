@@ -14,7 +14,7 @@ HUGE_NEG = -1e8
 class PPO(nn.Module):
     HIDDEN_DIM = 128
 
-    def __init__(self, input_dim, output_dim, dropout=DROPOUT, num_groups=32):
+    def __init__(self, input_dim, output_dim, dropout=DROPOUT):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(input_dim, PPO.HIDDEN_DIM),
@@ -44,13 +44,6 @@ class PPO(nn.Module):
             x = x.unsqueeze(0)
         x1 = self.net(x)
         actor_output = self.actor(x1)
-        # masked_actor_output = torch.where(action_mask == 0, -torch.inf, actor_output)
         masked_actor_output = torch.where(action_mask == 0, HUGE_NEG, actor_output)
         prob = F.softmax(masked_actor_output, dim=1)
-
-        if prob.isnan().any():
-            from ipdb import set_trace
-
-            set_trace()
-
         return prob, self.critic(x1)
