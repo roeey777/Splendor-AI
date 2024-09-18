@@ -1,18 +1,20 @@
+import random
+
 from datetime import datetime
+from argparse import ArgumentParser
+from itertools import chain
+from typing import List, Dict, Tuple
+from pathlib import Path
 
 import numpy as np
 import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from pathlib import Path
 from csv import writer as csv_writer
-from itertools import chain
-from typing import List, Dict, Tuple
-import random
 
 from Engine.Splendor.splendor_model import SplendorState
-from Engine.agents.generic.random import myAgent as random_agent
+from Engine.agents.our_agents.minmax import myAgent as MiniMaxAgent
 
 from .network import PPO, DROPOUT
 from .training import train_single_episode
@@ -20,7 +22,7 @@ from .training import train_single_episode
 # import this would register splendor as one of gym's environments.
 import Engine.Splendor.gym
 
-opponents = [random_agent(0)]
+opponents = [MiniMaxAgent(0)]
 
 WORKING_DIR = Path().absolute()
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
@@ -51,14 +53,14 @@ PPO_STEPS = 10
 PPO_CLIP = 0.2
 
 
-def evaluate(env, policy):
+def evaluate(env, policy, seed):
     policy.eval()
 
     rewards = []
     done = False
     episode_reward = 0
 
-    state, info = env.reset(seed=SEED)
+    state, info = env.reset(seed=seed)
 
     while not done:
         state = torch.tensor(state, dtype=torch.float64).unsqueeze(0)
@@ -70,8 +72,9 @@ def evaluate(env, policy):
             action_prob, _ = policy(state, action_mask)
 
         action = torch.argmax(action_prob, dim=-1)
-        _, reward, done, __, ____ = env.step(action.item())
+        next_state, reward, done, _, __ = env.step(action.item())
         episode_reward += reward
+        state = next_state
 
     return episode_reward
 
@@ -90,10 +93,15 @@ def extract_game_stats(final_game_state: SplendorState, agent_id) -> List:
     return stats
 
 
-def main(working_dir: Path = WORKING_DIR):
-    np.random.seed(SEED)
-    torch.manual_seed(SEED)
-    random.seed(SEED)
+def train(
+    working_dir: Path = WORKING_DIR,
+    learning_rate: float = LEARNING_RATE,
+    weight_decay: float = WEIGHT_DECAY,
+    seed: int = SEED
+):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    random.seed(seed)
     start_time = datetime.now()
     folder = working_dir / start_time.strftime(FOLDER_FORMAT)
     models_folder = folder / "models"
@@ -131,9 +139,9 @@ def main(working_dir: Path = WORKING_DIR):
                 PPO_STEPS,
                 PPO_CLIP,
                 loss_function,
-                SEED,
+                seed,
             )
-            test_reward = evaluate(test_env, policy)
+            test_reward = evaluate(test_env, policy, seed)
 
             stats = extract_game_stats(
                 train_env.unwrapped.state, train_env.unwrapped.my_turn
@@ -157,6 +165,45 @@ def main(working_dir: Path = WORKING_DIR):
                     policy,
                     models_folder / f"ppo_model_{episode + 1 // N_TRIALS}.pth"
                 )
+
+
+def main():
+    parser = ArgumentParser(
+        prog="ppo",
+        description="Train a PPO agent.",
+    )
+    parser.add_argument(
+        "-l",
+        "--learning-rate",
+        default=LEARNING_RATE,
+        type=float,
+        help="The learning rate to use during training with gradient descent",
+    )
+    parser.add_argument(
+        "-d",
+        "--weight-decay",
+        default=WEIGHT_DECAY,
+        type=float,
+        help="The weight decay (L2 regularization) to use during training with gradient descent",
+    )
+    parser.add_argument(
+        "-w",
+        "--working-dir",
+        default=WORKING_DIR,
+        type=Path,
+        help="Path to directory to work in (will create a directory with "
+        "current timestamp for each run)",
+    )
+    parser.add_argument(
+        "-s",
+        "--seed",
+        default=SEED,
+        type=int,
+        help="Seed to set for numpy's, torch's and random's random number generators.",
+    )
+
+    options = parser.parse_args()
+    train(**options.__dict__)
 
 
 if __name__ == "__main__":

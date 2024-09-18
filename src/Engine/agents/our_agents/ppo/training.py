@@ -113,7 +113,7 @@ def train_single_episode(
 
     state, info = env.reset(seed=seed)
     while not done:
-        state = torch.tensor(state).double().unsqueeze(0)
+        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0)
         # append state here, not after we get the next state from env.step()
         states.append(state)
         action_mask = (
@@ -125,13 +125,14 @@ def train_single_episode(
         dist = distributions.Categorical(action_prob)
         action = dist.sample()
         log_prob_action = dist.log_prob(action)
-        _, reward, done, __, ___ = env.step(action.item())
+        next_state, reward, done, _, __ = env.step(action.item())
         actions.append(action.unsqueeze(0))
         action_mask_history.append(action_mask)
         log_prob_actions.append(log_prob_action.unsqueeze(0))
         values.append(value_pred)
         rewards.append(reward)
         episode_reward += reward
+        state = next_state
 
     states = torch.cat(states)
     actions = torch.cat(actions)
