@@ -56,24 +56,24 @@ PPO_CLIP = 0.2
 def save_model(model: nn.Module, path: Path):
     torch.save(
         {
-            "model_state_dict": model.state_dict(),
+            "model_state_dict": model.cpu().state_dict(),
             "running_mean": (
-                model.input_norm.running_mean
-                if hasattr(model, "input_norm")
-                else model.running_mean
+                model.cpu().input_norm.running_mean
+                if hasattr(model.cpu(), "input_norm")
+                else model.cpu().running_mean
             ),
             "running_var": (
-                model.input_norm.running_var
-                if hasattr(model, "input_norm")
-                else model.running_var
+                model.cpu().input_norm.running_var
+                if hasattr(model.cpu(), "input_norm")
+                else model.cpu().running_var
             ),
         },
         str(path),
     )
 
 
-def evaluate(env, policy, seed):
-    policy.eval()
+def evaluate(env: gym.Env, policy: nn.Module, seed: int, device: torch.device) -> float:
+    policy.eval().to(device)
 
     rewards = []
     done = False
@@ -82,12 +82,14 @@ def evaluate(env, policy, seed):
     state, info = env.reset(seed=seed)
 
     while not done:
-        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0)
+        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
 
         with torch.no_grad():
-            action_mask = torch.from_numpy(
-                env.unwrapped.get_legal_actions_mask()
-            ).double()
+            action_mask = (
+                torch.from_numpy(env.unwrapped.get_legal_actions_mask())
+                .double()
+                .to(device)
+            )
             action_prob, _ = policy(state, action_mask)
 
         action = torch.argmax(action_prob, dim=-1)
@@ -98,7 +100,7 @@ def evaluate(env, policy, seed):
     return episode_reward
 
 
-def extract_game_stats(final_game_state: SplendorState, agent_id) -> List:
+def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> List:
     agent_state = final_game_state.agents[agent_id]
     stats = [
         len(final_game_state.agents),  # players_count
@@ -117,7 +119,10 @@ def train(
     learning_rate: float = LEARNING_RATE,
     weight_decay: float = WEIGHT_DECAY,
     seed: int = SEED,
+    device: str = "cpu",
 ):
+    device = torch.device(device if getattr(torch, device).is_available() else "cpu")
+
     np.random.seed(seed)
     torch.manual_seed(seed)
     random.seed(seed)
@@ -131,7 +136,7 @@ def train(
     input_dim = train_env.observation_space.shape[0]
     output_dim = train_env.action_space.n
 
-    policy = PPO(input_dim, output_dim, dropout=DROPOUT).double()
+    policy = PPO(input_dim, output_dim, dropout=DROPOUT).double().to(device)
 
     optimizer = optim.Adam(
         policy.parameters(),
@@ -159,8 +164,9 @@ def train(
                 PPO_CLIP,
                 loss_function,
                 seed,
+                device,
             )
-            test_reward = evaluate(test_env, policy, seed)
+            test_reward = evaluate(test_env, policy, seed, device)
 
             stats = extract_game_stats(
                 train_env.unwrapped.state, train_env.unwrapped.my_turn
@@ -219,6 +225,9 @@ def main():
         default=SEED,
         type=int,
         help="Seed to set for numpy's, torch's and random's random number generators.",
+    )
+    parser.add_argument(
+        "--device", default="cuda", type=str, choices=("cuda", "cpu", "mps")
     )
 
     options = parser.parse_args()

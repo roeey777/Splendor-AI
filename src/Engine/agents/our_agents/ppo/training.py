@@ -66,7 +66,9 @@ def calculate_policy_loss(
     )
 
     policy_loss = -torch.min(policy_loss_1, policy_loss_2).mean()
-    kl_divergence_estimate = (log_prob_actions - new_log_prob_actions).mean().item()
+    kl_divergence_estimate = (
+        (log_prob_actions - new_log_prob_actions).mean().detach().cpu().item()
+    )
 
     # entropy bonus - use to improve exploration.
     # as seen here (bullet #10):
@@ -101,7 +103,9 @@ def train_single_episode(
     ppo_clip: float,
     loss_fn: Loss_Fn,
     seed: int,
+    device: torch.device,
 ):
+    policy = policy.to(device)
     policy.train()
 
     states = []
@@ -115,19 +119,20 @@ def train_single_episode(
 
     state, info = env.reset(seed=seed)
     while not done:
-        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0)
+        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
         # append state here, not after we get the next state from env.step()
         states.append(state)
         action_mask = (
             torch.from_numpy(env.unwrapped.get_legal_actions_mask())
             .double()
             .unsqueeze(0)
+            .to(device)
         )
         action_prob, value_pred = policy(state, action_mask)
         dist = distributions.Categorical(action_prob)
         action = dist.sample()
         log_prob_action = dist.log_prob(action)
-        next_state, reward, done, _, __ = env.step(action.item())
+        next_state, reward, done, _, __ = env.step(action.detach().cpu().item())
         actions.append(action.unsqueeze(0))
         action_mask_history.append(action_mask)
         log_prob_actions.append(log_prob_action.unsqueeze(0))
@@ -136,14 +141,14 @@ def train_single_episode(
         episode_reward += reward
         state = next_state
 
-    states = torch.cat(states)
-    actions = torch.cat(actions)
-    action_mask_history = torch.cat(action_mask_history)
-    log_prob_actions = torch.cat(log_prob_actions)
-    values = torch.cat(values).squeeze(-1)
+    states = torch.cat(states).to(device)
+    actions = torch.cat(actions).to(device)
+    action_mask_history = torch.cat(action_mask_history).to(device)
+    log_prob_actions = torch.cat(log_prob_actions).to(device)
+    values = torch.cat(values).squeeze(-1).to(device)
 
-    returns = calculate_returns(rewards, discount_factor)
-    advantages = calculate_advantages(returns, values)
+    returns = calculate_returns(rewards, discount_factor).to(device)
+    advantages = calculate_advantages(returns, values).to(device)
 
     policy_loss, value_loss = update_policy(
         policy,
@@ -157,6 +162,7 @@ def train_single_episode(
         ppo_steps,
         ppo_clip,
         loss_fn,
+        device,
     )
 
     return policy_loss, value_loss, episode_reward
@@ -174,6 +180,7 @@ def update_policy(
     ppo_steps: int,
     ppo_clip: float,
     loss_fn: Loss_Fn,
+    device: torch.device,
 ):
     total_policy_loss = 0
     total_value_loss = 0
@@ -203,7 +210,7 @@ def update_policy(
         torch.nn.utils.clip_grad_norm_(policy.parameters(), MAX_GRADIENT_NORM)
         optimizer.step()
 
-        total_policy_loss += policy_loss.item()
-        total_value_loss += value_loss.item()
+        total_policy_loss += policy_loss.detach().cpu().item()
+        total_value_loss += value_loss.detach().cpu().item()
 
     return total_policy_loss / ppo_steps, total_value_loss / ppo_steps
