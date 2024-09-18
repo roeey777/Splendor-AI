@@ -42,15 +42,15 @@ STATS_HEADERS = (
 )
 
 SEED = 1234
-LEARNING_RATE = 1e-6
-WEIGHT_DECAY = 1e-2
-MAX_EPISODES = 1000
+LEARNING_RATE = 1e-5
+WEIGHT_DECAY = 1e-4
+MAX_EPISODES = 50000
 
 HUGE_NEG = -1e10
 DISCOUNT_FACTOR = 0.99
 N_TRIALS = 10
 PRINT_EVERY = 10
-PPO_STEPS = 5
+PPO_STEPS = 10
 PPO_CLIP = 0.2
 
 
@@ -125,8 +125,8 @@ def main(working_dir: Path = WORKING_DIR):
         stats_csv.writerow(STATS_HEADERS)
 
         # Main training loop
-        for episode in range(1, MAX_EPISODES + 1):
-            print(f"Episode {episode}")
+        for episode in range(MAX_EPISODES):
+            print(f"Episode {episode + 1}")
             policy_loss, value_loss, train_reward = train_single_episode(
                 train_env,
                 policy,
@@ -155,11 +155,11 @@ def main(working_dir: Path = WORKING_DIR):
 
             if episode % PRINT_EVERY == 0:
                 print(
-                    f"| Episode: {episode:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |"
+                    f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |"
                 )
                 torch.save(
                     policy,
-                    models_folder / f"ppo_model_{episode // PRINT_EVERY}.pth"
+                    models_folder / f"ppo_model_{episode + 1 // PRINT_EVERY}.pth"
                 )
             
     show_figures(train_rewards, test_rewards)

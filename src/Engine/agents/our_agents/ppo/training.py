@@ -1,6 +1,11 @@
+from typing import Tuple
+
+import gymnasium as gym
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.optim.optimizer import Optimizer
 import torch.distributions as distributions
 from torch.nn.modules.loss import _Loss as Loss_Fn
 
@@ -42,8 +47,59 @@ def calculate_advantages(returns, values, normalize=True):
     return advantages
 
 
+def calculate_policy_loss(
+    action_prob: torch.Tensor,
+    actions: torch.Tensor,
+    log_prob_actions: torch.Tensor,
+    advantages: torch.Tensor,
+    ppo_clip,
+) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    dist = distributions.Categorical(action_prob)
+
+    # new log prob using old actions
+    new_log_prob_actions = dist.log_prob(actions)
+    policy_ratio = (new_log_prob_actions - log_prob_actions).exp()
+    policy_loss_1 = policy_ratio * advantages
+    policy_loss_2 = (
+        torch.clamp(policy_ratio, min=1.0 - ppo_clip, max=1.0 + ppo_clip) * advantages
+    )
+
+    policy_loss = -torch.min(policy_loss_1, policy_loss_2).mean()
+    kl_divergence_estimate = (log_prob_actions - new_log_prob_actions).mean().item()
+
+    # entropy bonus - use to improve exploration.
+    # as seen here (bullet #10):
+    # https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+    entropy = dist.entropy().mean()
+
+    return policy_loss, kl_divergence_estimate, entropy
+
+
+def calculate_loss(
+    policy_loss: torch.Tensor, value_loss: torch.Tensor, entropy_bonus: torch.Tensor
+) -> torch.Tensor:
+    """
+    final loss of clipped objective PPO, as seen here:
+    https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/ppo2/model.py#L91
+    """
+    loss = (
+        policy_loss
+        + COEFFICIENTS["value"] * value_loss
+        - COEFFICIENTS["entropy"] * entropy_bonus
+    )
+
+    return loss
+
+
 def train_single_episode(
-    env, policy, optimizer, discount_factor, ppo_steps, ppo_clip, loss_fn: Loss_Fn, seed
+    env: gym.Env,
+    policy: nn.Module,
+    optimizer: Optimizer,
+    discount_factor: float,
+    ppo_steps: int,
+    ppo_clip: float,
+    loss_fn: Loss_Fn,
+    seed: int,
 ):
     policy.train()
 
@@ -105,16 +161,16 @@ def train_single_episode(
 
 
 def update_policy(
-    policy,
-    states,
-    actions,
-    action_masks,
-    log_prob_actions,
-    advantages,
-    returns,
-    optimizer,
-    ppo_steps,
-    ppo_clip,
+    policy: nn.Module,
+    states: torch.Tensor,
+    actions: torch.Tensor,
+    action_masks: torch.Tensor,
+    log_prob_actions: torch.Tensor,
+    advantages: torch.Tensor,
+    returns: torch.Tensor,
+    optimizer: Optimizer,
+    ppo_steps: int,
+    ppo_clip: float,
     loss_fn: Loss_Fn,
 ):
     total_policy_loss = 0
@@ -130,36 +186,17 @@ def update_policy(
         action_prob, value_pred = policy(states, action_masks)
         value_pred = value_pred.squeeze(-1)
 
-        dist = distributions.Categorical(action_prob)
-
-        # new log prob using old actions
-        new_log_prob_actions = dist.log_prob(actions)
-        policy_ratio = (new_log_prob_actions - log_prob_actions).exp()
-        policy_loss_1 = policy_ratio * advantages
-        policy_loss_2 = (
-            torch.clamp(policy_ratio, min=1.0 - ppo_clip, max=1.0 + ppo_clip)
-            * advantages
+        policy_loss, kl_divergence_estimate, entropy = calculate_policy_loss(
+            action_prob, actions, log_prob_actions, advantages, ppo_clip
         )
 
-        policy_loss = -torch.min(policy_loss_1, policy_loss_2).mean()
         value_loss = loss_fn(returns, value_pred).mean()
 
-        # entropy bonus - use to improve exploration.
-        # as seen here (bullet #10):
-        # https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
-        entropy = dist.entropy().mean()
-
-        # final loss of clipped objective PPO
-        # as seen here:
-        # https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/ppo2/model.py#L91
-        loss = (
-            policy_loss
-            + COEFFICIENTS["value"] * value_loss
-            - COEFFICIENTS["entropy"] * entropy
-        )
+        loss = calculate_loss(policy_loss, value_loss, entropy)
 
         optimizer.zero_grad()
         loss.backward(retain_graph=True)
+
         # clip gradient norm - limit the amount of change a single step can do.
         torch.nn.utils.clip_grad_norm_(policy.parameters(), MAX_GRADIENT_NORM)
         optimizer.step()
