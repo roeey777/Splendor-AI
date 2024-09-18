@@ -41,7 +41,9 @@ def calculate_advantages(returns, values, normalize=True):
 
     if normalize:
         # avoid possible division by 0
-        advantages = (advantages - advantages.mean()) / (advantages.std() + VERY_SMALL_EPSILON)
+        advantages = (advantages - advantages.mean()) / (
+            advantages.std() + VERY_SMALL_EPSILON
+        )
 
     return advantages
 

@@ -53,6 +53,25 @@ PPO_STEPS = 10
 PPO_CLIP = 0.2
 
 
+def save_model(model: nn.Module, path: Path):
+    torch.save(
+        {
+            "model_state_dict": model.state_dict(),
+            "running_mean": (
+                model.input_norm.running_mean
+                if hasattr(model, "input_norm")
+                else model.running_mean
+            ),
+            "running_var": (
+                model.input_norm.running_var
+                if hasattr(model, "input_norm")
+                else model.running_var
+            ),
+        },
+        str(path),
+    )
+
+
 def evaluate(env, policy, seed):
     policy.eval()
 
@@ -97,7 +116,7 @@ def train(
     working_dir: Path = WORKING_DIR,
     learning_rate: float = LEARNING_RATE,
     weight_decay: float = WEIGHT_DECAY,
-    seed: int = SEED
+    seed: int = SEED,
 ):
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -112,7 +131,7 @@ def train(
     input_dim = train_env.observation_space.shape[0]
     output_dim = train_env.action_space.n
 
-    policy = PPO(input_dim, output_dim, DROPOUT).double()
+    policy = PPO(input_dim, output_dim, dropout=DROPOUT).double()
 
     optimizer = optim.Adam(
         policy.parameters(),
@@ -161,9 +180,9 @@ def train(
                 print(
                     f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |"
                 )
-                torch.save(
+                save_model(
                     policy,
-                    models_folder / f"ppo_model_{episode + 1 // N_TRIALS}.pth"
+                    models_folder / f"ppo_model_{episode + 1 // N_TRIALS}.pth",
                 )
 
 
