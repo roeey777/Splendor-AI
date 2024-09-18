@@ -10,10 +10,9 @@ import torch.distributions as distributions
 from torch.nn.modules.loss import _Loss as Loss_Fn
 
 
-COEFFICIENTS = {
-    "value": 0.5,
-    "entropy": 0.01,
-}
+ENTROPY_COEFFICIENT = 0.01
+VALUE_COEFFICIENT = 0.5
+VERY_SMALL_EPSILON = 1e-8
 
 # Global Gradient Norm Clipping as suggested by (bullet #11):
 # https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
@@ -32,7 +31,7 @@ def calculate_returns(rewards, discount_factor, normalize=True):
 
     if normalize:
         # avoid possible division by 0
-        returns = (returns - returns.mean()) / (returns.std() + 1e-8)
+        returns = (returns - returns.mean()) / (returns.std() + VERY_SMALL_EPSILON)
 
     return returns
 
@@ -42,7 +41,7 @@ def calculate_advantages(returns, values, normalize=True):
 
     if normalize:
         # avoid possible division by 0
-        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
+        advantages = (advantages - advantages.mean()) / (advantages.std() + VERY_SMALL_EPSILON)
 
     return advantages
 
@@ -84,8 +83,8 @@ def calculate_loss(
     """
     loss = (
         policy_loss
-        + COEFFICIENTS["value"] * value_loss
-        - COEFFICIENTS["entropy"] * entropy_bonus
+        + VALUE_COEFFICIENT * value_loss
+        - ENTROPY_COEFFICIENT * entropy_bonus
     )
 
     return loss
@@ -114,7 +113,7 @@ def train_single_episode(
 
     state, info = env.reset(seed=seed)
     while not done:
-        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0)
+        state = torch.tensor(state).double().unsqueeze(0)
         # append state here, not after we get the next state from env.step()
         states.append(state)
         action_mask = (

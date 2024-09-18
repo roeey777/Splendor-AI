@@ -104,6 +104,11 @@ Let the genetic algorithm agent play against minimax (with alpha-beta pruning) a
 splendor -a Engine.agents.our_agents.genetic_algorithm.genetic_algorithm_agent,Engine.agents.our_agents.minmax --agent_names=genetic,minimax -t -m 10
 ```
 
+Let the PPO agent play against minimax (with alpha-beta pruning) agent for 10 consecutive games (only text display):
+```
+splendor -a Engine.agents.our_agents.ppo.ppo_agent,Engine.agents.our_agents.minmax --agent_names=ppo,minimax -t -m 10
+```
+
 ## Training Our Agents:
 ### Training The Genetic Algorithm Agent:
 In order to train the genetic algorithm agent with the following hyper-parameters:
@@ -115,6 +120,14 @@ Use the following command:
 ```
 evolve --population-size 24 --generations 20 --mutation-rate 0.1 --seed 1234
 ```
+
+### Training The PPO Agent:
+In order to train the PPO agent you should run the following command:
+```
+ppo
+```
+This command will train the PPO agent with the default training hyper-parameters.
+
 
 ### ```SplendorEnv``` - an OpenAI ```gym``` compatible simulator for the game Splendor 
 We've made a custom ```gym.Env``` and registered it as one of ```gym``` environments. This would come in handy when training agent such as DQN or PPO.

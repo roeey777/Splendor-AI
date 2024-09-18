@@ -1,6 +1,5 @@
 from datetime import datetime
 
-import matplotlib.pyplot as plt
 import numpy as np
 import gymnasium as gym
 import torch
@@ -48,7 +47,6 @@ MAX_EPISODES = 50000
 
 DISCOUNT_FACTOR = 0.99
 N_TRIALS = 10
-PRINT_EVERY = 10
 PPO_STEPS = 10
 PPO_CLIP = 0.2
 
@@ -60,7 +58,7 @@ def evaluate(env, policy):
     done = False
     episode_reward = 0
 
-    state, info = env.reset(seed=SEED + 1)
+    state, info = env.reset(seed=SEED)
 
     while not done:
         state = torch.tensor(state, dtype=torch.float64).unsqueeze(0)
@@ -72,7 +70,7 @@ def evaluate(env, policy):
             action_prob, _ = policy(state, action_mask)
 
         action = torch.argmax(action_prob, dim=-1)
-        state, reward, done, truncated, _ = env.step(action.item())
+        _, reward, done, __, ____ = env.step(action.item())
         episode_reward += reward
 
     return episode_reward
@@ -83,11 +81,11 @@ def extract_game_stats(final_game_state: SplendorState, agent_id) -> List:
     stats = [
         len(final_game_state.agents),  # players_count
         len(agent_state.agent_trace.action_reward),  # "rounds_count",
-        len(agent_state.nobles),  # "nobles_taken",
         agent_state.score,  # "score",
+        len(agent_state.nobles),  # "nobles_taken",
+        len(list(filter(lambda c: c.deck_id == 0, chain(*agent_state.cards.values())))),
         len(list(filter(lambda c: c.deck_id == 1, chain(*agent_state.cards.values())))),
         len(list(filter(lambda c: c.deck_id == 2, chain(*agent_state.cards.values())))),
-        len(list(filter(lambda c: c.deck_id == 3, chain(*agent_state.cards.values())))),
     ]
     return stats
 
@@ -113,7 +111,6 @@ def main(working_dir: Path = WORKING_DIR):
         lr=LEARNING_RATE,
         weight_decay=WEIGHT_DECAY,
     )
-    # loss_function = nn.MSELoss()
     loss_function = nn.SmoothL1Loss()
 
     train_rewards = []
@@ -147,12 +144,12 @@ def main(working_dir: Path = WORKING_DIR):
 
             train_rewards.append(train_reward)
             test_rewards.append(test_reward)
-            mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
-            mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
-            train_rewards_std = np.std(train_rewards[-N_TRIALS:])
-            test_rewards_std = np.std(test_rewards[-N_TRIALS:])
 
-            if episode % PRINT_EVERY == 0:
+            if (episode + 1) % N_TRIALS == 0:
+                mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
+                mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
+                train_rewards_std = np.std(train_rewards[-N_TRIALS:])
+                test_rewards_std = np.std(test_rewards[-N_TRIALS:])
                 print(
                     f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |"
                 )
@@ -160,19 +157,6 @@ def main(working_dir: Path = WORKING_DIR):
                     policy,
                     models_folder / f"ppo_model_{episode + 1 // PRINT_EVERY}.pth"
                 )
-            
-    show_figures(train_rewards, test_rewards)
-
-
-def show_figures(train_rewards, test_rewards):
-    plt.figure(figsize=(12, 8))
-    plt.plot(test_rewards, label="Test Reward")
-    plt.plot(train_rewards, label="Train Reward")
-    plt.xlabel("Episode", fontsize=20)
-    plt.ylabel("Reward", fontsize=20)
-    plt.hlines(REWARD_THRESHOLD, 0, len(test_rewards), color="r")
-    plt.legend(loc="lower right")
-    plt.grid()
 
 
 if __name__ == "__main__":
