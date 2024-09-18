@@ -155,7 +155,7 @@ def main(working_dir: Path = WORKING_DIR):
                 )
                 torch.save(
                     policy,
-                    models_folder / f"ppo_model_{episode + 1 // PRINT_EVERY}.pth"
+                    models_folder / f"ppo_model_{episode + 1 // N_TRIALS}.pth"
                 )
 
 

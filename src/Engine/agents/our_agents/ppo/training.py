@@ -125,7 +125,7 @@ def train_single_episode(
         dist = distributions.Categorical(action_prob)
         action = dist.sample()
         log_prob_action = dist.log_prob(action)
-        state, reward, done, truncated, _ = env.step(action.item())
+        _, reward, done, __, ___ = env.step(action.item())
         actions.append(action.unsqueeze(0))
         action_mask_history.append(action_mask)
         log_prob_actions.append(log_prob_action.unsqueeze(0))
