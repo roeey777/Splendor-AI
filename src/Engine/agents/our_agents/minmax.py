@@ -21,13 +21,13 @@ class myAgent(Agent):
         alpha=-np.inf,
         beta=np.inf,
     ):
+        if depth == 0:
+            return None, self.evaluation_function(game_state)
         agent_id = self.id if is_maximizing else 1 - self.id
         actions = game_rule.getLegalActions(game_state, agent_id)
         random.shuffle(actions)
         actions.sort(key=lambda action: action["type"])
         assert len(actions) != 0
-        if depth == 0:
-            return None, self.evaluation_function(game_state)
 
         best_action = None
         best_value = -np.inf if is_maximizing else np.inf
