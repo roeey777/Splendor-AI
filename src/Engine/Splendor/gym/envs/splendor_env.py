@@ -150,10 +150,7 @@ class SplendorEnv(gym.Env):
             == self.my_turn
         )
 
-        if current_score >= 15 and is_leading:
-            reward = 100
-        else:
-            reward = current_score - previous_score
+        reward = current_score - previous_score
 
         return (
             self._vectorize(next_state, self.observation_space.shape, self.my_turn),
