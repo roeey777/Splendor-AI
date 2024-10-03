@@ -3,7 +3,7 @@ import random
 from datetime import datetime
 from argparse import ArgumentParser
 from itertools import chain
-from typing import List, Dict, Tuple
+from typing import List
 from pathlib import Path
 
 import numpy as np
@@ -14,7 +14,6 @@ import torch.optim as optim
 from csv import writer as csv_writer
 
 from Engine.Splendor.splendor_model import SplendorState
-from Engine.agents.our_agents.minmax import myAgent as MiniMaxAgent
 
 from .network import PPO, DROPOUT
 from .training import train_single_episode
@@ -22,7 +21,8 @@ from .training import train_single_episode
 # import this would register splendor as one of gym's environments.
 import Engine.Splendor.gym
 
-opponents = [MiniMaxAgent(0)]
+from Engine.agents.generic.random import myAgent as RandomAgent
+opponents = [RandomAgent(0)]
 
 WORKING_DIR = Path().absolute()
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
@@ -140,8 +140,8 @@ def train(
 
     optimizer = optim.Adam(
         policy.parameters(),
-        lr=LEARNING_RATE,
-        weight_decay=WEIGHT_DECAY,
+        lr=learning_rate,
+        weight_decay=weight_decay,
     )
     loss_function = nn.SmoothL1Loss()
 
