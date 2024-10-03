@@ -9,6 +9,7 @@ import numpy as np
 
 DROPOUT = 0.2
 HUGE_NEG = -1e8
+HIDDEN_DIMS: List[int] = [128, 128, 128, 128]
 
 
 class InputNormalization(nn.Module):
@@ -38,8 +39,6 @@ class InputNormalization(nn.Module):
 
 
 class PPO(nn.Module):
-    HIDDEN_DIMS: List[int] = [128, 128]
-
     def __init__(
         self,
         input_dim: int,
