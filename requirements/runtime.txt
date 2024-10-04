@@ -5,3 +5,6 @@ pytz==2024.1
 gymnasium==0.29.1
 scikit-learn==1.5.2
 torch==2.4.1
+torchrl==0.5.0
+jaxtyping==0.2.34
+

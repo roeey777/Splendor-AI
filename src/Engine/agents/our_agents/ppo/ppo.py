@@ -22,6 +22,7 @@ from .training import train_single_episode
 import Engine.Splendor.gym
 
 from Engine.agents.generic.random import myAgent as RandomAgent
+
 opponents = [RandomAgent(0)]
 
 WORKING_DIR = Path().absolute()
@@ -80,6 +81,7 @@ def evaluate(env: gym.Env, policy: nn.Module, seed: int, device: torch.device) -
     episode_reward = 0
 
     state, info = env.reset(seed=seed)
+    hidden = policy.init_hidden_state().to(device)
 
     while not done:
         state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
@@ -90,7 +92,7 @@ def evaluate(env: gym.Env, policy: nn.Module, seed: int, device: torch.device) -
                 .double()
                 .to(device)
             )
-            action_prob, _ = policy(state, action_mask)
+            action_prob, _, hidden = policy(state, action_mask, hidden)
 
         action = torch.argmax(action_prob, dim=-1)
         next_state, reward, done, _, __ = env.step(action.item())

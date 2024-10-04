@@ -549,9 +549,11 @@ class SplendorGameRule(GameRule):
                     for noble in new_nobles:
                         actions.append(
                             {
-                                "type": "buy_reserve"
-                                if card in agent.cards["yellow"]
-                                else "buy_available",
+                                "type": (
+                                    "buy_reserve"
+                                    if card in agent.cards["yellow"]
+                                    else "buy_available"
+                                ),
                                 "card": card,
                                 "card_position": (row, col),
                                 "returned_gems": returned_gems,

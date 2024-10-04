@@ -108,6 +108,7 @@ def train_single_episode(
     policy = policy.to(device)
     policy.train()
 
+    hidden_states = []
     states = []
     actions = []
     action_mask_history = []
@@ -118,9 +119,11 @@ def train_single_episode(
     episode_reward = 0
 
     state, info = env.reset(seed=seed)
+    hidden = policy.init_hidden_state().to(device)
     while not done:
         state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
         # append state here, not after we get the next state from env.step()
+        hidden_states.append(hidden)
         states.append(state)
         action_mask = (
             torch.from_numpy(env.unwrapped.get_legal_actions_mask())
@@ -128,7 +131,7 @@ def train_single_episode(
             .unsqueeze(0)
             .to(device)
         )
-        action_prob, value_pred = policy(state, action_mask)
+        action_prob, value_pred, next_hidden = policy(state, action_mask, hidden)
         dist = distributions.Categorical(action_prob)
         action = dist.sample()
         log_prob_action = dist.log_prob(action)
@@ -140,7 +143,9 @@ def train_single_episode(
         rewards.append(reward)
         episode_reward += reward
         state = next_state
+        hidden = next_hidden
 
+    hidden_states = torch.cat(hidden_states).to(device)
     states = torch.cat(states).to(device)
     actions = torch.cat(actions).to(device)
     action_mask_history = torch.cat(action_mask_history).to(device)
@@ -152,6 +157,7 @@ def train_single_episode(
 
     policy_loss, value_loss = update_policy(
         policy,
+        hidden_states,
         states,
         actions,
         action_mask_history,
@@ -170,6 +176,7 @@ def train_single_episode(
 
 def update_policy(
     policy: nn.Module,
+    hidden_states: torch.Tensor,
     states: torch.Tensor,
     actions: torch.Tensor,
     action_masks: torch.Tensor,
@@ -185,6 +192,7 @@ def update_policy(
     total_policy_loss = 0
     total_value_loss = 0
 
+    hidden_states = hidden_states.detach()
     advantages = advantages.detach()
     log_prob_actions = log_prob_actions.detach()
     actions = actions.detach()
@@ -192,7 +200,10 @@ def update_policy(
 
     for _ in range(ppo_steps):
         # get new log prob of actions for all input states
-        action_prob, value_pred = policy(states, action_masks)
+        action_prob, value_pred, next_hidden_states = policy(
+            states, action_masks, hidden_states
+        )
+        next_hidden_states.detach()
         value_pred = value_pred.squeeze(-1)
 
         policy_loss, kl_divergence_estimate, entropy = calculate_policy_loss(
