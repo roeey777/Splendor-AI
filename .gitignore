@@ -4,5 +4,4 @@
 *.egg-info
 build
 *.pth
-docs/build/
 docs/_build/
