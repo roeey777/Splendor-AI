@@ -14,6 +14,13 @@ Some of the features here will require python `3.11` or higher.
 
 ---
 
+---
+**Github Pages**
+
+Further documentation can be found at [github pages](https://roeey777.github.io/Splendor-AI/).
+
+---
+
 
 ## Installation of Splendor
 There are 2 possible ways to install the requirements of splendor.
