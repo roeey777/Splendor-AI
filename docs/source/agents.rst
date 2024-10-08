@@ -1,5 +1,5 @@
-splendor
-========
+Agents
+======
 
 .. toctree::
    :maxdepth: 6
