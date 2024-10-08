@@ -1,6 +1,13 @@
 # Splendor
 
 ---
+**Github Pages**
+
+Further documentation can be found at [github pages](https://roeey777.github.io/Splendor-AI/).
+
+---
+
+---
 **Special Thanks**
 
 We would like to thank Prof. Nir Lipovetzky, an instructor in COMP90054 “AI Planning for Autonomy” course of the University of Melbourne. The course staff have organized a contest for autonomous agents for the game Splendor, developed by the students. We've contancted associate Prof. Nir Lipovetzky ([Github](https://github.com/nirlipo), [mail](nir.lipovetzky@unimelb.edu.au) ) of [Melbourne University](https://www.unimelb.edu.au/) and he provided us with their implementation of the game engine. From there we've started tweeking the game engine a bit for our needs (like adding the [generatePredecessor method to SplendorGameRule](https://github.com/roeey777/Splendor-AI/blob/4f8b8b9895c5b4ab700181f73d74659dfb1eff8f/src/Engine/Splendor/splendor_model.py#L150) ).
@@ -11,13 +18,6 @@ We would like to thank Prof. Nir Lipovetzky, an instructor in COMP90054 “AI Pl
 **NOTE**
 
 Some of the features here will require python `3.11` or higher.
-
----
-
----
-**Github Pages**
-
-Further documentation can be found at [github pages](https://roeey777.github.io/Splendor-AI/).
 
 ---
 
