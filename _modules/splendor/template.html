@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.template &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.template</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.template</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">utils</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+
+<div class="viewcode-block" id="GameState">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameState">[docs]</a>
+<span class="k">class</span> <span class="nc">GameState</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_of_agent</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="Action">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Action">[docs]</a>
+<span class="k">class</span> <span class="nc">Action</span><span class="p">:</span>
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="GameRule">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule">[docs]</a>
+<span class="k">class</span> <span class="nc">GameRule</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_of_agent</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_agent_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_of_agent</span> <span class="o">=</span> <span class="n">num_of_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_game_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initialGameState</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="GameRule.initialGameState">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.initialGameState">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialGameState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="GameRule.generateSuccessor">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.generateSuccessor">[docs]</a>
+    <span class="k">def</span> <span class="nf">generateSuccessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="GameRule.getNextAgentIndex">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.getNextAgentIndex">[docs]</a>
+    <span class="k">def</span> <span class="nf">getNextAgentIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_agent_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_of_agent</span></div>
+
+
+<div class="viewcode-block" id="GameRule.getLegalActions">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.getLegalActions">[docs]</a>
+    <span class="k">def</span> <span class="nf">getLegalActions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="GameRule.calScore">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.calScore">[docs]</a>
+    <span class="k">def</span> <span class="nf">calScore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="GameRule.gameEnds">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.gameEnds">[docs]</a>
+    <span class="k">def</span> <span class="nf">gameEnds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="GameRule.update">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+        <span class="n">temp_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_game_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_game_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generateSuccessor</span><span class="p">(</span>
+            <span class="n">temp_state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_agent_index</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_agent_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getNextAgentIndex</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_counter</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+
+<div class="viewcode-block" id="GameRule.getCurrentAgentIndex">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.GameRule.getCurrentAgentIndex">[docs]</a>
+    <span class="k">def</span> <span class="nf">getCurrentAgentIndex</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_agent_index</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Agent">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Agent">[docs]</a>
+<span class="k">class</span> <span class="nc">Agent</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">_id</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+    <span class="c1"># Given a set of available actions for the agent to execute, and</span>
+    <span class="c1"># a copy of the current game state (including that of the agent),</span>
+    <span class="c1"># select one of the actions to execute.</span>
+<div class="viewcode-block" id="Agent.SelectAction">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Agent.SelectAction">[docs]</a>
+    <span class="k">def</span> <span class="nf">SelectAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">game_rule</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Displayer">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Displayer">[docs]</a>
+<span class="k">class</span> <span class="nc">Displayer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="c1"># show the displayer for the first time</span>
+<div class="viewcode-block" id="Displayer.InitDisplayer">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Displayer.InitDisplayer">[docs]</a>
+    <span class="k">def</span> <span class="nf">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Displayer.ExcuteAction">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Displayer.ExcuteAction">[docs]</a>
+    <span class="k">def</span> <span class="nf">ExcuteAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">move</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Displayer.TimeOutWarning">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Displayer.TimeOutWarning">[docs]</a>
+    <span class="k">def</span> <span class="nf">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Displayer.EndGame">
+<a class="viewcode-back" href="../../splendor.html#splendor.template.Displayer.EndGame">[docs]</a>
+    <span class="k">def</span> <span class="nf">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+        <span class="n">utils</span><span class="o">.</span><span class="n">raiseNotDefined</span><span class="p">()</span>
+        <span class="k">pass</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

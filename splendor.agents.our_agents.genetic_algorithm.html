@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.agents.our_agents.genetic_algorithm package &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="splendor.agents.our_agents.ppo package" href="splendor.agents.our_agents.ppo.html" />
+    <link rel="prev" title="splendor.agents.our_agents package" href="splendor.agents.our_agents.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="splendor.html">splendor package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="splendor.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.game">splendor.game module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.general_game_runner">splendor.general_game_runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.template">splendor.template module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.utils">splendor.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="splendor.html">splendor package</a></li>
+          <li class="breadcrumb-item"><a href="splendor.agents.html">splendor.agents package</a></li>
+          <li class="breadcrumb-item"><a href="splendor.agents.our_agents.html">splendor.agents.our_agents package</a></li>
+      <li class="breadcrumb-item active">splendor.agents.our_agents.genetic_algorithm package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/splendor.agents.our_agents.genetic_algorithm.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="splendor-agents-our-agents-genetic-algorithm-package">
+<h1>splendor.agents.our_agents.genetic_algorithm package<a class="headerlink" href="#splendor-agents-our-agents-genetic-algorithm-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-splendor.agents.our_agents.genetic_algorithm.evolve">
+<span id="splendor-agents-our-agents-genetic-algorithm-evolve-module"></span><h2>splendor.agents.our_agents.genetic_algorithm.evolve module<a class="headerlink" href="#module-splendor.agents.our_agents.genetic_algorithm.evolve" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.crossover">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">crossover</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="splendor.agents.our_agents.genetic_algorithm.genes.Gene"><span class="pre">Gene</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dad</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="splendor.agents.our_agents.genetic_algorithm.genes.Gene"><span class="pre">Gene</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="splendor.agents.our_agents.genetic_algorithm.genes.Gene"><span class="pre">Gene</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="splendor.agents.our_agents.genetic_algorithm.genes.Gene"><span class="pre">Gene</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#crossover"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.crossover" title="Link to this definition"></a></dt>
+<dd><p>Executes crossover between 2 genes, which produces 2 children.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.evaluate">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent"><span class="pre">GeneAlgoAgent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent"><span class="pre">GeneAlgoAgent</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Measures the fitness of each individual by having them play against each
+other. Each individual plays in 3 games with 1,2 and 3 rivals.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.evolve">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">evolve</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">24</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">PosixPath('/home/eyal/Desktop/projects/ws1-splendor/docs')</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#evolve"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.evolve" title="Link to this definition"></a></dt>
+<dd><p>Genetic algorithm evolution process.
+In each generation <cite>selection_size</cite> are kept and used for mating.
+Returns the top <cite>return_size</cite> individuals of the last generation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.generate_initial_population">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">generate_initial_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#generate_initial_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.generate_initial_population" title="Link to this definition"></a></dt>
+<dd><p>Creates agents with random genes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.main">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.main" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.mate">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">mate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent"><span class="pre">GeneAlgoAgent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">population_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent"><span class="pre">GeneAlgoAgent</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#mate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.mate" title="Link to this definition"></a></dt>
+<dd><p>Creates new individual by randomly choosing 2 parents and mating them till
+we got enough individuals.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.mutate">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">mutate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gene</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="splendor.agents.our_agents.genetic_algorithm.genes.Gene"><span class="pre">Gene</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutate_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#mutate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.mutate" title="Link to this definition"></a></dt>
+<dd><p>Mutates a single gene.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.mutate_population">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">mutate_population</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent"><span class="pre">GeneAlgoAgent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutation_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#mutate_population"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.mutate_population" title="Link to this definition"></a></dt>
+<dd><p>Mutates the genes of the population.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.single_game">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">single_game</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agents</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="splendor.html#splendor.game.Game" title="splendor.game.Game"><span class="pre">Game</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#single_game"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.single_game" title="Link to this definition"></a></dt>
+<dd><p>Runs a single game of Splendor (with the Engine) using the given agents.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.evolve.sort_by_fitness">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.evolve.</span></span><span class="sig-name descname"><span class="pre">sort_by_fitness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">population</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent"><span class="pre">GeneAlgoAgent</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quiet</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiprocess</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">list</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/evolve.html#sort_by_fitness"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.evolve.sort_by_fitness" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-splendor.agents.our_agents.genetic_algorithm.genes">
+<span id="splendor-agents-our-agents-genetic-algorithm-genes-module"></span><h2>splendor.agents.our_agents.genetic_algorithm.genes module<a class="headerlink" href="#module-splendor.agents.our_agents.genetic_algorithm.genes" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.genes.</span></span><span class="sig-name descname"><span class="pre">Gene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dna</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#Gene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A generic gene representation class.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.LOWER_BOUND">
+<span class="sig-name descname"><span class="pre">LOWER_BOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-20</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.LOWER_BOUND" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.SHAPE">
+<span class="sig-name descname"><span class="pre">SHAPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.SHAPE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.UPPER_BOUND">
+<span class="sig-name descname"><span class="pre">UPPER_BOUND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.UPPER_BOUND" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.dna">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">dna</span></span><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.dna" title="Link to this definition"></a></dt>
+<dd><p>We want some metrics to have the same weight (in places the is no
+meaning to the order). This methods returns a dna which matches in
+dimentions to the metrics we get in practice by repeting some value
+multiple time (according to the instructions of <cite>METRICS_SHAPE</cite>).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.load">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_or_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#Gene.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.load" title="Link to this definition"></a></dt>
+<dd><p>Initiate a gene with DNA from a saved file.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.mutate">
+<span class="sig-name descname"><span class="pre">mutate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutate_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutator</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#Gene.mutate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.mutate" title="Link to this definition"></a></dt>
+<dd><p>Mutates a gene’s DNA (in place).
+Should be the only thing that edits the DNA of an existing gene.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.random">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#Gene.random"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.random" title="Link to this definition"></a></dt>
+<dd><p>Initiate a gene with random DNA.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.Gene.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_or_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#Gene.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene.save" title="Link to this definition"></a></dt>
+<dd><p>Saves a gene’s DNA to a file.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.genes.</span></span><span class="sig-name descname"><span class="pre">ManagerGene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dna</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#ManagerGene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="splendor.agents.our_agents.genetic_algorithm.genes.Gene"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gene</span></code></a></p>
+<p>Represent a gene that helps to choose a strategy to follow (from 3 options)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene.SHAPE">
+<span class="sig-name descname"><span class="pre">SHAPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(24,</span> <span class="pre">3)</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene.SHAPE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene.select_strategy">
+<span class="sig-name descname"><span class="pre">select_strategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_metrics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene" title="splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene"><span class="pre">StrategyGene</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene" title="splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene"><span class="pre">StrategyGene</span></a></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#ManagerGene.select_strategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene.select_strategy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.genes.</span></span><span class="sig-name descname"><span class="pre">StrategyGene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dna</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">array</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#StrategyGene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genes.Gene" title="splendor.agents.our_agents.genetic_algorithm.genes.Gene"><code class="xref py py-class docutils literal notranslate"><span class="pre">Gene</span></code></a></p>
+<p>Represent a gene that helps to choose an action each turn.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene.SHAPE">
+<span class="sig-name descname"><span class="pre">SHAPE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(24,)</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene.SHAPE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene.evaluate_state">
+<span class="sig-name descname"><span class="pre">evaluate_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_metrics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genes.html#StrategyGene.evaluate_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene.evaluate_state" title="Link to this definition"></a></dt>
+<dd><p>Evaluates a state’s value according to its metrics</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent">
+<span id="splendor-agents-our-agents-genetic-algorithm-genetic-algorithm-agent-module"></span><h2>splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent module<a class="headerlink" href="#module-splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.</span></span><span class="sig-name descname"><span class="pre">GeneAlgoAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genetic_algorithm_agent.html#GeneAlgoAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="splendor.html#splendor.template.Agent" title="splendor.template.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a></p>
+<p>Agent which plays according to a “plan” reached by genetic algorithm.
+This agent is also used to represent an individual in the evolution
+process.
+We decided to describe an agents plan using 4 genes: 3 of them are used to
+evaluate actions and choose one from an available actions list and the
+forth used to assess the current situation and choose one of the 3
+strategies.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.MANAGER_PATH">
+<span class="sig-name descname"><span class="pre">MANAGER_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/eyal/Desktop/projects/ws1-splendor/src/splendor/agents/our_agents/genetic_algorithm/manager.npy')</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.MANAGER_PATH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.STRATEGY_1_PATH">
+<span class="sig-name descname"><span class="pre">STRATEGY_1_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/eyal/Desktop/projects/ws1-splendor/src/splendor/agents/our_agents/genetic_algorithm/strategy1.npy')</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.STRATEGY_1_PATH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.STRATEGY_2_PATH">
+<span class="sig-name descname"><span class="pre">STRATEGY_2_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/eyal/Desktop/projects/ws1-splendor/src/splendor/agents/our_agents/genetic_algorithm/strategy2.npy')</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.STRATEGY_2_PATH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.STRATEGY_3_PATH">
+<span class="sig-name descname"><span class="pre">STRATEGY_3_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">PosixPath('/home/eyal/Desktop/projects/ws1-splendor/src/splendor/agents/our_agents/genetic_algorithm/strategy3.npy')</span></em><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.STRATEGY_3_PATH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.SelectAction">
+<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genetic_algorithm_agent.html#GeneAlgoAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.SelectAction" title="Link to this definition"></a></dt>
+<dd><p>Method used by the game’s engine when running a game with this agent.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.evaluate_action">
+<span class="sig-name descname"><span class="pre">evaluate_action</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genetic_algorithm_agent.html#GeneAlgoAgent.evaluate_action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.evaluate_action" title="Link to this definition"></a></dt>
+<dd><p>Evaluates an <cite>action</cite> by the metrcis of the game’s state after the
+action. The <cite>strategy</cite> is used to evaluate the state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/genetic_algorithm/genetic_algorithm_agent.html#GeneAlgoAgent.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.save" title="Link to this definition"></a></dt>
+<dd><p>Saves the genes of the given agent to the provided folder.
+Used for evolution.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.myAgent">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><a class="headerlink" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.myAgent" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent" title="splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeneAlgoAgent</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-splendor.agents.our_agents.genetic_algorithm">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-splendor.agents.our_agents.genetic_algorithm" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="splendor.agents.our_agents.html" class="btn btn-neutral float-left" title="splendor.agents.our_agents package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="splendor.agents.our_agents.ppo.html" class="btn btn-neutral float-right" title="splendor.agents.our_agents.ppo package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

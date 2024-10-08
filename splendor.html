@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor package &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="splendor.Splendor package" href="splendor.Splendor.html" />
+    <link rel="prev" title="Modules" href="modules.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">splendor package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-splendor.game">splendor.game module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.game.Game"><code class="docutils literal notranslate"><span class="pre">Game</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.game.GameReplayer"><code class="docutils literal notranslate"><span class="pre">GameReplayer</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-splendor.general_game_runner">splendor.general_game_runner module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.HidePrint"><code class="docutils literal notranslate"><span class="pre">HidePrint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.add_cwd_to_sys_path"><code class="docutils literal notranslate"><span class="pre">add_cwd_to_sys_path()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.get_commit_time"><code class="docutils literal notranslate"><span class="pre">get_commit_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.gitCloneTeam"><code class="docutils literal notranslate"><span class="pre">gitCloneTeam()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.is_git_repo"><code class="docutils literal notranslate"><span class="pre">is_git_repo()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.loadAgent"><code class="docutils literal notranslate"><span class="pre">loadAgent()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.loadParameter"><code class="docutils literal notranslate"><span class="pre">loadParameter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.general_game_runner.run"><code class="docutils literal notranslate"><span class="pre">run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-splendor.template">splendor.template module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.template.Action"><code class="docutils literal notranslate"><span class="pre">Action</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.template.Agent"><code class="docutils literal notranslate"><span class="pre">Agent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.template.Displayer"><code class="docutils literal notranslate"><span class="pre">Displayer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.template.GameRule"><code class="docutils literal notranslate"><span class="pre">GameRule</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.template.GameState"><code class="docutils literal notranslate"><span class="pre">GameState</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-splendor.utils">splendor.utils module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.utils.raiseNotDefined"><code class="docutils literal notranslate"><span class="pre">raiseNotDefined()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-splendor">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
+      <li class="breadcrumb-item active">splendor package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/splendor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="splendor-package">
+<h1>splendor package<a class="headerlink" href="#splendor-package" title="Link to this heading"></a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.gym.html">splendor.Splendor.gym package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.gym.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.gym.html#module-splendor.Splendor.gym">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.constants">splendor.Splendor.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.features">splendor.Splendor.features module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.Noble"><code class="docutils literal notranslate"><span class="pre">Noble</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.Noble.code"><code class="docutils literal notranslate"><span class="pre">Noble.code</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.Noble.cost"><code class="docutils literal notranslate"><span class="pre">Noble.cost</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.agent_buying_power"><code class="docutils literal notranslate"><span class="pre">agent_buying_power()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.agent_won"><code class="docutils literal notranslate"><span class="pre">agent_won()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.build_array"><code class="docutils literal notranslate"><span class="pre">build_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.diminish_return"><code class="docutils literal notranslate"><span class="pre">diminish_return()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_cards"><code class="docutils literal notranslate"><span class="pre">extract_cards()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_metrics"><code class="docutils literal notranslate"><span class="pre">extract_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_metrics_with_cards"><code class="docutils literal notranslate"><span class="pre">extract_metrics_with_cards()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_reserved_cards"><code class="docutils literal notranslate"><span class="pre">extract_reserved_cards()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_agent"><code class="docutils literal notranslate"><span class="pre">get_agent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_color_encoder"><code class="docutils literal notranslate"><span class="pre">get_color_encoder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_indices_access_by_color"><code class="docutils literal notranslate"><span class="pre">get_indices_access_by_color()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_yellow_gem_index"><code class="docutils literal notranslate"><span class="pre">get_yellow_gem_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.missing_gems_to_card"><code class="docutils literal notranslate"><span class="pre">missing_gems_to_card()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.normalize_metrics"><code class="docutils literal notranslate"><span class="pre">normalize_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.turns_made_by_agent"><code class="docutils literal notranslate"><span class="pre">turns_made_by_agent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.turns_to_buy_card"><code class="docutils literal notranslate"><span class="pre">turns_to_buy_card()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.vectorize_card"><code class="docutils literal notranslate"><span class="pre">vectorize_card()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.splendor_displayer">splendor.Splendor.splendor_displayer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.AgentArea"><code class="docutils literal notranslate"><span class="pre">AgentArea</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.AgentArea.set_agent_title"><code class="docutils literal notranslate"><span class="pre">AgentArea.set_agent_title()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.AgentArea.update"><code class="docutils literal notranslate"><span class="pre">AgentArea.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.BoardArea"><code class="docutils literal notranslate"><span class="pre">BoardArea</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.BoardArea.update"><code class="docutils literal notranslate"><span class="pre">BoardArea.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.EndGame"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.EndGame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.ExcuteAction"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.ExcuteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.InitDisplayer"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.InitDisplayer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.TimeOutWarning"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.TimeOutWarning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.close_window"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.close_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.end_fullscreen"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.end_fullscreen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.get_selection"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.get_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.prime_action_box"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.prime_action_box()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.toggle_fullscreen"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.toggle_fullscreen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.user_input"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.user_input()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer"><code class="docutils literal notranslate"><span class="pre">TextDisplayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.EndGame"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.EndGame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.ExcuteAction"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.ExcuteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.InitDisplayer"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.InitDisplayer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.StartRound"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.StartRound()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.TimeOutWarning"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.TimeOutWarning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.user_input"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.user_input()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.can_buy"><code class="docutils literal notranslate"><span class="pre">can_buy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.make_label"><code class="docutils literal notranslate"><span class="pre">make_label()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.splendor_model">splendor.Splendor.splendor_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.Card"><code class="docutils literal notranslate"><span class="pre">Card</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.calScore"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.calScore()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.gameEnds"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.gameEnds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generatePredecessor"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generatePredecessor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generateSuccessor"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generateSuccessor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generate_return_combos"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generate_return_combos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.getLegalActions"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.getLegalActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.initialGameState"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.initialGameState()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.noble_visit"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.noble_visit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.resources_sufficient"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.resources_sufficient()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState"><code class="docutils literal notranslate"><span class="pre">SplendorState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.AgentState"><code class="docutils literal notranslate"><span class="pre">SplendorState.AgentState</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.BoardState"><code class="docutils literal notranslate"><span class="pre">SplendorState.BoardState</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.splendor_utils">splendor.Splendor.splendor_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.ActionToString"><code class="docutils literal notranslate"><span class="pre">ActionToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.AgentToString"><code class="docutils literal notranslate"><span class="pre">AgentToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.AgentTrace"><code class="docutils literal notranslate"><span class="pre">AgentTrace</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.BoardToString"><code class="docutils literal notranslate"><span class="pre">BoardToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.GemsToString"><code class="docutils literal notranslate"><span class="pre">GemsToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.convert_filename"><code class="docutils literal notranslate"><span class="pre">convert_filename()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.utils">splendor.Splendor.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.utils.LimitRoundsGameRule"><code class="docutils literal notranslate"><span class="pre">LimitRoundsGameRule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.utils.LimitRoundsGameRule.gameEnds"><code class="docutils literal notranslate"><span class="pre">LimitRoundsGameRule.gameEnds()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.generic.html">splendor.agents.generic package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.generic.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.generic.html#module-splendor.agents.generic.first_move">splendor.agents.generic.first_move module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.generic.html#module-splendor.agents.generic.random">splendor.agents.generic.random module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.generic.html#module-splendor.agents.generic.timeout">splendor.agents.generic.timeout module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.generic.html#module-splendor.agents.generic">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.html">splendor.agents.our_agents package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.html#module-splendor.agents.our_agents.minmax">splendor.agents.our_agents.minmax module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.html#module-splendor.agents.our_agents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.html#module-splendor.agents">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-splendor.game">
+<span id="splendor-game-module"></span><h2>splendor.game module<a class="headerlink" href="#module-splendor.game" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.game.Game">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.game.</span></span><span class="sig-name descname"><span class="pre">Game</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GameRule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_of_agent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warning_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">displayer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agents_namelist</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['Alice',</span> <span class="pre">'Bob']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/game.html#Game"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.game.Game" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.game.Game.Run">
+<span class="sig-name descname"><span class="pre">Run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/game.html#Game.Run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.game.Game.Run" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.game.GameReplayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.game.</span></span><span class="sig-name descname"><span class="pre">GameReplayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">GameRule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replay</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">displayer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/game.html#GameReplayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.game.GameReplayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.game.GameReplayer.Run">
+<span class="sig-name descname"><span class="pre">Run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/game.html#GameReplayer.Run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.game.GameReplayer.Run" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-splendor.general_game_runner">
+<span id="splendor-general-game-runner-module"></span><h2>splendor.general_game_runner module<a class="headerlink" href="#module-splendor.general_game_runner" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.general_game_runner.HidePrint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">HidePrint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">flag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#HidePrint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.HidePrint" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.add_cwd_to_sys_path">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">add_cwd_to_sys_path</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#add_cwd_to_sys_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.add_cwd_to_sys_path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.get_commit_time">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">get_commit_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Repo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#get_commit_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.get_commit_time" title="Link to this definition"></a></dt>
+<dd><p>Returns the commit time based on the TIMEZONE</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>repo</strong> – the repository</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the commit time</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.gitCloneTeam">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">gitCloneTeam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">team_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#gitCloneTeam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.gitCloneTeam" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.is_git_repo">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">is_git_repo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#is_git_repo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.is_git_repo" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.loadAgent">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">loadAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">superQuiet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#loadAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.loadAgent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.loadParameter">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">loadParameter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#loadParameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.loadParameter" title="Link to this definition"></a></dt>
+<dd><p>Processes the command used to run Yinsh from the command line.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.main">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.main" title="Link to this definition"></a></dt>
+<dd><p>The main function called when advance_model.py is run
+from the command line:</p>
+<p>&gt; python runner.py</p>
+<p>See the usage string for more details.</p>
+<p>&gt; python runner.py –help</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.general_game_runner.run">
+<span class="sig-prename descclassname"><span class="pre">splendor.general_game_runner.</span></span><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">options</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/general_game_runner.html#run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.general_game_runner.run" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-splendor.template">
+<span id="splendor-template-module"></span><h2>splendor.template module<a class="headerlink" href="#module-splendor.template" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.template.Action">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.template.</span></span><span class="sig-name descname"><span class="pre">Action</span></span><a class="reference internal" href="_modules/splendor/template.html#Action"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Action" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.template.Agent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.template.</span></span><span class="sig-name descname"><span class="pre">Agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#Agent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Agent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.Agent.SelectAction">
+<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#Agent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Agent.SelectAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.template.Displayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.template.</span></span><span class="sig-name descname"><span class="pre">Displayer</span></span><a class="reference internal" href="_modules/splendor/template.html#Displayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Displayer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.Displayer.EndGame">
+<span class="sig-name descname"><span class="pre">EndGame</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scores</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#Displayer.EndGame"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Displayer.EndGame" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.Displayer.ExcuteAction">
+<span class="sig-name descname"><span class="pre">ExcuteAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">move</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#Displayer.ExcuteAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Displayer.ExcuteAction" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.Displayer.InitDisplayer">
+<span class="sig-name descname"><span class="pre">InitDisplayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runner</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#Displayer.InitDisplayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Displayer.InitDisplayer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.Displayer.TimeOutWarning">
+<span class="sig-name descname"><span class="pre">TimeOutWarning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#Displayer.TimeOutWarning"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.Displayer.TimeOutWarning" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.template.GameRule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.template.</span></span><span class="sig-name descname"><span class="pre">GameRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_of_agent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.calScore">
+<span class="sig-name descname"><span class="pre">calScore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.calScore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.calScore" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.gameEnds">
+<span class="sig-name descname"><span class="pre">gameEnds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.gameEnds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.gameEnds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.generateSuccessor">
+<span class="sig-name descname"><span class="pre">generateSuccessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.generateSuccessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.generateSuccessor" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.getCurrentAgentIndex">
+<span class="sig-name descname"><span class="pre">getCurrentAgentIndex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.getCurrentAgentIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.getCurrentAgentIndex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.getLegalActions">
+<span class="sig-name descname"><span class="pre">getLegalActions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.getLegalActions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.getLegalActions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.getNextAgentIndex">
+<span class="sig-name descname"><span class="pre">getNextAgentIndex</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.getNextAgentIndex"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.getNextAgentIndex" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.initialGameState">
+<span class="sig-name descname"><span class="pre">initialGameState</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.initialGameState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.initialGameState" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.template.GameRule.update">
+<span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">action</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameRule.update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameRule.update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.template.GameState">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.template.</span></span><span class="sig-name descname"><span class="pre">GameState</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_of_agent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/template.html#GameState"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.template.GameState" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</section>
+<section id="module-splendor.utils">
+<span id="splendor-utils-module"></span><h2>splendor.utils module<a class="headerlink" href="#module-splendor.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.utils.raiseNotDefined">
+<span class="sig-prename descclassname"><span class="pre">splendor.utils.</span></span><span class="sig-name descname"><span class="pre">raiseNotDefined</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/utils.html#raiseNotDefined"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.utils.raiseNotDefined" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-splendor">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-splendor" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="modules.html" class="btn btn-neutral float-left" title="Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="splendor.Splendor.html" class="btn btn-neutral float-right" title="splendor.Splendor package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

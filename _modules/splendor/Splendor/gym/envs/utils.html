@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.Splendor.gym.envs.utils &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.Splendor.gym.envs.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.Splendor.gym.envs.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">splendor.Splendor.splendor_model</span> <span class="kn">import</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">SplendorGameRule</span>
+<span class="kn">from</span> <span class="nn">splendor.Splendor.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">NUMBER_OF_TIERS</span><span class="p">,</span>
+    <span class="n">MAX_TIER_CARDS</span><span class="p">,</span>
+    <span class="n">RESERVED</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">.actions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ALL_ACTIONS</span><span class="p">,</span>
+    <span class="n">ActionType</span><span class="p">,</span>
+    <span class="n">Action</span><span class="p">,</span>
+    <span class="n">CardPosition</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_valid_position</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">CardPosition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    check if the given card position is a valid position in the given state.</span>
+<span class="sd">    useful for validating that a position of a card can be purchased/reserved.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">position</span><span class="o">.</span><span class="n">tier</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUMBER_OF_TIERS</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">elif</span> <span class="p">(</span>
+        <span class="n">position</span><span class="o">.</span><span class="n">card_index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_TIER_CARDS</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">position</span><span class="o">.</span><span class="n">tier</span><span class="p">][</span><span class="n">position</span><span class="o">.</span><span class="n">card_index</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span> <span class="nf">_valid_reserved_position</span><span class="p">(</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">CardPosition</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    check if the given reserved card position is a valid position in the given state.</span>
+<span class="sd">    useful for validating that a position of a reserved card can be purchased.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">position</span><span class="o">.</span><span class="n">reserved_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">RESERVED</span><span class="p">]))</span>
+        <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">RESERVED</span><span class="p">][</span><span class="n">position</span><span class="o">.</span><span class="n">reserved_index</span><span class="p">]</span>
+    <span class="p">)</span>
+
+
+<div class="viewcode-block" id="build_action">
+<a class="viewcode-back" href="../../../../../splendor.Splendor.gym.envs.html#splendor.Splendor.gym.envs.utils.build_action">[docs]</a>
+<span class="k">def</span> <span class="nf">build_action</span><span class="p">(</span>
+    <span class="n">action_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">game_rule</span><span class="p">:</span> <span class="n">SplendorGameRule</span><span class="p">,</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span>
+    <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct the action to be taken from it&#39;s action index in the ALL_ACTION list.</span>
+
+<span class="sd">    :return: the corresponding action to the action_index, in the format required</span>
+<span class="sd">             by SplendorGameRule.</span>
+
+<span class="sd">    :note: when using this function for building a buying action the function doesn&#39;t</span>
+<span class="sd">           takes into account the wildcard gems (yellow) and the owned cards for the</span>
+<span class="sd">           conclusion of the returned_gems - this can lead to a broken state where a</span>
+<span class="sd">           player have a negative amount of gems...</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">action_index</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ALL_ACTIONS</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The action </span><span class="si">{</span><span class="n">action_index</span><span class="si">}</span><span class="s2"> isn&#39;t a valid action&quot;</span><span class="p">)</span>
+
+    <span class="n">action</span> <span class="o">=</span> <span class="n">ALL_ACTIONS</span><span class="p">[</span><span class="n">action_index</span><span class="p">]</span>
+
+    <span class="n">noble</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">noble_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">noble_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="n">action</span><span class="o">.</span><span class="n">noble_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">))</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="n">card</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">action</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">tier</span><span class="p">][</span><span class="n">action</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">card_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">position</span> <span class="ow">and</span> <span class="n">_valid_position</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">position</span><span class="p">)</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
+    <span class="n">reserved_card</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">RESERVED</span><span class="p">][</span><span class="n">action</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">reserved_index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">position</span>
+        <span class="ow">and</span> <span class="n">_valid_reserved_position</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="o">.</span><span class="n">position</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+        <span class="k">else</span> <span class="kc">None</span>
+    <span class="p">)</span>
+
+    <span class="k">match</span> <span class="n">action</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+        <span class="k">case</span> <span class="n">ActionType</span><span class="o">.</span><span class="n">PASS</span><span class="p">:</span>
+            <span class="n">action_to_execute</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">case</span> <span class="n">ActionType</span><span class="o">.</span><span class="n">COLLECT_SAME</span><span class="p">:</span>
+            <span class="n">action_to_execute</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;collect_same&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                <span class="s2">&quot;collected_gems&quot;</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">collected_gems</span><span class="p">,</span>
+                <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">returned_gems</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">case</span> <span class="n">ActionType</span><span class="o">.</span><span class="n">COLLECT_DIFF</span><span class="p">:</span>
+            <span class="n">action_to_execute</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;collect_diff&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                <span class="s2">&quot;collected_gems&quot;</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">collected_gems</span><span class="p">,</span>
+                <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">returned_gems</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">case</span> <span class="n">ActionType</span><span class="o">.</span><span class="n">RESERVE</span><span class="p">:</span>
+            <span class="n">action_to_execute</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;reserve&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                <span class="s2">&quot;card&quot;</span><span class="p">:</span> <span class="n">card</span><span class="p">,</span>
+                <span class="s2">&quot;collected_gems&quot;</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">collected_gems</span><span class="p">,</span>
+                <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">action</span><span class="o">.</span><span class="n">returned_gems</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">case</span> <span class="n">ActionType</span><span class="o">.</span><span class="n">BUY_AVAILABLE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">card</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># this might happen when buying a card but with a</span>
+                <span class="c1"># wrong index (there is no card at that position).</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Can&#39;t build action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2"> since there is not card to buy!&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">returned_gems</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">cost</span>
+
+            <span class="n">action_to_execute</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;buy_available&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                <span class="s2">&quot;card&quot;</span><span class="p">:</span> <span class="n">card</span><span class="p">,</span>
+                <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">returned_gems</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">case</span> <span class="n">ActionType</span><span class="o">.</span><span class="n">BUY_RESERVE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">reserved_card</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># this might happen when buying a reserved card but with a</span>
+                <span class="c1"># wrong index.</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Can&#39;t build action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2"> since there is not card to buy!&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">returned_gems</span> <span class="o">=</span> <span class="n">reserved_card</span><span class="o">.</span><span class="n">cost</span>
+
+            <span class="n">action_to_execute</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;buy_reserve&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                <span class="s2">&quot;card&quot;</span><span class="p">:</span> <span class="n">reserved_card</span><span class="p">,</span>
+                <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">returned_gems</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown action type: </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2"> of the action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">action_to_execute</span></div>
+
+
+
+<div class="viewcode-block" id="create_legal_actions_mask">
+<a class="viewcode-back" href="../../../../../splendor.Splendor.gym.envs.html#splendor.Splendor.gym.envs.utils.create_legal_actions_mask">[docs]</a>
+<span class="k">def</span> <span class="nf">create_legal_actions_mask</span><span class="p">(</span>
+    <span class="n">legal_actions</span><span class="p">,</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span>
+    <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create an array of shape (len(ALL_ACTIONS),) whose values are 0&#39;s or 1&#39;s.</span>
+<span class="sd">    If the at the i&#39;th index the mask[i] == 1 then the i&#39;th action is legal,</span>
+<span class="sd">    otherwise it&#39;s illegal.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ALL_ACTIONS</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">legal_action</span> <span class="ow">in</span> <span class="n">legal_actions</span><span class="p">:</span>
+        <span class="n">action_element</span> <span class="o">=</span> <span class="n">Action</span><span class="o">.</span><span class="n">to_action_element</span><span class="p">(</span><span class="n">legal_action</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+        <span class="n">mask</span><span class="p">[</span><span class="n">ALL_ACTIONS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action_element</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">mask</span></div>
+
+
+
+<div class="viewcode-block" id="create_action_mapping">
+<a class="viewcode-back" href="../../../../../splendor.Splendor.gym.envs.html#splendor.Splendor.gym.envs.utils.create_action_mapping">[docs]</a>
+<span class="k">def</span> <span class="nf">create_action_mapping</span><span class="p">(</span>
+    <span class="n">legal_actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create the mapping between action indices to legal actions.</span>
+<span class="sd">    This would be in use by both SplendorEnv &amp; by the PPO agent.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">ALL_ACTIONS</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+            <span class="n">Action</span><span class="o">.</span><span class="n">to_action_element</span><span class="p">(</span><span class="n">legal_action</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+        <span class="p">):</span> <span class="n">legal_action</span>
+        <span class="k">for</span> <span class="n">legal_action</span> <span class="ow">in</span> <span class="n">legal_actions</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">mapping</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

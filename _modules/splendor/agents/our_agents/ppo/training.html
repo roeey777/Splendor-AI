@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.agents.our_agents.ppo.training &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.agents.our_agents.ppo.training</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.agents.our_agents.ppo.training</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">torch.optim.optimizer</span> <span class="kn">import</span> <span class="n">Optimizer</span>
+<span class="kn">import</span> <span class="nn">torch.distributions</span> <span class="k">as</span> <span class="nn">distributions</span>
+<span class="kn">from</span> <span class="nn">torch.nn.modules.loss</span> <span class="kn">import</span> <span class="n">_Loss</span> <span class="k">as</span> <span class="n">Loss_Fn</span>
+
+
+<span class="n">ENTROPY_COEFFICIENT</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">VALUE_COEFFICIENT</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">VERY_SMALL_EPSILON</span> <span class="o">=</span> <span class="mf">1e-8</span>
+
+<span class="c1"># Global Gradient Norm Clipping as suggested by (bullet #11):</span>
+<span class="c1"># https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/</span>
+<span class="n">MAX_GRADIENT_NORM</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+
+<div class="viewcode-block" id="calculate_returns">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.calculate_returns">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_returns</span><span class="p">(</span><span class="n">rewards</span><span class="p">,</span> <span class="n">discount_factor</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">returns</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">R</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">rewards</span><span class="p">):</span>
+        <span class="n">R</span> <span class="o">=</span> <span class="n">r</span> <span class="o">+</span> <span class="n">R</span> <span class="o">*</span> <span class="n">discount_factor</span>
+        <span class="n">returns</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">R</span><span class="p">)</span>
+
+    <span class="n">returns</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">returns</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="c1"># avoid possible division by 0</span>
+        <span class="n">returns</span> <span class="o">=</span> <span class="p">(</span><span class="n">returns</span> <span class="o">-</span> <span class="n">returns</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">returns</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">+</span> <span class="n">VERY_SMALL_EPSILON</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">returns</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_advantages">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.calculate_advantages">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_advantages</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">advantages</span> <span class="o">=</span> <span class="n">returns</span> <span class="o">-</span> <span class="n">values</span>
+
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="c1"># avoid possible division by 0</span>
+        <span class="n">advantages</span> <span class="o">=</span> <span class="p">(</span><span class="n">advantages</span> <span class="o">-</span> <span class="n">advantages</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="n">advantages</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">+</span> <span class="n">VERY_SMALL_EPSILON</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">advantages</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_policy_loss">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.calculate_policy_loss">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_policy_loss</span><span class="p">(</span>
+    <span class="n">action_prob</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">actions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">log_prob_actions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">advantages</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">ppo_clip</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">distributions</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">action_prob</span><span class="p">)</span>
+
+    <span class="c1"># new log prob using old actions</span>
+    <span class="n">new_log_prob_actions</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+    <span class="n">policy_ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">new_log_prob_actions</span> <span class="o">-</span> <span class="n">log_prob_actions</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+    <span class="n">policy_loss_1</span> <span class="o">=</span> <span class="n">policy_ratio</span> <span class="o">*</span> <span class="n">advantages</span>
+    <span class="n">policy_loss_2</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="n">policy_ratio</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">ppo_clip</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">ppo_clip</span><span class="p">)</span> <span class="o">*</span> <span class="n">advantages</span>
+    <span class="p">)</span>
+
+    <span class="n">policy_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">policy_loss_1</span><span class="p">,</span> <span class="n">policy_loss_2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">kl_divergence_estimate</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="n">log_prob_actions</span> <span class="o">-</span> <span class="n">new_log_prob_actions</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># entropy bonus - use to improve exploration.</span>
+    <span class="c1"># as seen here (bullet #10):</span>
+    <span class="c1"># https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/</span>
+    <span class="n">entropy</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">entropy</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">policy_loss</span><span class="p">,</span> <span class="n">kl_divergence_estimate</span><span class="p">,</span> <span class="n">entropy</span></div>
+
+
+
+<div class="viewcode-block" id="calculate_loss">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.calculate_loss">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_loss</span><span class="p">(</span>
+    <span class="n">policy_loss</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">value_loss</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">entropy_bonus</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    final loss of clipped objective PPO, as seen here:</span>
+<span class="sd">    https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/ppo2/model.py#L91</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">policy_loss</span>
+        <span class="o">+</span> <span class="n">VALUE_COEFFICIENT</span> <span class="o">*</span> <span class="n">value_loss</span>
+        <span class="o">-</span> <span class="n">ENTROPY_COEFFICIENT</span> <span class="o">*</span> <span class="n">entropy_bonus</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">loss</span></div>
+
+
+
+<div class="viewcode-block" id="train_single_episode">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.train_single_episode">[docs]</a>
+<span class="k">def</span> <span class="nf">train_single_episode</span><span class="p">(</span>
+    <span class="n">env</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">,</span>
+    <span class="n">policy</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">,</span>
+    <span class="n">discount_factor</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">ppo_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ppo_clip</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">loss_fn</span><span class="p">:</span> <span class="n">Loss_Fn</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">policy</span> <span class="o">=</span> <span class="n">policy</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">policy</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">action_mask_history</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">log_prob_actions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">rewards</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+    <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># append state here, not after we get the next state from env.step()</span>
+        <span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="n">action_mask</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">get_legal_actions_mask</span><span class="p">())</span>
+            <span class="o">.</span><span class="n">double</span><span class="p">()</span>
+            <span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">action_prob</span><span class="p">,</span> <span class="n">value_pred</span> <span class="o">=</span> <span class="n">policy</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action_mask</span><span class="p">)</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">distributions</span><span class="o">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">action_prob</span><span class="p">)</span>
+        <span class="n">action</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">sample</span><span class="p">()</span>
+        <span class="n">log_prob_action</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">__</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">action_mask_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action_mask</span><span class="p">)</span>
+        <span class="n">log_prob_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_prob_action</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value_pred</span><span class="p">)</span>
+        <span class="n">rewards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reward</span><span class="p">)</span>
+        <span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">next_state</span>
+
+    <span class="n">states</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">states</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">actions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">action_mask_history</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">action_mask_history</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">log_prob_actions</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">log_prob_actions</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">returns</span> <span class="o">=</span> <span class="n">calculate_returns</span><span class="p">(</span><span class="n">rewards</span><span class="p">,</span> <span class="n">discount_factor</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">advantages</span> <span class="o">=</span> <span class="n">calculate_advantages</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="n">policy_loss</span><span class="p">,</span> <span class="n">value_loss</span> <span class="o">=</span> <span class="n">update_policy</span><span class="p">(</span>
+        <span class="n">policy</span><span class="p">,</span>
+        <span class="n">states</span><span class="p">,</span>
+        <span class="n">actions</span><span class="p">,</span>
+        <span class="n">action_mask_history</span><span class="p">,</span>
+        <span class="n">log_prob_actions</span><span class="p">,</span>
+        <span class="n">advantages</span><span class="p">,</span>
+        <span class="n">returns</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="p">,</span>
+        <span class="n">ppo_steps</span><span class="p">,</span>
+        <span class="n">ppo_clip</span><span class="p">,</span>
+        <span class="n">loss_fn</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">policy_loss</span><span class="p">,</span> <span class="n">value_loss</span><span class="p">,</span> <span class="n">episode_reward</span></div>
+
+
+
+<div class="viewcode-block" id="update_policy">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.update_policy">[docs]</a>
+<span class="k">def</span> <span class="nf">update_policy</span><span class="p">(</span>
+    <span class="n">policy</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+    <span class="n">states</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">actions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">action_masks</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">log_prob_actions</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">advantages</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">returns</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">,</span>
+    <span class="n">ppo_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ppo_clip</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="n">loss_fn</span><span class="p">:</span> <span class="n">Loss_Fn</span><span class="p">,</span>
+    <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">total_policy_loss</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_value_loss</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">advantages</span> <span class="o">=</span> <span class="n">advantages</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+    <span class="n">log_prob_actions</span> <span class="o">=</span> <span class="n">log_prob_actions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+    <span class="n">actions</span> <span class="o">=</span> <span class="n">actions</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+    <span class="n">action_masks</span> <span class="o">=</span> <span class="n">action_masks</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ppo_steps</span><span class="p">):</span>
+        <span class="c1"># get new log prob of actions for all input states</span>
+        <span class="n">action_prob</span><span class="p">,</span> <span class="n">value_pred</span> <span class="o">=</span> <span class="n">policy</span><span class="p">(</span><span class="n">states</span><span class="p">,</span> <span class="n">action_masks</span><span class="p">)</span>
+        <span class="n">value_pred</span> <span class="o">=</span> <span class="n">value_pred</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">policy_loss</span><span class="p">,</span> <span class="n">kl_divergence_estimate</span><span class="p">,</span> <span class="n">entropy</span> <span class="o">=</span> <span class="n">calculate_policy_loss</span><span class="p">(</span>
+            <span class="n">action_prob</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">log_prob_actions</span><span class="p">,</span> <span class="n">advantages</span><span class="p">,</span> <span class="n">ppo_clip</span>
+        <span class="p">)</span>
+
+        <span class="n">value_loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">returns</span><span class="p">,</span> <span class="n">value_pred</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">calculate_loss</span><span class="p">(</span><span class="n">policy_loss</span><span class="p">,</span> <span class="n">value_loss</span><span class="p">,</span> <span class="n">entropy</span><span class="p">)</span>
+
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">(</span><span class="n">retain_graph</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># clip gradient norm - limit the amount of change a single step can do.</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">policy</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">MAX_GRADIENT_NORM</span><span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+        <span class="n">total_policy_loss</span> <span class="o">+=</span> <span class="n">policy_loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">total_value_loss</span> <span class="o">+=</span> <span class="n">value_loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">total_policy_loss</span> <span class="o">/</span> <span class="n">ppo_steps</span><span class="p">,</span> <span class="n">total_value_loss</span> <span class="o">/</span> <span class="n">ppo_steps</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

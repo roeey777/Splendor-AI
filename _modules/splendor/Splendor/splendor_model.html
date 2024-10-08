@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.Splendor.splendor_model &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.Splendor.splendor_model</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.Splendor.splendor_model</h1><div class="highlight"><pre>
+<span></span><span class="c1"># INFORMATION ------------------------------------------------------------------------------------------------------- #</span>
+
+<span class="c1"># Author:  Steven Spratley, extending code by Guang Ho and Michelle Blom</span>
+<span class="c1"># Date:    04/01/2021</span>
+<span class="c1"># Purpose: Implements &quot;Splendor&quot; for the COMP90054 competitive game environment</span>
+
+<span class="c1"># IMPORTS ------------------------------------------------------------------------------------------------------------#</span>
+
+
+<span class="kn">import</span> <span class="nn">random</span><span class="o">,</span> <span class="nn">itertools</span><span class="o">,</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">.splendor_utils</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">splendor.template</span> <span class="kn">import</span> <span class="n">GameState</span><span class="p">,</span> <span class="n">GameRule</span>
+
+<span class="c1"># CLASS DEF ----------------------------------------------------------------------------------------------------------#</span>
+
+
+<span class="c1"># Represents cards with a colour (str), unique code (str), resource costs (dict), deck ID (int), and points (int).</span>
+<div class="viewcode-block" id="Card">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.Card">[docs]</a>
+<span class="k">class</span> <span class="nc">Card</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">colour</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">deck_id</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">colour</span> <span class="o">=</span> <span class="n">colour</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">code</span> <span class="o">=</span> <span class="n">code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cost</span> <span class="o">=</span> <span class="n">cost</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deck_id</span> <span class="o">=</span> <span class="n">deck_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">=</span> <span class="n">points</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">gem_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">number</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">gem_string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="s2">&quot;, &quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">gem_string</span><span class="o">!=</span><span class="s2">&quot;&quot;</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="si">}{</span><span class="n">number</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">colour</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Tier </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">deck_id</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">colour</span><span class="si">}</span><span class="s2"> card worth </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">points</span><span class="si">}</span><span class="s2"> points and costing </span><span class="si">{</span><span class="n">gem_string</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span>
+    <span class="p">):</span>  <span class="c1"># Equal in the ways that matter: code is identical, and points haven&#39;t been tampered with.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="s2">&quot;code&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="n">other</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">code</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">points</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">points</span> <span class="o">==</span> <span class="n">CARDS</span><span class="p">[</span><span class="n">other</span><span class="o">.</span><span class="n">code</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="c1"># Represents game as agents playing on a board with cards, gems, and nobles.</span>
+<div class="viewcode-block" id="SplendorState">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState">[docs]</a>
+<span class="k">class</span> <span class="nc">SplendorState</span><span class="p">(</span><span class="n">GameState</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_agents</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">BoardState</span><span class="p">(</span><span class="n">num_agents</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">AgentState</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_agents</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_to_move</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># def __repr__(self) -&gt; str:</span>
+    <span class="c1">#     return super().__repr__()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">board</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">agent_state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">agent_state</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+<div class="viewcode-block" id="SplendorState.BoardState">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.BoardState">[docs]</a>
+    <span class="k">class</span> <span class="nc">BoardState</span><span class="p">:</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_agents</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">decks</span> <span class="o">=</span> <span class="p">[[],</span> <span class="p">[],</span> <span class="p">[]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dealt</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+            <span class="c1"># All gem stacks start at (4,5,7) for games of (2,3,4) players respectively. Yellow seals always start at 5.</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">][</span><span class="n">num_agents</span> <span class="o">-</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gems</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;black&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                <span class="s2">&quot;red&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                <span class="s2">&quot;yellow&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="s2">&quot;green&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                <span class="s2">&quot;blue&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+                <span class="s2">&quot;white&quot;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="c1"># Deal out num_agents+1 of the 10 nobles at random. Nobles = (code, cost).</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nobles</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">NOBLES</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">num_agents</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># Sort cards into three deck tiers. Deal four cards per tier. Decks are shuffled before each deal.</span>
+            <span class="k">for</span> <span class="n">code</span><span class="p">,</span> <span class="p">(</span><span class="n">colour</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">deck_id</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span> <span class="ow">in</span> <span class="n">CARDS</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">deck_id</span> <span class="o">-=</span> <span class="mi">1</span>  <span class="c1"># Deck IDs are read in as (1-3), but should be zero-indexed instead.</span>
+                <span class="n">card</span> <span class="o">=</span> <span class="n">Card</span><span class="p">(</span><span class="n">colour</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">cost</span><span class="p">,</span> <span class="n">deck_id</span><span class="p">,</span> <span class="n">points</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">decks</span><span class="p">[</span><span class="n">deck_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">deck</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decks</span><span class="p">:</span>
+                <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">deck</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">deal</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SplendorState.BoardState.deal">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.BoardState.deal">[docs]</a>
+        <span class="k">def</span> <span class="nf">deal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">deck_id</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decks</span><span class="p">[</span><span class="n">deck_id</span><span class="p">]):</span>
+                <span class="c1"># random.shuffle(self.decks[deck_id])</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decks</span><span class="p">[</span><span class="n">deck_id</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SplendorState.BoardState.dealt_list">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.BoardState.dealt_list">[docs]</a>
+        <span class="k">def</span> <span class="nf">dealt_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">card</span> <span class="k">for</span> <span class="n">deck</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealt</span> <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">deck</span> <span class="k">if</span> <span class="n">card</span><span class="p">]</span></div>
+
+
+        <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Available Gems:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gems</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Dealt Card List: </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dealt_list</span><span class="p">():</span>
+                <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">card</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Noble List </span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobles</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+
+            <span class="k">return</span> <span class="n">output</span></div>
+
+
+        <span class="c1"># def __repr__(self) -&gt; str:</span>
+        <span class="c1">#     return self.__str__</span>
+
+<div class="viewcode-block" id="SplendorState.AgentState">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.AgentState">[docs]</a>
+    <span class="k">class</span> <span class="nc">AgentState</span><span class="p">:</span>
+        <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_id</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gems</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cards</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nobles</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">passed</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent_trace</span> <span class="o">=</span> <span class="n">AgentTrace</span><span class="p">(</span><span class="n">_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_action</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;Agent (</span><span class="si">%d</span><span class="s2">): </span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">score: </span><span class="si">%d</span><span class="s2">,</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">score</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">gems: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gems</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">cards: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cards</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">nobles: </span><span class="si">%s</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nobles</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">output</span></div>
+</div>
+
+
+
+<span class="c1"># Implements game logic.</span>
+<div class="viewcode-block" id="SplendorGameRule">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule">[docs]</a>
+<span class="k">class</span> <span class="nc">SplendorGameRule</span><span class="p">(</span><span class="n">GameRule</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_of_agent</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">num_of_agent</span><span class="p">)</span>
+        <span class="c1"># No private information: agent states are available to other agents. While upcoming cards are random, the decks</span>
+        <span class="c1"># are still provided in the gamestate for agents to use if they want, since they are shuffled before each deal.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">private_information</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># # for now the idea is to see whether the action is one of the legal action</span>
+    <span class="c1"># def validAction(self, selected, all_legal_actions):</span>
+    <span class="c1">#     # return utils.ValidAction(m, actions)</span>
+
+<div class="viewcode-block" id="SplendorGameRule.initialGameState">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.initialGameState">[docs]</a>
+    <span class="k">def</span> <span class="nf">initialGameState</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">SplendorState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_of_agent</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SplendorGameRule.generatePredecessor">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generatePredecessor">[docs]</a>
+    <span class="k">def</span> <span class="nf">generatePredecessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="n">agent</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span>
+        <span class="n">board</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">last_action</span> <span class="o">=</span> <span class="n">action</span>  <span class="c1"># Record last action such that other agents can make use of this information.</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;card&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+            <span class="n">card</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;card&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s2">&quot;collect&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;reserve&quot;</span><span class="p">:</span>
+            <span class="c1"># Increment board gem stacks by collected_gems. Decrement player gem stacks by collected_gems.</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-=</span> <span class="n">count</span>
+            <span class="c1"># Increment player gem stacks by returned_gems. Decrement board gem stacks by returned_gems.</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-=</span> <span class="n">count</span>
+
+            <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;reserve&quot;</span><span class="p">:</span>
+                <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;card_position&quot;</span><span class="p">]</span>
+                <span class="c1"># Card drawn from deck, will be returned to it</span>
+                <span class="n">bought_card</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">bought_card</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">board</span><span class="o">.</span><span class="n">decks</span><span class="p">[</span><span class="n">bought_card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bought_card</span><span class="p">)</span>
+                <span class="c1"># Remove card from reserved cards</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">card</span>
+
+        <span class="k">elif</span> <span class="s2">&quot;buy&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]:</span>
+            <span class="c1"># Increment player gem stacks by returned_gems. Decrement board gem stacks by returned_gems.</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-=</span> <span class="n">count</span>
+            <span class="c1"># If buying one of the available cards on the board, set removed card slot to new dealt card.</span>
+            <span class="c1"># Since the board may have None cards (empty slots that cannot be filled), check cards first.</span>
+            <span class="k">if</span> <span class="s2">&quot;available&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]:</span>
+                <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;card_position&quot;</span><span class="p">]</span>
+                <span class="n">bought_card</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">bought_card</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">board</span><span class="o">.</span><span class="n">decks</span><span class="p">[</span><span class="n">bought_card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bought_card</span><span class="p">)</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">card</span>
+
+            <span class="c1"># Else, agent bought a reserved card. Return card to player&#39;s yellow stack.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+
+            <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+            <span class="n">score</span> <span class="o">-=</span> <span class="n">card</span><span class="o">.</span><span class="n">points</span>
+
+        <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Remove noble from board. Add noble to player&#39;s stack. Like cards, nobles aren&#39;t hashable due to possessing</span>
+            <span class="c1"># dictionaries (i.e. resource costs). Therefore, locate and delete the noble via unique code.</span>
+            <span class="c1"># Add noble&#39;s points to agent score.</span>
+            <span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">])</span>
+            <span class="n">agent</span><span class="o">.</span><span class="n">nobles</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">])</span>
+            <span class="n">score</span> <span class="o">-=</span> <span class="mi">3</span>
+
+        <span class="c1"># Log this turn&#39;s action and any resultant score. Return updated gamestate.</span>
+        <span class="c1"># agent.agent_trace.action_reward.remove((action, -score))</span>
+        <span class="c1"># Removing last one because I belive it is more reliable</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">action_reward</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">score</span> <span class="o">+=</span> <span class="n">score</span>  <span class="c1"># score is negative</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">passed</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pass&quot;</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+<div class="viewcode-block" id="SplendorGameRule.generateSuccessor">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generateSuccessor">[docs]</a>
+    <span class="k">def</span> <span class="nf">generateSuccessor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="n">agent</span><span class="p">,</span> <span class="n">board</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">],</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">last_action</span> <span class="o">=</span> <span class="n">action</span>  <span class="c1"># Record last action such that other agents can make use of this information.</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="s2">&quot;card&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">:</span>
+            <span class="n">card</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;card&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="s2">&quot;collect&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;reserve&quot;</span><span class="p">:</span>
+            <span class="c1"># Decrement board gem stacks by collected_gems. Increment player gem stacks by collected_gems.</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-=</span> <span class="n">count</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
+            <span class="c1"># Decrement player gem stacks by returned_gems. Increment board gem stacks by returned_gems.</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-=</span> <span class="n">count</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
+
+            <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;reserve&quot;</span><span class="p">:</span>
+                <span class="c1"># Remove card from dealt cards by locating via unique code (cards aren&#39;t otherwise hashable).</span>
+                <span class="c1"># Since we want to retain the positioning of dealt cards, set removed card slot to new dealt card.</span>
+                <span class="c1"># Since the board may have None cards (empty slots that cannot be filled), check cards first.</span>
+                <span class="c1"># Add card to player&#39;s yellow stack.</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">])):</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                        <span class="ow">and</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">card</span><span class="o">.</span><span class="n">code</span>
+                    <span class="p">):</span>
+                        <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">deal</span><span class="p">(</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">)</span>
+                        <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+                        <span class="k">break</span>
+
+        <span class="k">elif</span> <span class="s2">&quot;buy&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]:</span>
+            <span class="c1"># Decrement player gem stacks by returned_gems. Increment board gem stacks by returned_gems.</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-=</span> <span class="n">count</span>
+                <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+=</span> <span class="n">count</span>
+            <span class="c1"># If buying one of the available cards on the board, set removed card slot to new dealt card.</span>
+            <span class="c1"># Since the board may have None cards (empty slots that cannot be filled), check cards first.</span>
+            <span class="k">if</span> <span class="s2">&quot;available&quot;</span> <span class="ow">in</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">])):</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                        <span class="ow">and</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">card</span><span class="o">.</span><span class="n">code</span>
+                    <span class="p">):</span>
+                        <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">deal</span><span class="p">(</span><span class="n">card</span><span class="o">.</span><span class="n">deck_id</span><span class="p">)</span>
+                        <span class="k">break</span>
+            <span class="c1"># Else, agent is buying a reserved card. Remove card from player&#39;s yellow stack.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">])):</span>
+                    <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">code</span> <span class="o">==</span> <span class="n">card</span><span class="o">.</span><span class="n">code</span><span class="p">:</span>
+                        <span class="k">del</span> <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                        <span class="k">break</span>
+
+            <span class="c1"># Add card to player&#39;s stack of matching colour, and increment agent&#39;s score accordingly.</span>
+            <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">card</span><span class="o">.</span><span class="n">points</span>
+
+        <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">]:</span>
+            <span class="c1"># Remove noble from board. Add noble to player&#39;s stack. Like cards, nobles aren&#39;t hashable due to possessing</span>
+            <span class="c1"># dictionaries (i.e. resource costs). Therefore, locate and delete the noble via unique code.</span>
+            <span class="c1"># Add noble&#39;s points to agent score.</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="k">del</span> <span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="n">agent</span><span class="o">.</span><span class="n">nobles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">])</span>
+                    <span class="n">score</span> <span class="o">+=</span> <span class="mi">3</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># Log this turn&#39;s action and any resultant score. Return updated gamestate.</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">action_reward</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">action</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">score</span> <span class="o">+=</span> <span class="n">score</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">passed</span> <span class="o">=</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;pass&quot;</span>
+        <span class="k">return</span> <span class="n">state</span></div>
+
+
+    <span class="c1"># Game ends if any agent possesses at least 15 points, and all agents have gone in this round. As a very rare edge</span>
+    <span class="c1"># case, poor playing agents might encounter a game where none are able to proceed. Game also ends in this case.</span>
+<div class="viewcode-block" id="SplendorGameRule.gameEnds">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.gameEnds">[docs]</a>
+    <span class="k">def</span> <span class="nf">gameEnds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">deadlock</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="n">deadlock</span> <span class="o">+=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">passed</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">score</span> <span class="o">&gt;=</span> <span class="mi">15</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_agent_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">deadlock</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span></div>
+
+
+    <span class="c1"># Return final score for this agent. If victories are tied, tie-break on number of cards placed by incrementing points.</span>
+<div class="viewcode-block" id="SplendorGameRule.calScore">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.calScore">[docs]</a>
+    <span class="k">def</span> <span class="nf">calScore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="n">max_score</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">details</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">bought_cards</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">cards</span><span class="p">)</span> <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">cards</span> <span class="ow">in</span> <span class="n">a</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">colour</span> <span class="o">!=</span> <span class="s2">&quot;yellow&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="n">details</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">bought_cards</span><span class="p">(</span><span class="n">a</span><span class="p">),</span> <span class="n">a</span><span class="o">.</span><span class="n">score</span><span class="p">))</span>
+            <span class="n">max_score</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">score</span><span class="p">,</span> <span class="n">max_score</span><span class="p">)</span>
+        <span class="n">victors</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">details</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">max_score</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">victors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">agent_id</span> <span class="ow">in</span> <span class="p">[</span><span class="n">d</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">victors</span><span class="p">]:</span>
+            <span class="n">min_cards</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">details</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">bought_cards</span><span class="p">(</span><span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">])</span> <span class="o">==</span> <span class="n">min_cards</span><span class="p">:</span>
+                <span class="c1"># Add a half point if this agent was a tied victor, and had the fewest cards.</span>
+                <span class="k">return</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span><span class="o">.</span><span class="n">score</span> <span class="o">+</span> <span class="mf">0.5</span>
+        <span class="k">return</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span><span class="o">.</span><span class="n">score</span></div>
+
+
+    <span class="c1"># Generate a list of gem combinations that can be returned, if agent exceeds limit with collected gems.</span>
+    <span class="c1"># Agents are disallowed from returning gems of the same colour as those they&#39;ve just picked up. Since collected_gems</span>
+    <span class="c1"># is sampled exhaustively, this function simply needs to screen out colours in collected_gems, in order for agents</span>
+    <span class="c1"># to be given all collected/returned combinations permissible.</span>
+<div class="viewcode-block" id="SplendorGameRule.generate_return_combos">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generate_return_combos">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_return_combos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_gems</span><span class="p">,</span> <span class="n">collected_gems</span><span class="p">):</span>
+        <span class="n">total_gem_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">current_gems</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">collected_gems</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">total_gem_count</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">return_combos</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">num_return</span> <span class="o">=</span> <span class="n">total_gem_count</span> <span class="o">-</span> <span class="mi">10</span>
+            <span class="c1"># Combine current and collected gems. Screen out gem colours that were just collected.</span>
+            <span class="n">total_gems</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">i</span><span class="p">:</span> <span class="n">current_gems</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">collected_gems</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">current_gems</span><span class="p">)</span>
+            <span class="p">}</span>
+            <span class="n">total_gems</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">total_gems</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">collected_gems</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+            <span class="p">}</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="c1"># Form a total gems list (with elements == gem colours, and len == number of gems).</span>
+            <span class="n">total_gems_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">total_gems</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">):</span>
+                    <span class="n">total_gems_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colour</span><span class="p">)</span>
+            <span class="c1"># If, after screening, there aren&#39;t enough gems that can be returned, return an empty list, indicating that</span>
+            <span class="c1"># the collected_gems combination is not viable.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">total_gems_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">num_return</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="c1"># Else, find all valid combinations of gems to return.</span>
+            <span class="k">for</span> <span class="n">combo</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">total_gems_list</span><span class="p">,</span> <span class="n">num_return</span><span class="p">)):</span>
+                <span class="n">returned_gems</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+                <span class="k">for</span> <span class="n">colour</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">:</span>
+                    <span class="n">returned_gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># Filter out colours with zero gems, and append.</span>
+                <span class="n">return_combos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="nb">dict</span><span class="p">({</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">returned_gems</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">})</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">return_combos</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{}</span>
+        <span class="p">]</span>  <span class="c1"># If no gems need to be returned, return a list comprised of one empty combo.</span></div>
+
+
+    <span class="c1"># Checks to see whether an agent&#39;s purchased cards and collected gems can cover a given resource cost.</span>
+    <span class="c1"># If it can, return the combination of gems to be returned, if any. If it can&#39;t, return False.</span>
+<div class="viewcode-block" id="SplendorGameRule.resources_sufficient">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.resources_sufficient">[docs]</a>
+    <span class="k">def</span> <span class="nf">resources_sufficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">costs</span><span class="p">):</span>
+        <span class="n">wild</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span>
+        <span class="n">return_combo</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">cost</span> <span class="ow">in</span> <span class="n">costs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># If a shortfall is found, see if the difference can be made with wild/seal/yellow gems.</span>
+            <span class="n">available</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">colour</span><span class="p">])</span>
+            <span class="n">shortfall</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cost</span> <span class="o">-</span> <span class="n">available</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Shortfall shouldn&#39;t be negative.</span>
+            <span class="n">wild</span> <span class="o">-=</span> <span class="n">shortfall</span>
+            <span class="c1"># If wilds are expended, the agent cannot make the purchase.</span>
+            <span class="k">if</span> <span class="n">wild</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="c1"># Else, increment return_combo accordingly. Note that the agent should never return gems if it can afford</span>
+            <span class="c1"># to pay using its card stacks, and should never return wilds if it can return coloured gems instead.</span>
+            <span class="c1"># Although there may be strategic instances where holding on to coloured gems is beneficial (by virtue of</span>
+            <span class="c1"># shorting players from resources), in this implementation, this edge case is not worth added complexity.</span>
+            <span class="n">gem_cost</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cost</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">colour</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Gems owed.</span>
+            <span class="n">gem_shortfall</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">gem_cost</span> <span class="o">-</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>  <span class="c1"># Wilds required.</span>
+            <span class="n">return_combo</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">gem_cost</span> <span class="o">-</span> <span class="n">gem_shortfall</span>
+            <span class="p">)</span>  <span class="c1"># Coloured gems to be returned.</span>
+            <span class="n">return_combo</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">gem_shortfall</span>  <span class="c1"># Wilds to be returned.</span>
+
+        <span class="c1"># Filter out unnecessary colours and return dict specifying combination of gems.</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">({</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">return_combo</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">})</span></div>
+
+
+    <span class="c1"># Checks whether a particular noble is a candidate for visiting this agent.</span>
+<div class="viewcode-block" id="SplendorGameRule.noble_visit">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.noble_visit">[docs]</a>
+    <span class="k">def</span> <span class="nf">noble_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">noble</span><span class="p">):</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">costs</span> <span class="o">=</span> <span class="n">noble</span>
+        <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">cost</span> <span class="ow">in</span> <span class="n">costs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">colour</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">cost</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="SplendorGameRule.getLegalActions">
+<a class="viewcode-back" href="../../../splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.getLegalActions">[docs]</a>
+    <span class="k">def</span> <span class="nf">getLegalActions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">):</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">agent</span><span class="p">,</span> <span class="n">board</span> <span class="o">=</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">],</span> <span class="n">game_state</span><span class="o">.</span><span class="n">board</span>
+
+        <span class="c1"># A given turn consists of the following:</span>
+        <span class="c1">#  1. Collect gems (up to 3 different)    OR</span>
+        <span class="c1">#     Collect gems (2 same, if stack &gt;=4) OR</span>
+        <span class="c1">#     Reserve one of 12 available cards   OR</span>
+        <span class="c1">#     Buy one of 12 available cards       OR</span>
+        <span class="c1">#     Buy a previously reserved card.</span>
+        <span class="c1">#  2. Discard down to 10 gems if necessary.</span>
+        <span class="c1">#  3. Obtain a noble if requirements are met.</span>
+
+        <span class="c1"># Since the gamestate does not change during an agent&#39;s turn, all turn parts are able to be planned for at once.</span>
+        <span class="c1"># Action fields: {&#39;type&#39;, &#39;collected_gems&#39;, &#39;returned_gems&#39;, &#39;card&#39;, &#39;noble&#39;}</span>
+
+        <span class="c1"># Actions will always take the form of one of the following three templates:</span>
+        <span class="c1"># {&#39;type&#39;: &#39;collect_diff&#39;/&#39;collect_same&#39;, &#39;collected_gems&#39;: {gem counts}, &#39;returned_gems&#39;: {gem counts}, &#39;noble&#39;: noble}</span>
+        <span class="c1"># {&#39;type&#39;: &#39;reserve&#39;, &#39;card&#39;:card, &#39;collected_gems&#39;: {&#39;yellow&#39;: 1/None}, &#39;returned_gems&#39;: {colour: 1/None}, &#39;noble&#39;: noble}</span>
+        <span class="c1"># {&#39;type&#39;: &#39;buy_available&#39;/&#39;buy_reserve&#39;, &#39;card&#39;: card, &#39;returned_gems&#39;: {gem counts}, &#39;noble&#39;: noble}</span>
+
+        <span class="c1"># First, check if any nobles are waiting to visit from the last turn. Ensure each action to follow recognises</span>
+        <span class="c1"># this, and in the exceedingly rare case that there are multiple nobles waiting (meaning that, at the last turn,</span>
+        <span class="c1"># this agent had the choice of at least 3 nobles), multiply all generated actions by these nobles to allow the</span>
+        <span class="c1"># agent to choose again.</span>
+
+        <span class="n">potential_nobles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noble_visit</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">noble</span><span class="p">):</span>
+                <span class="n">potential_nobles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">noble</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">potential_nobles</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">potential_nobles</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+
+        <span class="c1"># Generate actions (collect up to 3 different gems). Work out all legal combinations. Theoretical max is 10.</span>
+        <span class="n">available_colours</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">colour</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">colour</span> <span class="o">!=</span> <span class="s2">&quot;yellow&quot;</span> <span class="ow">and</span> <span class="n">number</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="n">num_holding_gem</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">num_holding_gem</span> <span class="o">&lt;=</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">min_comb_len</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_colours</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="n">num_holding_gem</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">min_comb_len</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_colours</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">min_comb_len</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">available_colours</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">combo_length</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_comb_len</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">available_colours</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">combo</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">available_colours</span><span class="p">,</span> <span class="n">combo_length</span><span class="p">):</span>
+                <span class="n">collected_gems</span> <span class="o">=</span> <span class="p">{</span><span class="n">colour</span><span class="p">:</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">colour</span> <span class="ow">in</span> <span class="n">combo</span><span class="p">}</span>
+                <span class="c1"># make sure there is no action that collect empty gem</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">collected_gems</span> <span class="o">==</span> <span class="p">{}:</span>
+                    <span class="c1"># Find combos of gems to return, if any. Since the max to be returned can be 3, theoretical max</span>
+                    <span class="c1"># combinations will be 51, and max actions generated by the end of this stage will be 510.</span>
+                    <span class="c1"># Handling this branching factor properly will be crucial for agent performance.</span>
+                    <span class="c1"># If return_combos comes back False, then taking these gems is invalid and won&#39;t be added.</span>
+                    <span class="n">return_combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_return_combos</span><span class="p">(</span>
+                        <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">,</span> <span class="n">collected_gems</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">returned_gems</span> <span class="ow">in</span> <span class="n">return_combos</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">potential_nobles</span><span class="p">:</span>
+                            <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="p">{</span>
+                                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;collect_diff&quot;</span><span class="p">,</span>
+                                    <span class="s2">&quot;collected_gems&quot;</span><span class="p">:</span> <span class="n">collected_gems</span><span class="p">,</span>
+                                    <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">returned_gems</span><span class="p">,</span>
+                                    <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                                <span class="p">}</span>
+                            <span class="p">)</span>
+
+        <span class="c1"># Generate actions (collect 2 identical gems). Theoretical max is 5.</span>
+        <span class="n">available_colours</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">colour</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">colour</span> <span class="o">!=</span> <span class="s2">&quot;yellow&quot;</span> <span class="ow">and</span> <span class="n">number</span> <span class="o">&gt;=</span> <span class="mi">4</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">colour</span> <span class="ow">in</span> <span class="n">available_colours</span><span class="p">:</span>
+            <span class="n">collected_gems</span> <span class="o">=</span> <span class="p">{</span><span class="n">colour</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+
+            <span class="c1"># Like before, find combos to return, if any. Since the max to be returned is now 2, theoretical max</span>
+            <span class="c1"># combinations will be 21, and max actions generated here will be 105.</span>
+            <span class="n">return_combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_return_combos</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">,</span> <span class="n">collected_gems</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">returned_gems</span> <span class="ow">in</span> <span class="n">return_combos</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">potential_nobles</span><span class="p">:</span>
+                    <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;collect_same&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;collected_gems&quot;</span><span class="p">:</span> <span class="n">collected_gems</span><span class="p">,</span>
+                            <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">returned_gems</span><span class="p">,</span>
+                            <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># Generate actions (reserve card). Agent can reserve only if it possesses &lt; 3 cards currently reserved.</span>
+        <span class="c1"># With a reservation, the agent will receive one seal (yellow), if there are any left. Reservations are stored</span>
+        <span class="c1"># and displayed under the agent&#39;s yellow stack, as they won&#39;t generate their true colour until fully purchased.</span>
+        <span class="c1"># There is a possible 12 cards to be reserved, and if the agent goes over limit, there are max 6 gem colours</span>
+        <span class="c1"># that can be returned, leading to a theoretical max of 72 actions here.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">collected_gems</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;yellow&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="k">if</span> <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="p">{}</span>
+            <span class="n">return_combos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_return_combos</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">,</span> <span class="n">collected_gems</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">returned_gems</span> <span class="ow">in</span> <span class="n">return_combos</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">deck</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">card</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">deck</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">card</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">potential_nobles</span><span class="p">:</span>
+                                <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                    <span class="p">{</span>
+                                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;reserve&quot;</span><span class="p">,</span>
+                                        <span class="s2">&quot;card&quot;</span><span class="p">:</span> <span class="n">card</span><span class="p">,</span>
+                                        <span class="s2">&quot;card_position&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">),</span>
+                                        <span class="s2">&quot;collected_gems&quot;</span><span class="p">:</span> <span class="n">collected_gems</span><span class="p">,</span>
+                                        <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">returned_gems</span><span class="p">,</span>
+                                        <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                                    <span class="p">}</span>
+                                <span class="p">)</span>
+
+        <span class="c1"># Generate actions (buy card). Agents can buy cards if they can cover its resource cost. Resources can come from</span>
+        <span class="c1"># an agent&#39;s gem and card stacks. Card stacks represent gem factories, or &#39;permanent gems&#39;; if there are 2 blue</span>
+        <span class="c1"># cards already purchased, this acts like 2 extra blue gems to spend in a given turn. Gems are therefore only</span>
+        <span class="c1"># returned if the stack of that colour is insufficient to cover the cost.</span>
+        <span class="c1"># Agents are disallowed from purchasing &gt; 7 cards of any one colour, for the purposes of a clean interface.</span>
+        <span class="c1"># This is not expected to affect gameplay, as there is essentially zero strategic reason to exceed this limit.</span>
+        <span class="c1"># Available cards consist of cards dealt onto the board, as well as cards previously reserved by this agent.</span>
+        <span class="c1"># There is a max 15 actions that can be generated here (15 possible cards to be bought: 12 dealt + 3 reserved).</span>
+        <span class="c1"># However, in the case that multiple nobles are made candidates for visiting with this move, this number will</span>
+        <span class="c1"># be multiplied accordingly. This however, is a rare event.</span>
+        <span class="k">for</span> <span class="n">row</span><span class="p">,</span> <span class="n">deck</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span> <span class="o">+</span> <span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]]):</span>
+            <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">card</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">deck</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">card</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">])</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">returned_gems</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources_sufficient</span><span class="p">(</span>
+                    <span class="n">agent</span><span class="p">,</span> <span class="n">card</span><span class="o">.</span><span class="n">cost</span>
+                <span class="p">)</span>  <span class="c1"># Check if this card is affordable.</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="n">returned_gems</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span>
+                <span class="p">):</span>  <span class="c1"># If a dict was returned, this means the agent possesses sufficient resources.</span>
+                    <span class="c1"># Check to see if the acquisition of a new card has meant new nobles becoming candidates to visit.</span>
+                    <span class="n">new_nobles</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">:</span>
+                        <span class="n">agent_post_action</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">agent</span><span class="p">)</span>
+                        <span class="c1"># Give the card featured in this action to a copy of the agent.</span>
+                        <span class="n">agent_post_action</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+                        <span class="c1"># Use this copied agent to check whether this noble can visit.</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noble_visit</span><span class="p">(</span><span class="n">agent_post_action</span><span class="p">,</span> <span class="n">noble</span><span class="p">):</span>
+                            <span class="n">new_nobles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="n">noble</span>
+                            <span class="p">)</span>  <span class="c1"># If so, add noble to the new list.</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_nobles</span><span class="p">:</span>
+                        <span class="n">new_nobles</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">new_nobles</span><span class="p">:</span>
+                        <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="p">{</span>
+                                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;buy_reserve&quot;</span>
+                                <span class="k">if</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span>
+                                <span class="k">else</span> <span class="s2">&quot;buy_available&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;card&quot;</span><span class="p">:</span> <span class="n">card</span><span class="p">,</span>
+                                <span class="s2">&quot;card_position&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">),</span>
+                                <span class="s2">&quot;returned_gems&quot;</span><span class="p">:</span> <span class="n">returned_gems</span><span class="p">,</span>
+                                <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">,</span>
+                            <span class="p">}</span>
+                        <span class="p">)</span>
+
+        <span class="c1"># Return list of actions. If there are no actions (almost impossible), all this player can do is pass.</span>
+        <span class="c1"># A noble is still permitted to visit if conditions are met.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">actions</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">potential_nobles</span><span class="p">:</span>
+                <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span> <span class="s2">&quot;noble&quot;</span><span class="p">:</span> <span class="n">noble</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">actions</span></div>
+</div>
+
+
+
+<span class="c1"># END FILE -----------------------------------------------------------------------------------------------------------#</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

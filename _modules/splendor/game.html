@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.game &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.game</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.game</h1><div class="highlight"><pre>
+<span></span><span class="c1"># INFORMATION ------------------------------------------------------------------------------------------------------- #</span>
+
+<span class="c1"># Author:  Steven Spratley, extending code by Guang Ho and Michelle Blom</span>
+<span class="c1"># Date:    04/01/2021</span>
+<span class="c1"># Purpose: Implements a Game class to run implemented games for this framework.</span>
+
+<span class="c1"># IMPORTS ------------------------------------------------------------------------------------------------------------#</span>
+
+<span class="kn">import</span> <span class="nn">random</span><span class="o">,</span> <span class="nn">copy</span><span class="o">,</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">.template</span> <span class="kn">import</span> <span class="n">GameState</span>
+<span class="kn">from</span> <span class="nn">func_timeout</span> <span class="kn">import</span> <span class="n">func_timeout</span><span class="p">,</span> <span class="n">FunctionTimedOut</span>
+<span class="kn">from</span> <span class="nn">.template</span> <span class="kn">import</span> <span class="n">Agent</span> <span class="k">as</span> <span class="n">DummyAgent</span>
+
+<span class="c1"># CONSTANTS ----------------------------------------------------------------------------------------------------------#</span>
+
+<span class="n">FREEDOM</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># Whether or not to penalise agents for incorrect moves and</span>
+<span class="c1"># timeouts. Useful for debugging.</span>
+<span class="n">WARMUP</span> <span class="o">=</span> <span class="mi">15</span>  <span class="c1"># Warmup period (time given to each agent on their first turn).</span>
+
+<span class="c1"># CLASS DEF ----------------------------------------------------------------------------------------------------------#</span>
+
+
+<div class="viewcode-block" id="Game">
+<a class="viewcode-back" href="../../splendor.html#splendor.game.Game">[docs]</a>
+<span class="k">class</span> <span class="nc">Game</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">GameRule</span><span class="p">,</span>
+        <span class="n">agent_list</span><span class="p">,</span>
+        <span class="n">num_of_agent</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">time_limit</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">warning_limit</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="n">displayer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">agents_namelist</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Alice&quot;</span><span class="p">,</span> <span class="s2">&quot;Bob&quot;</span><span class="p">],</span>
+        <span class="n">interactive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1e10</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Make sure we are forming a valid game, and that agent</span>
+        <span class="c1"># id&#39;s range from 0 to N-1, where N is the number of agents.</span>
+        <span class="c1"># assert(len(agent_list) &lt;= 4)</span>
+        <span class="c1"># assert(len(agent_list) &gt; 1)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">plyr</span> <span class="ow">in</span> <span class="n">agent_list</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">plyr</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">i</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span> <span class="o">=</span> <span class="n">GameRule</span><span class="p">(</span><span class="n">num_of_agent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gamemaster</span> <span class="o">=</span> <span class="n">DummyAgent</span><span class="p">(</span>
+            <span class="n">num_of_agent</span>
+        <span class="p">)</span>  <span class="c1"># GM/template agent used by some games (e.g. Azul, for signalling rounds).</span>
+
+        <span class="c1"># need to handle the same without needed a validAction function</span>
+        <span class="c1"># self.valid_action = self.game_rule.validAction</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="p">),</span> <span class="s2">&quot;validAction&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">validAction</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">validAction</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">valid_action</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span> <span class="o">=</span> <span class="n">agent_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents_namelist</span> <span class="o">=</span> <span class="n">agents_namelist</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_limit</span> <span class="o">=</span> <span class="n">time_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning_limit</span> <span class="o">=</span> <span class="n">warning_limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning_positions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="o">=</span> <span class="n">displayer</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span> <span class="o">=</span> <span class="n">interactive</span>
+
+    <span class="k">def</span> <span class="nf">_EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_of_agent</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">isTimeOut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">history</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;seed&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span>
+                <span class="s2">&quot;num_of_agent&quot;</span><span class="p">:</span> <span class="n">num_of_agent</span><span class="p">,</span>
+                <span class="s2">&quot;agents_namelist&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents_namelist</span><span class="p">,</span>
+                <span class="s2">&quot;warning_positions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">warning_positions</span><span class="p">,</span>
+                <span class="s2">&quot;warning_limit&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">warning_limit</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="n">history</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_of_agent</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">isTimeOut</span><span class="p">:</span>
+            <span class="n">history</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">][</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_of_agent</span><span class="p">):</span>
+                <span class="n">history</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">calScore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="p">,</span> <span class="n">i</span><span class="p">)}</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">history</span>
+
+<div class="viewcode-block" id="Game.Run">
+<a class="viewcode-back" href="../../splendor.html#splendor.game.Game.Run">[docs]</a>
+    <span class="k">def</span> <span class="nf">Run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="n">action_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">gameEnds</span><span class="p">():</span>
+            <span class="n">agent_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">getCurrentAgentIndex</span><span class="p">()</span>
+            <span class="n">agent</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">agent_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
+                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamemaster</span>
+            <span class="p">)</span>
+            <span class="n">game_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span>
+            <span class="n">game_state</span><span class="o">.</span><span class="n">agent_to_move</span> <span class="o">=</span> <span class="n">agent_index</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">getLegalActions</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+            <span class="n">actions_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+            <span class="n">gs_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span>
+
+            <span class="c1"># Delete all specified attributes in the agent state copies, if this isn&#39;t a perfect information game.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">private_information</span><span class="p">:</span>
+                <span class="nb">delattr</span><span class="p">(</span><span class="n">gs_copy</span><span class="o">.</span><span class="n">deck</span><span class="p">,</span> <span class="s2">&quot;cards&quot;</span><span class="p">)</span>  <span class="c1"># Upcoming cards cannot be observed.</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gs_copy</span><span class="o">.</span><span class="n">agents</span><span class="p">)):</span>
+                    <span class="k">if</span> <span class="n">gs_copy</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">id</span> <span class="o">!=</span> <span class="n">agent_index</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">private_information</span><span class="p">:</span>
+                            <span class="nb">delattr</span><span class="p">(</span><span class="n">gs_copy</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">attr</span><span class="p">)</span>
+
+            <span class="c1"># Before updating the game, if this is the first move, allow the displayer an initial update.</span>
+            <span class="c1"># This is used by some games to run simple pre-game animations.</span>
+            <span class="k">if</span> <span class="n">action_counter</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="p">)</span>
+
+            <span class="c1"># If interactive mode, update displayer and obtain action via user input.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive</span> <span class="ow">and</span> <span class="n">agent_index</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="p">)</span>
+                <span class="n">selected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">user_input</span><span class="p">(</span><span class="n">actions_copy</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If freedom is given to agents, let them return any action in any time period, at the risk of breaking</span>
+                <span class="c1"># the simulation. This can be useful for debugging purposes.</span>
+                <span class="k">if</span> <span class="n">FREEDOM</span><span class="p">:</span>
+                    <span class="n">selected</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">SelectAction</span><span class="p">(</span><span class="n">actions_copy</span><span class="p">,</span> <span class="n">gs_copy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># &quot;Gamemaster&quot; agent has an agent index equal to the number of player agents in the game.</span>
+                    <span class="c1"># If the gamemaster acts (e.g. to start or end a round in Azul), let it do so uninhibited.</span>
+                    <span class="c1"># Else, allow player agent to select action within a time limit.</span>
+                    <span class="c1"># - If it times out, display TimeOutWarning.</span>
+                    <span class="c1"># - If it returns an illegal move, display IllegalWarning.</span>
+                    <span class="c1">#  - Illegal move checked by self.validaction(), if implemented by the game being run.</span>
+                    <span class="c1">#  - Else, look for move in actions list by equality according to Python.</span>
+                    <span class="c1"># If this is the agent&#39;s first turn, allow warmup time.</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">selected</span> <span class="o">=</span> <span class="n">func_timeout</span><span class="p">(</span>
+                            <span class="p">(</span>
+                                <span class="n">WARMUP</span>
+                                <span class="k">if</span> <span class="n">action_counter</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
+                                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_limit</span>
+                            <span class="p">),</span>
+                            <span class="n">agent</span><span class="o">.</span><span class="n">SelectAction</span><span class="p">,</span>
+                            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">actions_copy</span><span class="p">,</span> <span class="n">gs_copy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="n">selected</span> <span class="o">=</span> <span class="s2">&quot;timeout&quot;</span>
+
+                    <span class="k">if</span> <span class="n">agent_index</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">num_of_agent</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">selected</span> <span class="o">!=</span> <span class="s2">&quot;timeout&quot;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_action</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">valid_action</span><span class="p">(</span><span class="n">selected</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+                                    <span class="n">selected</span> <span class="o">=</span> <span class="s2">&quot;illegal&quot;</span>
+                            <span class="k">elif</span> <span class="ow">not</span> <span class="n">selected</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+                                <span class="n">selected</span> <span class="o">=</span> <span class="s2">&quot;illegal&quot;</span>
+
+                        <span class="k">if</span> <span class="n">selected</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="s2">&quot;illegal&quot;</span><span class="p">]:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">warning_positions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">agent_index</span><span class="p">,</span> <span class="n">action_counter</span><span class="p">))</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">selected</span> <span class="o">==</span> <span class="s2">&quot;timeout&quot;</span><span class="p">:</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">IllegalWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+                            <span class="n">selected</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+
+            <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">history</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">action_counter</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;agent_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_agent_index</span><span class="p">,</span>
+                        <span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="n">selected</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">action_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">ExcuteAction</span><span class="p">(</span>
+                    <span class="n">agent_index</span><span class="p">,</span> <span class="n">selected</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">agent_index</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">num_of_agent</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">warning_limit</span>
+            <span class="p">):</span>
+                <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_EndGame</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">num_of_agent</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">isTimeOut</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">agent_index</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">history</span>
+
+        <span class="c1"># Score agent bonuses</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_EndGame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">num_of_agent</span><span class="p">,</span> <span class="n">history</span><span class="p">,</span> <span class="n">isTimeOut</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GameReplayer">
+<a class="viewcode-back" href="../../splendor.html#splendor.game.GameReplayer">[docs]</a>
+<span class="k">class</span> <span class="nc">GameReplayer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">GameRule</span><span class="p">,</span> <span class="n">replay</span><span class="p">,</span> <span class="n">displayer</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">replay</span> <span class="o">=</span> <span class="n">replay</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">replay</span><span class="p">[</span><span class="s2">&quot;seed&quot;</span><span class="p">]</span>
+        <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1e10</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_of_agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">replay</span><span class="p">[</span><span class="s2">&quot;num_of_agent&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents_namelist</span> <span class="o">=</span> <span class="n">replay</span><span class="p">[</span><span class="s2">&quot;agents_namelist&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning_limit</span> <span class="o">=</span> <span class="n">replay</span><span class="p">[</span><span class="s2">&quot;warning_limit&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_of_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning_positions</span> <span class="o">=</span> <span class="n">replay</span><span class="p">[</span><span class="s2">&quot;warning_positions&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span> <span class="o">=</span> <span class="n">GameRule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_of_agent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="o">=</span> <span class="n">replay</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="o">=</span> <span class="n">displayer</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GameReplayer.Run">
+<a class="viewcode-back" href="../../splendor.html#splendor.game.GameReplayer.Run">[docs]</a>
+    <span class="k">def</span> <span class="nf">Run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">replay</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">]:</span>
+            <span class="p">((</span><span class="n">index</span><span class="p">,</span> <span class="n">info</span><span class="p">),)</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;action&quot;</span><span class="p">]</span>
+            <span class="n">agent_index</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;agent_id&quot;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_agent_index</span> <span class="o">=</span> <span class="n">agent_index</span>
+
+            <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_list</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">agent_index</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warning_positions</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">ExcuteAction</span><span class="p">(</span>
+                    <span class="n">agent_index</span><span class="p">,</span> <span class="n">selected</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">displayer</span><span class="o">.</span><span class="n">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

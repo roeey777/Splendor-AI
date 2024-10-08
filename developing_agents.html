@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Developing an Agent &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Modules" href="modules.html" />
+    <link rel="prev" title="Run the game" href="run_splendor.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_splendor.html">Run the game</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Developing an Agent</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#training-our-agents">Training Our Agents:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#training-the-genetic-algorithm-agent">Training The Genetic Algorithm Agent:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#training-the-ppo-agent">Training The PPO Agent:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor"><code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> - an OpenAI <code class="docutils literal notranslate"><span class="pre">gym</span></code> compatible simulator for the game Splendor</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-create-an-instance-of-splendorenv">How to create an instance of <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code>:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#custom-features-of-splendorenv">Custom features of <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Developing an Agent</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/developing_agents.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="developing-an-agent">
+<h1>Developing an Agent<a class="headerlink" href="#developing-an-agent" title="Link to this heading"></a></h1>
+<p>In order for the game to properly load your agent one must install the
+agent, there are several ways to do so: 1. create a new agent within
+<code class="docutils literal notranslate"><span class="pre">src/splendor/agents</span></code> and when installing splendor your agent will be
+installed as well. (i.e. when invoking <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>) 2. create a
+new package and develop your agent there and then install it. 3. create
+a new agent within <code class="docutils literal notranslate"><span class="pre">src/splendor/agents</span></code> and <strong>ONLY DURING
+DEVELOPMENT</strong> install splendor by using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> (instead of
+the <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>) which allowes you to edit and adjust your agent
+as you please without the necessity to re-install the package.</p>
+<section id="training-our-agents">
+<h2>Training Our Agents:<a class="headerlink" href="#training-our-agents" title="Link to this heading"></a></h2>
+</section>
+<section id="training-the-genetic-algorithm-agent">
+<h2>Training The Genetic Algorithm Agent:<a class="headerlink" href="#training-the-genetic-algorithm-agent" title="Link to this heading"></a></h2>
+<p>In order to train the genetic algorithm agent with the following
+hyper-parameters: 1. Specify the population size in each generation to
+be 24 (should be a multiple of 12). 2. Train for 20 generations. 3. Fix
+the mutation rate chance to be 0.1(%). 4. Use a fixed random seed. Use
+the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evolve</span> <span class="o">--</span><span class="n">population</span><span class="o">-</span><span class="n">size</span> <span class="mi">24</span> <span class="o">--</span><span class="n">generations</span> <span class="mi">20</span> <span class="o">--</span><span class="n">mutation</span><span class="o">-</span><span class="n">rate</span> <span class="mf">0.1</span> <span class="o">--</span><span class="n">seed</span> <span class="mi">1234</span>
+</pre></div>
+</div>
+</section>
+<section id="training-the-ppo-agent">
+<h2>Training The PPO Agent:<a class="headerlink" href="#training-the-ppo-agent" title="Link to this heading"></a></h2>
+<p>In order to train the PPO agent you should run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ppo</span>
+</pre></div>
+</div>
+<p>This command will train the PPO agent with the default training
+hyper-parameters.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ppo</span> <span class="o">--</span><span class="n">device</span> <span class="n">cuda</span> <span class="o">--</span><span class="n">working</span><span class="o">-</span><span class="nb">dir</span> <span class="n">runs</span> <span class="o">--</span><span class="n">transfer</span><span class="o">-</span><span class="n">learning</span> <span class="o">--</span><span class="n">opponent</span> <span class="n">minimax</span>
+</pre></div>
+</div>
+<p>This command will use GPU during it’s training, it will use the installed weights as initialization of the network
+and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files (weights stored in <code class="docutils literal notranslate"><span class="pre">.pth</span></code> files and <code class="docutils literal notranslate"><span class="pre">stats.csv</span></code>) will be generated within the directory <code class="docutils literal notranslate"><span class="pre">runs/</span></code>.</p>
+</section>
+<section id="splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor">
+<h2><code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> - an OpenAI <code class="docutils literal notranslate"><span class="pre">gym</span></code> compatible simulator for the game Splendor<a class="headerlink" href="#splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor" title="Link to this heading"></a></h2>
+<p>We’ve made a custom <code class="docutils literal notranslate"><span class="pre">gym.Env</span></code> and registered it as one of <code class="docutils literal notranslate"><span class="pre">gym</span></code>
+environments. This would come in handy when training agent such as DQN
+or PPO.</p>
+<section id="how-to-create-an-instance-of-splendorenv">
+<h3>How to create an instance of <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code>:<a class="headerlink" href="#how-to-create-an-instance-of-splendorenv" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>import <code class="docutils literal notranslate"><span class="pre">gymnasium</span></code> - <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">gymnasium</span> <span class="pre">as</span> <span class="pre">gym</span></code>.</p></li>
+<li><p>registering <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> to <code class="docutils literal notranslate"><span class="pre">gym</span></code> -
+<code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">splendor.Splendor.gym</span></code></p></li>
+<li><p>define the opponents:</p></li>
+</ol>
+<p>When creating an instance of <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> you should tell it which
+agents will be used as opponents to you (the one who uses the env.). For
+the following example we’ll use a single random agent as an opponent.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">splendor.agents.generic.random</span> <span class="kn">import</span> <span class="n">myAgent</span>
+
+<span class="n">opponents</span> <span class="o">=</span> <span class="p">[</span><span class="n">myAgent</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>creating the environment:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;splendor-v1&quot;</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="n">opponents</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-features-of-splendorenv">
+<h3>Custom features of <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code><a class="headerlink" href="#custom-features-of-splendorenv" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>every call to <code class="docutils literal notranslate"><span class="pre">env.step(action)</span></code> simulate (by using
+<code class="docutils literal notranslate"><span class="pre">SplendorGameRule</span></code>) the turns of all the opponents.</p></li>
+<li><p>when calling <code class="docutils literal notranslate"><span class="pre">env.reset()</span></code> <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> will return the feature
+vector of the initial state AND the turn of our agent via the second
+variable (the <code class="docutils literal notranslate"><span class="pre">dict</span></code>) which will have a key called <code class="docutils literal notranslate"><span class="pre">my_turn</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> have several custom properties:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code> - the actual <code class="docutils literal notranslate"><span class="pre">SplendorState</span></code> - not the feature vector.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">my_turn</span></code> - the turn of the agent, same as the value returned by
+<code class="docutils literal notranslate"><span class="pre">env.reset()</span></code>.</p></li>
+</ol>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> have several custom methods:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">get_legal_actions_mask</span></code> - a method for getting a mask vector
+which masks all the illegal action of
+<code class="docutils literal notranslate"><span class="pre">splendor.Splendor.gym.envs.actions.ALL_ACTIONS</span></code>.</p></li>
+</ol>
+</li>
+</ol>
+<p>You can access those like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">my_turn</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="run_splendor.html" class="btn btn-neutral float-left" title="Run the game" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-right" title="Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

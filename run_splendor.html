@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Run the game &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Developing an Agent" href="developing_agents.html" />
+    <link rel="prev" title="Installation of Splendor" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Run the game</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#interactive-mode">Interactive mode</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#specify-opponents">Specify Opponents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#case-1-specifying-opponents-from-splendor">Case #1 - Specifying Opponents from <code class="docutils literal notranslate"><span class="pre">splendor</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#case-2-specifying-opponents-not-from-splendor-installed-via-other-package">Case #2 - Specifying Opponents not from <code class="docutils literal notranslate"><span class="pre">splendor</span></code> (installed via other package)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#case-3-specifying-opponents-not-from-splendor-not-installed-via-other-package">Case #3 - Specifying Opponents not from <code class="docutils literal notranslate"><span class="pre">splendor</span></code> (not installed via other package)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#note-use-with-caution">Note - use with caution:</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#explanation">Explanation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#without-gui-textual-mode">Without GUI (Textual Mode)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-our-agents">Using Our Agents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#interactively-play-against-our-trained-agents">Interactively play against our trained agents</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#let-them-play-by-them-selves">Let them play by them selves</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Run the game</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/run_splendor.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="run-the-game">
+<h1>Run the game<a class="headerlink" href="#run-the-game" title="Link to this heading"></a></h1>
+<p>Execute the following command for help message (location is no longer
+relevant):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<section id="interactive-mode">
+<h2>Interactive mode<a class="headerlink" href="#interactive-mode" title="Link to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">--</span><span class="n">interactive</span>
+</pre></div>
+</div>
+</section>
+<section id="specify-opponents">
+<h2>Specify Opponents<a class="headerlink" href="#specify-opponents" title="Link to this heading"></a></h2>
+<p>There are a few option for specifying agents: 1. The specified agent is
+part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code>. 2. The specified agent is <strong>not</strong> part of
+<code class="docutils literal notranslate"><span class="pre">splendor</span></code>, however he is installed as a part of a different package.
+3. The specified agent is <strong>not</strong> part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code> and he is <strong>not
+installed</strong> as a part of a different package.</p>
+<p>We’ll now address each case.</p>
+<section id="case-1-specifying-opponents-from-splendor">
+<h3>Case #1 - Specifying Opponents from <code class="docutils literal notranslate"><span class="pre">splendor</span></code><a class="headerlink" href="#case-1-specifying-opponents-from-splendor" title="Link to this heading"></a></h3>
+<p>Whenever you wish to invoke/use a specific agent (from <code class="docutils literal notranslate"><span class="pre">splendor</span></code>) you
+need to specify the <strong>absolute import path</strong>. The absolute import path
+must be specified <strong>regardless of the working directory</strong>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">random</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">first_move</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">random</span><span class="p">,</span><span class="n">first_move</span>
+</pre></div>
+</div>
+</section>
+<section id="case-2-specifying-opponents-not-from-splendor-installed-via-other-package">
+<h3>Case #2 - Specifying Opponents not from <code class="docutils literal notranslate"><span class="pre">splendor</span></code> (installed via other package)<a class="headerlink" href="#case-2-specifying-opponents-not-from-splendor-installed-via-other-package" title="Link to this heading"></a></h3>
+<p>Let’s assume we’ve installed a package called <code class="docutils literal notranslate"><span class="pre">external</span></code> and there is
+an agent called <code class="docutils literal notranslate"><span class="pre">best</span></code> whithin <code class="docutils literal notranslate"><span class="pre">external.agents</span></code> and we want to
+flesh out this agent againt the random agent we would execute the
+following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">random</span><span class="p">,</span><span class="n">external</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">best</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">random</span><span class="p">,</span><span class="n">external</span>
+</pre></div>
+</div>
+</section>
+<section id="case-3-specifying-opponents-not-from-splendor-not-installed-via-other-package">
+<h3>Case #3 - Specifying Opponents not from <code class="docutils literal notranslate"><span class="pre">splendor</span></code> (not installed via other package)<a class="headerlink" href="#case-3-specifying-opponents-not-from-splendor-not-installed-via-other-package" title="Link to this heading"></a></h3>
+<p>Let’s assume we want to use an agent called agent_in_my_cwd which isn’t
+part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code> nor installed via another package. We would utilize
+the fact that the game adds the current working directory to the module
+search path when loading agents. So we would act as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span>
+<span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">agent_in_my_cwd</span><span class="p">,</span><span class="n">another_agent_in_my_cwd</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">external_1</span><span class="p">,</span><span class="n">external_2</span>
+</pre></div>
+</div>
+<section id="note-use-with-caution">
+<h4>Note - use with caution:<a class="headerlink" href="#note-use-with-caution" title="Link to this heading"></a></h4>
+<p>By default the game adds the current working directory to the module
+search path when loading agents. This can be disabled by providing the
+flag <code class="docutils literal notranslate"><span class="pre">--absolute-imports</span></code> however this would deny the usage of agents
+which aren’t part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code> without installing them as part of
+other package.</p>
+</section>
+</section>
+<section id="explanation">
+<h3>Explanation<a class="headerlink" href="#explanation" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>the <code class="docutils literal notranslate"><span class="pre">-a</span></code> flag is used to specify which agents to load, this must be
+comma seperated values, where each value must be an import path of
+the agent to be loaded. Moreover each of those agent must inherit
+from <code class="docutils literal notranslate"><span class="pre">splendor.template.Agent</span></code> and must call their agent (or a
+factory) by the following name - <code class="docutils literal notranslate"><span class="pre">myAgent</span></code>.</p></li>
+<li><p>the <code class="docutils literal notranslate"><span class="pre">--agent_names=</span></code> is another comma seperated argument which
+specifies the names given to each agent. The number of agents to be
+loaded is determined by the amount of names given, when there are
+more names listed than agents listed the game will automatically load
+random agents to fill the void.</p></li>
+</ol>
+</section>
+</section>
+<section id="without-gui-textual-mode">
+<h2>Without GUI (Textual Mode)<a class="headerlink" href="#without-gui-textual-mode" title="Link to this heading"></a></h2>
+<p>just add the <code class="docutils literal notranslate"><span class="pre">-t</span></code> option, for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">random</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">first_move</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">random</span><span class="p">,</span><span class="n">first_move</span> <span class="o">-</span><span class="n">t</span>
+</pre></div>
+</div>
+</section>
+<section id="using-our-agents">
+<h2>Using Our Agents<a class="headerlink" href="#using-our-agents" title="Link to this heading"></a></h2>
+<section id="interactively-play-against-our-trained-agents">
+<h3>Interactively play against our trained agents<a class="headerlink" href="#interactively-play-against-our-trained-agents" title="Link to this heading"></a></h3>
+<p>Interactively play against the trained genetic algorithm agent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">genetic_algorithm</span><span class="o">.</span><span class="n">genetic_algorithm_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">genetic</span><span class="p">,</span><span class="n">human</span> <span class="o">--</span><span class="n">interactive</span>
+</pre></div>
+</div>
+<p>Interactively play against the trained PPO agent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo</span><span class="p">,</span><span class="n">human</span> <span class="o">--</span><span class="n">interactive</span>
+</pre></div>
+</div>
+</section>
+<section id="let-them-play-by-them-selves">
+<h3>Let them play by them selves<a class="headerlink" href="#let-them-play-by-them-selves" title="Link to this heading"></a></h3>
+<p>Let the genetic algorithm agent play against minimax (with alpha-beta
+pruning) agent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">genetic_algorithm</span><span class="o">.</span><span class="n">genetic_algorithm_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">minmax</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">genetic</span><span class="p">,</span><span class="n">minimax</span>
+</pre></div>
+</div>
+<p>Let the genetic algorithm agent play against minimax (with alpha-beta
+pruning) agent for 10 consecutive games (only text display):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">genetic_algorithm</span><span class="o">.</span><span class="n">genetic_algorithm_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">minmax</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">genetic</span><span class="p">,</span><span class="n">minimax</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">m</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Let the PPO agent play against minimax (with alpha-beta pruning) agent for 10 consecutive games (only text display):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>splendor -a splendor.agents.our_agents.ppo.ppo_agent,splendor.agents.our_agents.minmax –agent_names=ppo,minimax -t -m 10
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation of Splendor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="developing_agents.html" class="btn btn-neutral float-right" title="Developing an Agent" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

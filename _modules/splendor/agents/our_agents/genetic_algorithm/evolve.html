@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.agents.our_agents.genetic_algorithm.evolve &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.agents.our_agents.genetic_algorithm.evolve</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.agents.our_agents.genetic_algorithm.evolve</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">csv</span> <span class="kn">import</span> <span class="n">writer</span> <span class="k">as</span> <span class="n">csv_writer</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">cpu_count</span><span class="p">,</span> <span class="n">Pool</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">splendor.agents.our_agents.genetic_algorithm.genes</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Gene</span><span class="p">,</span>
+    <span class="n">ManagerGene</span><span class="p">,</span>
+    <span class="n">StrategyGene</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GeneAlgoAgent</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">splendor.game</span> <span class="kn">import</span> <span class="n">Game</span>
+<span class="kn">from</span> <span class="nn">splendor.Splendor</span> <span class="kn">import</span> <span class="n">features</span>
+<span class="kn">from</span> <span class="nn">splendor.Splendor.utils</span> <span class="kn">import</span> <span class="n">LimitRoundsGameRule</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="n">POPULATION_SIZE</span> <span class="o">=</span> <span class="mi">24</span>  <span class="c1"># 60</span>
+<span class="n">GENERATIONS</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">MUTATION_RATE</span> <span class="o">=</span> <span class="mf">0.2</span>
+<span class="n">DEPENDECY_DEGREE</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">FOUR_PLAYERS</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">PLAYERS_OPTIONS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="n">WORKING_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+<span class="n">FOLDER_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;%y-%m-</span><span class="si">%d</span><span class="s2">_%H-%M-%S&quot;</span>
+<span class="c1"># SELECTION = (POPULATION_SIZE // 3) or 2</span>
+<span class="c1"># RETURN_SIZE = (POPULATION_SIZE // 12) or 1</span>
+<span class="n">WINNER_BONUS</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">MAX_PROCESS</span> <span class="o">=</span> <span class="n">cpu_count</span><span class="p">()</span> <span class="o">//</span> <span class="mi">2</span>
+<span class="n">STATS_FILE</span> <span class="o">=</span> <span class="s2">&quot;stats.csv&quot;</span>
+<span class="n">STATS_HEADERS</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;generation&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;players_count&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;rounds_count&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nobles_taken&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;scores_mean&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;player1_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;player2_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;player3_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;player4_score&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tier1_left&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tier2_left&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tier3_left&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="mutate">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.mutate">[docs]</a>
+<span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">gene</span><span class="p">:</span> <span class="n">Gene</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mutate_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mutates a single gene.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_mutate</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Mutation method is based on the following article (page 112)</span>
+<span class="sd">        http://web.ist.utl.pt/adriano.simoes/tese/referencias/Michalewicz%20Z.%20Genetic%20Algorithms%20+%20Data%20Structures%20=%20Evolution%20Programs%20%283ed%29.PDF</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">value</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">((</span><span class="n">gene</span><span class="o">.</span><span class="n">LOWER_BOUND</span><span class="p">,</span> <span class="n">gene</span><span class="o">.</span><span class="n">UPPER_BOUND</span><span class="p">))</span>
+        <span class="n">power</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">progress</span><span class="p">)</span> <span class="o">**</span> <span class="n">DEPENDECY_DEGREE</span>
+        <span class="k">return</span> <span class="n">value</span> <span class="o">-</span> <span class="n">diff</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">**</span> <span class="n">power</span><span class="p">)</span>
+
+    <span class="n">gene</span><span class="o">.</span><span class="n">mutate</span><span class="p">(</span><span class="n">mutate_rate</span><span class="p">,</span> <span class="n">_mutate</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="mutate_population">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.mutate_population">[docs]</a>
+<span class="k">def</span> <span class="nf">mutate_population</span><span class="p">(</span>
+    <span class="n">population</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">],</span> <span class="n">progress</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="p">:</span> <span class="nb">float</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mutates the genes of the population.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">population</span><span class="p">:</span>
+        <span class="n">mutate</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">_manager_gene</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="p">)</span>
+        <span class="n">mutate</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">_strategy_gene_1</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="p">)</span>
+        <span class="n">mutate</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">_strategy_gene_2</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="p">)</span>
+        <span class="n">mutate</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">_strategy_gene_3</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="p">)</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_crossover</span><span class="p">(</span><span class="n">dna1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">dna2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crossover method is based on the following article (page 9)</span>
+<span class="sd">    https://www.cs.us.es/~fsancho/ficheros/IA2019/TheContinuousGeneticAlgorithm.pdf</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">split_point</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dna1</span><span class="p">))</span>
+    <span class="n">mix_coefficient</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span>
+    <span class="n">diff</span> <span class="o">=</span> <span class="n">dna1</span><span class="p">[</span><span class="n">split_point</span><span class="p">]</span> <span class="o">-</span> <span class="n">dna2</span><span class="p">[</span><span class="n">split_point</span><span class="p">]</span>
+    <span class="n">new_value_1</span> <span class="o">=</span> <span class="n">dna1</span><span class="p">[</span><span class="n">split_point</span><span class="p">]</span> <span class="o">-</span> <span class="n">mix_coefficient</span> <span class="o">*</span> <span class="n">diff</span>
+    <span class="n">new_value_2</span> <span class="o">=</span> <span class="n">dna2</span><span class="p">[</span><span class="n">split_point</span><span class="p">]</span> <span class="o">+</span> <span class="n">mix_coefficient</span> <span class="o">*</span> <span class="n">diff</span>
+    <span class="n">child1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">dna1</span><span class="p">[:</span><span class="n">split_point</span><span class="p">],</span> <span class="p">[</span><span class="n">new_value_1</span><span class="p">],</span> <span class="n">dna2</span><span class="p">[</span><span class="n">split_point</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]))</span>
+    <span class="n">child2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">dna2</span><span class="p">[:</span><span class="n">split_point</span><span class="p">],</span> <span class="p">[</span><span class="n">new_value_2</span><span class="p">],</span> <span class="n">dna1</span><span class="p">[</span><span class="n">split_point</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]))</span>
+    <span class="k">return</span> <span class="n">child1</span><span class="p">,</span> <span class="n">child2</span>
+
+
+<div class="viewcode-block" id="crossover">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.crossover">[docs]</a>
+<span class="k">def</span> <span class="nf">crossover</span><span class="p">(</span><span class="n">mom</span><span class="p">:</span> <span class="n">Gene</span><span class="p">,</span> <span class="n">dad</span><span class="p">:</span> <span class="n">Gene</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Gene</span><span class="p">,</span> <span class="n">Gene</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Executes crossover between 2 genes, which produces 2 children.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="bp">cls</span> <span class="o">=</span> <span class="n">mom</span><span class="o">.</span><span class="vm">__class__</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dad</span><span class="p">,</span> <span class="bp">cls</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Crossover works only between genes of the same type&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">SHAPE</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">child_dna_1</span><span class="p">,</span> <span class="n">child_dna_2</span> <span class="o">=</span> <span class="n">_crossover</span><span class="p">(</span><span class="n">mom</span><span class="o">.</span><span class="n">_dna</span><span class="p">,</span> <span class="n">dad</span><span class="o">.</span><span class="n">_dna</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">child_dna_1</span><span class="p">),</span> <span class="bp">cls</span><span class="p">(</span><span class="n">child_dna_2</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">SHAPE</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">children_dna</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_crossover</span><span class="p">(</span><span class="n">dna1</span><span class="p">,</span> <span class="n">dna2</span><span class="p">)</span> <span class="k">for</span> <span class="n">dna1</span><span class="p">,</span> <span class="n">dna2</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mom</span><span class="o">.</span><span class="n">_dna</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">dad</span><span class="o">.</span><span class="n">_dna</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">child_dna_1</span><span class="p">,</span> <span class="n">child_dna_2</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">children_dna</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">child_dna_1</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">),</span> <span class="bp">cls</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="n">child_dna_2</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported DNA shape for crossover </span><span class="si">{</span><span class="bp">cls</span><span class="o">.</span><span class="n">SHAPE</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="mate">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.mate">[docs]</a>
+<span class="k">def</span> <span class="nf">mate</span><span class="p">(</span><span class="n">parents</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">],</span> <span class="n">population_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates new individual by randomly choosing 2 parents and mating them till</span>
+<span class="sd">    we got enough individuals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CHILDREN_PER_MATING</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">PARENTS_PER_MATING</span> <span class="o">=</span> <span class="mi">2</span>
+
+    <span class="n">children</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">matings</span> <span class="o">=</span> <span class="p">(</span><span class="n">population_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">parents</span><span class="p">))</span> <span class="o">//</span> <span class="n">CHILDREN_PER_MATING</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">matings</span><span class="p">):</span>
+        <span class="n">mom</span><span class="p">,</span> <span class="n">dad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">PARENTS_PER_MATING</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">managers</span> <span class="o">=</span> <span class="n">crossover</span><span class="p">(</span><span class="n">mom</span><span class="o">.</span><span class="n">_manager_gene</span><span class="p">,</span> <span class="n">dad</span><span class="o">.</span><span class="n">_manager_gene</span><span class="p">)</span>
+        <span class="n">strategies_1</span> <span class="o">=</span> <span class="n">crossover</span><span class="p">(</span><span class="n">mom</span><span class="o">.</span><span class="n">_strategy_gene_1</span><span class="p">,</span> <span class="n">dad</span><span class="o">.</span><span class="n">_strategy_gene_1</span><span class="p">)</span>
+        <span class="n">strategies_2</span> <span class="o">=</span> <span class="n">crossover</span><span class="p">(</span><span class="n">mom</span><span class="o">.</span><span class="n">_strategy_gene_2</span><span class="p">,</span> <span class="n">dad</span><span class="o">.</span><span class="n">_strategy_gene_2</span><span class="p">)</span>
+        <span class="n">strategies_3</span> <span class="o">=</span> <span class="n">crossover</span><span class="p">(</span><span class="n">mom</span><span class="o">.</span><span class="n">_strategy_gene_3</span><span class="p">,</span> <span class="n">dad</span><span class="o">.</span><span class="n">_strategy_gene_3</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">CHILDREN_PER_MATING</span><span class="p">):</span>
+            <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">GeneAlgoAgent</span><span class="p">(</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="n">managers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">strategies_1</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">strategies_2</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">strategies_3</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">children</span></div>
+
+
+
+<div class="viewcode-block" id="single_game">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.single_game">[docs]</a>
+<span class="k">def</span> <span class="nf">single_game</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Game</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Runs a single game of Splendor (with the Engine) using the given agents.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">agent</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">agents</span><span class="p">):</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+
+    <span class="n">game</span> <span class="o">=</span> <span class="n">Game</span><span class="p">(</span>
+        <span class="n">LimitRoundsGameRule</span><span class="p">,</span>
+        <span class="n">agents</span><span class="p">,</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">agents</span><span class="p">),</span>
+        <span class="n">seed</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mf">1e8</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+        <span class="n">agents_namelist</span><span class="o">=</span><span class="n">names</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">game</span><span class="p">,</span> <span class="n">game</span><span class="o">.</span><span class="n">Run</span><span class="p">()</span></div>
+
+
+
+<span class="k">def</span> <span class="nf">_evaluate_multiprocess</span><span class="p">(</span>
+    <span class="n">population</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">],</span> <span class="n">players_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Game</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">games</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">population</span><span class="p">)</span> <span class="o">//</span> <span class="n">players_count</span>
+    <span class="k">if</span> <span class="n">players_count</span> <span class="o">==</span> <span class="n">FOUR_PLAYERS</span><span class="p">:</span>
+        <span class="n">agents_generator</span> <span class="o">=</span> <span class="p">(</span><span class="n">population</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">FOUR_PLAYERS</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">population</span><span class="p">),</span> <span class="n">FOUR_PLAYERS</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">agents_generator</span> <span class="o">=</span> <span class="p">(</span><span class="n">population</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">games</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">games</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">MAX_PROCESS</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">single_game</span><span class="p">,</span> <span class="n">agents_generator</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_evaluate</span><span class="p">(</span>
+    <span class="n">population</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">],</span> <span class="n">players_count</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Game</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">games</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">population</span><span class="p">)</span> <span class="o">//</span> <span class="n">players_count</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">games</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;        game number </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">FOLDER_FORMAT</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">players_count</span> <span class="o">==</span> <span class="n">FOUR_PLAYERS</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="n">population</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">FOUR_PLAYERS</span> <span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">FOUR_PLAYERS</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">agents</span> <span class="o">=</span> <span class="n">population</span><span class="p">[</span><span class="n">i</span><span class="p">::</span><span class="n">games</span><span class="p">]</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">single_game</span><span class="p">(</span><span class="n">agents</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<div class="viewcode-block" id="evaluate">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.evaluate">[docs]</a>
+<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span>
+    <span class="n">population</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">],</span> <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">multiprocess</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Measures the fitness of each individual by having them play against each</span>
+<span class="sd">    other. Each individual plays in 3 games with 1,2 and 3 rivals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pool</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">games_stats</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">evaluation</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">players_count</span> <span class="ow">in</span> <span class="n">PLAYERS_OPTIONS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    evaluating games of </span><span class="si">{</span><span class="n">players_count</span><span class="si">}</span><span class="s2"> players&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">multiprocess</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">_evaluate_multiprocess</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">players_count</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">_evaluate</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">players_count</span><span class="p">,</span> <span class="n">quiet</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">game</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">max_score</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">game</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+                <span class="n">evaluation</span><span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">population_id</span><span class="p">]</span> <span class="o">+=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">][</span><span class="n">agent</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">][</span><span class="n">agent</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">==</span> <span class="n">max_score</span><span class="p">:</span>
+                    <span class="n">evaluation</span><span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">population_id</span><span class="p">]</span> <span class="o">+=</span> <span class="n">WINNER_BONUS</span>
+
+            <span class="n">stats</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">players_count</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;actions&quot;</span><span class="p">])</span> <span class="o">//</span> <span class="n">players_count</span><span class="p">,</span>
+                <span class="n">players_count</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">game</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+            <span class="p">]</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;scores&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">FOUR_PLAYERS</span><span class="p">))</span>
+            <span class="n">cards_in_play</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">game</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">decks</span><span class="p">,</span>
+                <span class="n">game</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span>
+            <span class="p">)</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">deck</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">dealt</span><span class="p">)))</span>
+                         <span class="k">for</span> <span class="n">deck</span><span class="p">,</span> <span class="n">dealt</span> <span class="ow">in</span> <span class="n">cards_in_play</span><span class="p">)</span>
+            <span class="n">games_stats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">evaluation</span><span class="p">,</span> <span class="n">games_stats</span></div>
+
+
+
+<div class="viewcode-block" id="sort_by_fitness">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.sort_by_fitness">[docs]</a>
+<span class="k">def</span> <span class="nf">sort_by_fitness</span><span class="p">(</span>
+    <span class="n">population</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">GeneAlgoAgent</span><span class="p">],</span>
+    <span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="n">multiprocess</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">agent</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">population</span><span class="p">):</span>
+        <span class="n">agent</span><span class="o">.</span><span class="n">population_id</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="n">evaluation</span><span class="p">,</span> <span class="n">games_stats</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">quiet</span><span class="p">,</span> <span class="n">multiprocess</span><span class="p">)</span>
+    <span class="n">population</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">agent</span><span class="p">:</span> <span class="n">evaluation</span><span class="p">[</span><span class="n">agent</span><span class="o">.</span><span class="n">population_id</span><span class="p">],</span>
+                    <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s1">&#39;    Saving the best agent &#39;</span>
+            <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">evaluation</span><span class="p">[</span><span class="n">population</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">population_id</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span>
+        <span class="p">)</span>
+    <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="n">population</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">games_stats</span></div>
+
+
+
+<div class="viewcode-block" id="generate_initial_population">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.generate_initial_population">[docs]</a>
+<span class="k">def</span> <span class="nf">generate_initial_population</span><span class="p">(</span><span class="n">population_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Creates agents with random genes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">GeneAlgoAgent</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="n">ManagerGene</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span>
+            <span class="n">StrategyGene</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span>
+            <span class="n">StrategyGene</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span>
+            <span class="n">StrategyGene</span><span class="o">.</span><span class="n">random</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">population_size</span><span class="p">)</span>
+    <span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="evolve">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.evolve">[docs]</a>
+<span class="k">def</span> <span class="nf">evolve</span><span class="p">(</span>
+    <span class="n">population_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">POPULATION_SIZE</span><span class="p">,</span>
+    <span class="n">generations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">GENERATIONS</span><span class="p">,</span>
+    <span class="n">mutation_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">MUTATION_RATE</span><span class="p">,</span>
+    <span class="n">working_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WORKING_DIR</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">quiet</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">multiprocess</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Genetic algorithm evolution process.</span>
+<span class="sd">    In each generation `selection_size` are kept and used for mating.</span>
+<span class="sd">    Returns the top `return_size` individuals of the last generation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">selection_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">population_size</span> <span class="o">//</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">2</span>
+    <span class="n">return_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">population_size</span> <span class="o">//</span> <span class="mi">12</span><span class="p">)</span> <span class="ow">or</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+
+    <span class="n">folder</span> <span class="o">=</span> <span class="n">working_dir</span> <span class="o">/</span> <span class="n">start_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">FOLDER_FORMAT</span><span class="p">)</span>
+    <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="vm">__file__</span><span class="p">,</span> <span class="n">folder</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">folder</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">) Starting evolution with&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    population: </span><span class="si">{</span><span class="n">population_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    selection:  </span><span class="si">{</span><span class="n">selection_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">population</span> <span class="o">=</span> <span class="n">generate_initial_population</span><span class="p">(</span><span class="n">population_size</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="n">STATS_FILE</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stats_file</span><span class="p">:</span>
+        <span class="n">stats_csv</span> <span class="o">=</span> <span class="n">csv_writer</span><span class="p">(</span><span class="n">stats_file</span><span class="p">)</span>
+        <span class="n">stats_csv</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">STATS_HEADERS</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">generation</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">generations</span><span class="p">):</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="n">generation</span> <span class="o">/</span> <span class="n">generations</span>
+            <span class="n">generation</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">games_stats</span> <span class="o">=</span> <span class="n">sort_by_fitness</span><span class="p">(</span><span class="n">population</span><span class="p">,</span>
+                                          <span class="n">folder</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">generation</span><span class="p">),</span>
+                                          <span class="sa">f</span><span class="s1">&#39;Gen </span><span class="si">{</span><span class="n">generation</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                                          <span class="n">quiet</span><span class="p">,</span>
+                                          <span class="n">multiprocess</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">games_stats</span><span class="p">:</span>
+                <span class="n">stats</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">generation</span><span class="p">)</span>
+                <span class="n">stats_csv</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+
+            <span class="n">parents</span> <span class="o">=</span> <span class="n">population</span><span class="p">[:</span><span class="n">selection_size</span><span class="p">]</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">parents</span><span class="p">)</span>
+            <span class="n">children</span> <span class="o">=</span> <span class="n">mate</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="n">population_size</span><span class="p">)</span>
+            <span class="n">mutate_population</span><span class="p">(</span><span class="n">children</span><span class="p">,</span> <span class="n">progress</span><span class="p">,</span> <span class="n">mutation_rate</span><span class="p">)</span>
+            <span class="n">population</span> <span class="o">=</span> <span class="n">parents</span> <span class="o">+</span> <span class="n">children</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
+
+        <span class="n">games_stats</span> <span class="o">=</span> <span class="n">sort_by_fitness</span><span class="p">(</span><span class="n">population</span><span class="p">,</span>
+                                      <span class="n">folder</span> <span class="o">/</span> <span class="s2">&quot;final&quot;</span><span class="p">,</span>
+                                      <span class="s2">&quot;Final&quot;</span><span class="p">,</span>
+                                      <span class="n">quiet</span><span class="p">,</span>
+                                      <span class="n">multiprocess</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">stats</span> <span class="ow">in</span> <span class="n">games_stats</span><span class="p">:</span>
+            <span class="n">stats</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;final&quot;</span><span class="p">)</span>
+            <span class="n">stats_csv</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">quiet</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Done (run time was </span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">population</span><span class="p">[:</span><span class="n">return_size</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.main">[docs]</a>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;evolve&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Evolves a Splendor agent using genetic algorithm.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-p&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--population-size&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">POPULATION_SIZE</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Size of the population (should be multiple of 12)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-g&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--generations&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">GENERATIONS</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Amount of generations&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--mutation-rate&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">MUTATION_RATE</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Probability to mutate (should be in the range [0,1])&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-w&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--working-dir&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">WORKING_DIR</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to directory to work in (will create a directory with &quot;</span>
+        <span class="s2">&quot;current timestamp for each run)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--seed&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Seed to set for numpy&#39;s random number generator&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--multiprocess&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Use multiprocessing to evolve faster&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-q&#39;</span><span class="p">,</span> <span class="s1">&#39;--quiet&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">population_size</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">population_size</span> <span class="o">%</span> <span class="mi">12</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;To work properly, population size should be a &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;multiple of 12 (not </span><span class="si">{</span><span class="n">options</span><span class="o">.</span><span class="n">population_size</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">options</span><span class="o">.</span><span class="n">generations</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid amount of generations </span><span class="si">{</span><span class="n">options</span><span class="o">.</span><span class="n">generations</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">options</span><span class="o">.</span><span class="n">mutation_rate</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid mutation rate value </span><span class="si">{</span><span class="n">options</span><span class="o">.</span><span class="n">mutation_rate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">evolve</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
