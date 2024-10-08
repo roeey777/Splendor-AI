@@ -1,0 +1,40 @@
+name: Publish Sphinx Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish_sphinx_docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Do not ignore bash profile files. From:
+    # https://github.com/marketplace/actions/setup-miniconda
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+          activate-environment: splendor
+          environment-file: environment.yaml
+      - name: Install Splendor
+        run: |
+          pip install .
+      - name: Sphinx build
+        run: |
+          sphinx-build docs/source/ docs/_build/html
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
+          force_orphan: true
+
