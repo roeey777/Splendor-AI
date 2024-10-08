@@ -16,6 +16,7 @@ from splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent import
 from splendor.game import Game
 from splendor.Splendor import features
 from splendor.Splendor.utils import LimitRoundsGameRule
+from splendor.version import get_version
 
 import numpy as np
 
@@ -407,6 +408,7 @@ def main():
         help="Use multiprocessing to evolve faster",
     )
     parser.add_argument('-q', '--quiet', action='store_true')
+    parser.add_argument("--version", action="version", version=get_version())
 
     options = parser.parse_args()
     if options.population_size <= 0 or (options.population_size % 12):

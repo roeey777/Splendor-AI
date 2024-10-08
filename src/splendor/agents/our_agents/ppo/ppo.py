@@ -5,23 +5,25 @@ from argparse import ArgumentParser
 from itertools import chain
 from typing import List
 from pathlib import Path
+from csv import writer as csv_writer
 
 import numpy as np
 import gymnasium as gym
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from csv import writer as csv_writer
 
 from splendor.Splendor.splendor_model import SplendorState
-
-from .network import PPO, DROPOUT
-from .training import train_single_episode
+from splendor.version import get_version
 
 # import this would register splendor as one of gym's environments.
 import splendor.Splendor.gym
 
 from splendor.agents.generic.random import myAgent as RandomAgent
+
+from .network import PPO, DROPOUT
+from .training import train_single_episode
+
 opponents = [RandomAgent(0)]
 
 WORKING_DIR = Path().absolute()
@@ -229,6 +231,7 @@ def main():
     parser.add_argument(
         "--device", default="cuda", type=str, choices=("cuda", "cpu", "mps")
     )
+    parser.add_argument("--version", action="version", version=get_version())
 
     options = parser.parse_args()
     train(**options.__dict__)

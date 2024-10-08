@@ -10,7 +10,6 @@
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
 
-from re import L
 import sys
 import os
 import importlib
@@ -20,14 +19,18 @@ import time
 import pickle
 import random
 import contextlib
-import git
 import shutil
 import logging
-import pytz
 import json
+
+from optparse import OptionParser
+
+import git
+import pytz
+
 from .template import Agent as DummyAgent
 from .game import Game, GameReplayer
-from optparse import OptionParser
+from .version import get_version
 
 
 # CONSTANTS ----------------------------------------------------------------------------------------------------------#
@@ -500,7 +503,7 @@ def loadParameter():
                 (2) python runner.py -c MyAgent
                     - starts a fully automated game where Citrine team is a custom agent and the rest are random.
     """
-    parser = OptionParser(usageStr)
+    parser = OptionParser(usageStr, version=get_version())
     # parser.add_option('-r','--red', help='Red team agent file', default=DEFAULT_AGENT)
     # parser.add_option('-b','--blue', help='Blue team agent file', default=DEFAULT_AGENT)
     parser.add_option(
