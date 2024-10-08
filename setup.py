@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="splendor",
-    version="0.0.2",
+    version="0.0.3",
     python_requires=">=3.11",
     classifiers=[
         "Programming Language :: Python :: 3",
