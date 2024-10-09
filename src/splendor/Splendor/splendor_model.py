@@ -7,9 +7,9 @@
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
 
-import random, itertools, copy
-
-from typing import Dict
+import copy
+import itertools
+import random
 
 from .splendor_utils import *
 from splendor.template import GameState, GameRule
