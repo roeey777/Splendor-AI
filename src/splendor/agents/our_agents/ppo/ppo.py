@@ -1,7 +1,6 @@
 import random
 
 from datetime import datetime
-from argparse import ArgumentParser
 from itertools import chain
 from typing import List, Optional
 from pathlib import Path
@@ -14,16 +13,12 @@ import torch.nn as nn
 import torch.optim as optim
 
 from splendor.Splendor.splendor_model import SplendorState
-from splendor.version import get_version
 
 # import this would register splendor as one of gym's environments.
 import splendor.Splendor.gym
 
-from splendor.agents.generic.random import myAgent as RandomAgent
-
-from .network import PPO, DROPOUT
 from .training import train_single_episode
-from .utils import load_saved_ppo
+from .utils import load_saved_model
 from .constants import (
     SEED,
     LEARNING_RATE,
@@ -34,16 +29,17 @@ from .constants import (
     PPO_STEPS,
     PPO_CLIP,
 )
+from .arguments_parsing import (
+    parse_args,
+    NeuralNetArch,
+    WORKING_DIR,
+    OPPONENTS_AGENTS,
+    DEFAULT_OPPONENT,
+    DEFAULT_TEST_OPPONENT,
+    NN_ARCHITECTURES,
+    DEFAULT_ARCHITECTURE,
+)
 
-OPPONENTS_AGENTS = {
-    "random": [RandomAgent(0)],
-    "minimax": [MinMaxAgent(0)],
-}
-DEFAULT_OPPONENT = "random"
-DEFAULT_TEST_OPPONENT = "minimax"
-OPPONENTS_CHOICES = OPPONENTS_AGENTS.keys()
-
-WORKING_DIR = Path().absolute()
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
 STATS_FILE = "stats.csv"
 STATS_HEADERS = (
@@ -81,15 +77,22 @@ def save_model(model: nn.Module, path: Path):
     )
 
 
-def evaluate(env: gym.Env, policy: nn.Module, seed: int, device: torch.device) -> float:
+def evaluate(
+        env: gym.Env,
+        policy: nn.Module,
+        is_recurrent: bool,
+        seed: int,
+        device: torch.device
+    ) -> float:
     policy.eval().to(device)
 
-    rewards = []
     done = False
     episode_reward = 0
 
-    state, info = env.reset(seed=seed)
-    hidden = policy.init_hidden_state().to(device)
+    state, _ = env.reset(seed=seed)
+
+    if is_recurrent:
+        hidden = policy.init_hidden_state().to(device)
 
     with torch.no_grad():
         while not done:
@@ -100,7 +103,11 @@ def evaluate(env: gym.Env, policy: nn.Module, seed: int, device: torch.device) -
                 .double()
                 .to(device)
             )
-            action_prob, _, hidden = policy(state, action_mask, hidden)
+
+            if is_recurrent:
+                action_prob, _, hidden = policy(state, action_mask, hidden)
+            else:
+                action_prob, _ = policy(state, action_mask)
 
             action = torch.argmax(action_prob, dim=-1)
             next_state, reward, done, _, __ = env.step(action.item())
@@ -134,9 +141,11 @@ def train(
     saved_weights: Optional[Path] = None,
     opponent: str = DEFAULT_OPPONENT,
     test_opponent: str = DEFAULT_TEST_OPPONENT,
+    architecture: str = DEFAULT_ARCHITECTURE,
 ):
     device = torch.device(device if getattr(torch, device).is_available() else "cpu")
 
+    nn_arch: NeuralNetArch = NN_ARCHITECTURES[architecture]
     opponents = OPPONENTS_AGENTS[opponent]
     test_opponents = OPPONENTS_AGENTS[test_opponent]
 
@@ -144,7 +153,7 @@ def train(
     torch.manual_seed(seed)
     random.seed(seed)
     start_time = datetime.now()
-    folder = working_dir / start_time.strftime(FOLDER_FORMAT)
+    folder = working_dir / f"{start_time.strftime(FOLDER_FORMAT)}__arch_{nn_arch.name}"
     models_folder = folder / "models"
     models_folder.mkdir(parents=True)
     train_env = gym.make("splendor-v1", agents=opponents)
@@ -153,10 +162,12 @@ def train(
     input_dim = train_env.observation_space.shape[0]
     output_dim = train_env.action_space.n
 
-    if transfer_learning:
-        policy = load_saved_ppo(saved_weights)
+    if transfer_learning and saved_weights is not None:
+        policy = load_saved_model(saved_weights, nn_arch.ppo_factory)
+    elif transfer_learning:
+        policy = load_saved_model(nn_arch.default_saved_weights, nn_arch.ppo_factory)
     else:
-        policy = PPO(input_dim, output_dim, dropout=DROPOUT).double().to(device)
+        policy = nn_arch.ppo_factory(input_dim, output_dim).double().to(device)
 
     optimizer = optim.Adam(
         policy.parameters(),
@@ -185,8 +196,9 @@ def train(
                 loss_function,
                 seed,
                 device,
+                nn_arch.is_recurrent,
             )
-            test_reward = evaluate(test_env, policy, seed, device)
+            test_reward = evaluate(test_env, policy, nn_arch.is_recurrent, seed, device)
 
             stats = extract_game_stats(
                 train_env.unwrapped.state, train_env.unwrapped.my_turn
@@ -213,76 +225,7 @@ def train(
 
 
 def main():
-    parser = ArgumentParser(
-        prog="ppo",
-        description="Train a PPO agent.",
-    )
-    parser.add_argument(
-        "-l",
-        "--learning-rate",
-        default=LEARNING_RATE,
-        type=float,
-        help="The learning rate to use during training with gradient descent",
-    )
-    parser.add_argument(
-        "-d",
-        "--weight-decay",
-        default=WEIGHT_DECAY,
-        type=float,
-        help="The weight decay (L2 regularization) to use during training with gradient descent",
-    )
-    parser.add_argument(
-        "-w",
-        "--working-dir",
-        default=WORKING_DIR,
-        type=Path,
-        help="Path to directory to work in (will create a directory with "
-        "current timestamp for each run)",
-    )
-    parser.add_argument(
-        "-s",
-        "--seed",
-        default=SEED,
-        type=int,
-        help="Seed to set for numpy's, torch's and random's random number generators.",
-    )
-    parser.add_argument(
-        "-t",
-        "--transfer-learning",
-        action="store_true",
-        help="Learn from previosly learned model, i.e. trasfer learning from previos training sessions",
-    )
-    parser.add_argument(
-        "--saved-weights",
-        default=None,
-        type=Path,
-        help="Path to the weights to start from a new learning session (ignored if not in transfer-learning mode)",
-    )
-    parser.add_argument(
-        "-o",
-        "--opponent",
-        type=str,
-        default=DEFAULT_OPPONENT,
-        choices=OPPONENTS_CHOICES,
-        help="Against whom the PPO should train",
-    )
-    parser.add_argument(
-        "--test-opponent",
-        type=str,
-        default=DEFAULT_TEST_OPPONENT,
-        choices=OPPONENTS_CHOICES,
-        help="Against whom the PPO should be evaluated",
-    )
-    parser.add_argument(
-        "--device",
-        default="cuda",
-        type=str,
-        choices=("cuda", "cpu", "mps"),
-        help="On which device to do heavy mathematical computation",
-    )
-    parser.add_argument("--version", action="version", version=get_version())
-
-    options = parser.parse_args()
+    options = parse_args()
     train(**options.__dict__)
 
 

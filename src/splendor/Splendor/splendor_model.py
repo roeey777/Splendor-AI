@@ -8,6 +8,9 @@
 
 
 import random, itertools, copy
+
+from typing import Dict
+
 from .splendor_utils import *
 from splendor.template import GameState, GameRule
 

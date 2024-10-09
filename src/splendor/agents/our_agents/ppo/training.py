@@ -9,88 +9,14 @@ from torch.optim.optimizer import Optimizer
 import torch.distributions as distributions
 from torch.nn.modules.loss import _Loss as Loss_Fn
 
+from .constants import MAX_GRADIENT_NORM
 
-from .constants import (
-    ENTROPY_COEFFICIENT,
-    VALUE_COEFFICIENT,
-    VERY_SMALL_EPSILON,
-    MAX_GRADIENT_NORM,
+from .common import (
+    calculate_returns,
+    calculate_advantages,
+    calculate_policy_loss,
+    calculate_loss,
 )
-
-
-def calculate_returns(rewards, discount_factor, normalize=True):
-    returns = []
-    R = 0
-
-    for r in reversed(rewards):
-        R = r + R * discount_factor
-        returns.insert(0, R)
-
-    returns = torch.tensor(returns)
-
-    if normalize:
-        # avoid possible division by 0
-        returns = (returns - returns.mean()) / (returns.std() + VERY_SMALL_EPSILON)
-
-    return returns
-
-
-def calculate_advantages(returns, values, normalize=True):
-    advantages = returns - values
-
-    if normalize:
-        # avoid possible division by 0
-        advantages = (advantages - advantages.mean()) / (
-            advantages.std() + VERY_SMALL_EPSILON
-        )
-
-    return advantages
-
-
-def calculate_policy_loss(
-    action_prob: torch.Tensor,
-    actions: torch.Tensor,
-    log_prob_actions: torch.Tensor,
-    advantages: torch.Tensor,
-    ppo_clip,
-) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-    dist = distributions.Categorical(action_prob)
-
-    # new log prob using old actions
-    new_log_prob_actions = dist.log_prob(actions)
-    policy_ratio = (new_log_prob_actions - log_prob_actions).exp()
-    policy_loss_1 = policy_ratio * advantages
-    policy_loss_2 = (
-        torch.clamp(policy_ratio, min=1.0 - ppo_clip, max=1.0 + ppo_clip) * advantages
-    )
-
-    policy_loss = -torch.min(policy_loss_1, policy_loss_2).mean()
-    kl_divergence_estimate = (
-        (log_prob_actions - new_log_prob_actions).mean().detach().cpu().item()
-    )
-
-    # entropy bonus - use to improve exploration.
-    # as seen here (bullet #10):
-    # https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
-    entropy = dist.entropy().mean()
-
-    return policy_loss, kl_divergence_estimate, entropy
-
-
-def calculate_loss(
-    policy_loss: torch.Tensor, value_loss: torch.Tensor, entropy_bonus: torch.Tensor
-) -> torch.Tensor:
-    """
-    final loss of clipped objective PPO, as seen here:
-    https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/ppo2/model.py#L91
-    """
-    loss = (
-        policy_loss
-        + VALUE_COEFFICIENT * value_loss
-        - ENTROPY_COEFFICIENT * entropy_bonus
-    )
-
-    return loss
 
 
 def train_single_episode(
@@ -103,6 +29,7 @@ def train_single_episode(
     loss_fn: Loss_Fn,
     seed: int,
     device: torch.device,
+    is_recurrent: bool
 ):
     policy = policy.to(device)
     policy.train()
@@ -118,19 +45,29 @@ def train_single_episode(
     episode_reward = 0
 
     state, info = env.reset(seed=seed)
-    hidden = policy.init_hidden_state().to(device)
+    if is_recurrent:
+        hidden = policy.init_hidden_state().to(device)
+
     while not done:
         state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
         # append state here, not after we get the next state from env.step()
-        hidden_states.append(hidden)
         states.append(state)
+
+        if is_recurrent:
+            hidden_states.append(hidden)
+
         action_mask = (
             torch.from_numpy(env.unwrapped.get_legal_actions_mask())
             .double()
             .unsqueeze(0)
             .to(device)
         )
-        action_prob, value_pred, next_hidden = policy(state, action_mask, hidden)
+
+        if is_recurrent:
+            action_prob, value_pred, next_hidden = policy(state, action_mask, hidden)
+        else:
+            action_prob, value_pred = policy(state, action_mask)
+
         dist = distributions.Categorical(action_prob)
         action = dist.sample()
         log_prob_action = dist.log_prob(action)
@@ -142,9 +79,12 @@ def train_single_episode(
         rewards.append(reward)
         episode_reward += reward
         state = next_state
-        hidden = next_hidden
+        if is_recurrent:
+            hidden = next_hidden
 
-    hidden_states = torch.cat(hidden_states).to(device)
+    if is_recurrent:
+        hidden_states = torch.cat(hidden_states).to(device)
+
     states = torch.cat(states).to(device)
     actions = torch.cat(actions).to(device)
     action_mask_history = torch.cat(action_mask_history).to(device)
@@ -168,6 +108,7 @@ def train_single_episode(
         ppo_clip,
         loss_fn,
         device,
+        is_recurrent,
     )
 
     return policy_loss, value_loss, episode_reward
@@ -187,11 +128,14 @@ def update_policy(
     ppo_clip: float,
     loss_fn: Loss_Fn,
     device: torch.device,
+    is_recurrent: bool,
 ):
     total_policy_loss = 0
     total_value_loss = 0
 
-    hidden_states = hidden_states.detach()
+    if is_recurrent:
+        hidden_states = hidden_states.detach()
+
     advantages = advantages.detach()
     log_prob_actions = log_prob_actions.detach()
     actions = actions.detach()
@@ -199,11 +143,15 @@ def update_policy(
 
     for _ in range(ppo_steps):
         # get new log prob of actions for all input states
-        action_prob, value_pred, next_hidden_states = policy(
-            states, action_masks, hidden_states
-        )
-        next_hidden_states.detach()
-        value_pred = value_pred.squeeze(-1)
+        if is_recurrent:
+            action_prob, value_pred, next_hidden_states = policy(
+                states, action_masks, hidden_states
+            )
+            next_hidden_states.detach()
+            value_pred = value_pred.squeeze(-1)
+        else:
+            action_prob, value_pred = policy(states, action_masks)
+            value_pred = value_pred.squeeze(-1)
 
         policy_loss, kl_divergence_estimate, entropy = calculate_policy_loss(
             action_prob, actions, log_prob_actions, advantages, ppo_clip
