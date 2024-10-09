@@ -7,7 +7,10 @@
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
 
-import random, itertools, copy
+import copy
+import itertools
+import random
+
 from .splendor_utils import *
 from splendor.template import GameState, GameRule
 

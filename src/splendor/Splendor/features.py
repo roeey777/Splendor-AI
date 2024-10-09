@@ -40,12 +40,6 @@ from .constants import (
 )
 
 
-@dataclass
-class Noble:
-    code: str
-    cost: Dict[str, int]
-
-
 ### RANDOM VALUES (change?) ###
 MAX_CARDS_PER_COLOR = 8  # normal value is 5
 MAX_TOTAL_CARDS = MAX_CARDS_PER_COLOR * 3  # normal value is 20

@@ -5,3 +5,7 @@
 build
 *.pth
 docs/_build/
+
+# define exceptions for pre-trained models.
+!src/splendor/agents/our_agents/ppo/ppo_model.pth
+!src/splendor/agents/our_agents/ppo/ppo_rnn/gru/ppo_gru_model.pth

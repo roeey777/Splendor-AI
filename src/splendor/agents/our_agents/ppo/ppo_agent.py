@@ -1,29 +1,38 @@
 from pathlib import Path
+from typing import List
 
 import numpy as np
 import torch
 import gymnasium as gym
 
-from splendor.template import Agent
 from splendor.Splendor.features import extract_metrics_with_cards
 from splendor.Splendor.gym.envs.utils import (
     create_action_mapping,
     create_legal_actions_mask,
 )
+from splendor.Splendor.splendor_model import SplendorState, SplendorGameRule
+from splendor.Splendor.types import ActionType
 
-from .ppo import PPO, DROPOUT
+from .ppo_agent_base import PPOAgentBase, PPOBase
 from .utils import load_saved_ppo
 
 
-class PPOAgent(Agent):
+DEFAULT_SAVED_PPO_PATH = Path(__file__).parent / "ppo_model.pth"
+
+
+class PPOAgent(PPOAgentBase):
     def __init__(self, _id):
         super().__init__(_id)
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.net = load_saved_ppo().to(self.device)
-        self.net.eval()
-        self.hidden_state = self.net.init_hidden_state().to(self.device)
 
-    def SelectAction(self, actions, game_state, game_rule):
+    def SelectAction(
+        self,
+        actions: List[ActionType],
+        game_state: SplendorState,
+        game_rule: SplendorGameRule,
+    ) -> ActionType:
+        """
+        select an action to play from the given actions.
+        """
         with torch.no_grad():
             state: np.array = extract_metrics_with_cards(game_state, self.id).astype(
                 np.float32
@@ -40,14 +49,14 @@ class PPOAgent(Agent):
                 .to(self.device)
             )
 
-            action_pred, _, next_hidden_state = self.net(
-                state_tesnor, action_mask, self.hidden_state
-            )
+            action_pred, _ = self.net(state_tesnor, action_mask)
             chosen_action = action_pred.argmax()
             mapping = create_action_mapping(actions, game_state, self.id)
-            self.hidden_state = next_hidden_state
 
         return mapping[chosen_action.item()]
+
+    def load(self) -> PPOBase:
+        return load_saved_ppo()
 
 
 myAgent = PPOAgent

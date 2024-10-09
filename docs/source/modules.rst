@@ -1,5 +1,5 @@
-Modules
-=======
+splendor
+========
 
 .. toctree::
    :maxdepth: 4
