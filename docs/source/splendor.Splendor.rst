@@ -52,6 +52,14 @@ splendor.Splendor.splendor\_utils module
    :undoc-members:
    :show-inheritance:
 
+splendor.Splendor.types module
+------------------------------
+
+.. automodule:: splendor.Splendor.types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 splendor.Splendor.utils module
 ------------------------------
 

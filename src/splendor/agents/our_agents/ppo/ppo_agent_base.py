@@ -29,7 +29,7 @@ class PPOAgentBase(Agent):
         self,
         actions: List[ActionType],
         game_state: SplendorState,
-        game_rule: SplendorGameRule
+        game_rule: SplendorGameRule,
     ) -> ActionType:
         """
         select an action to play from the given actions.

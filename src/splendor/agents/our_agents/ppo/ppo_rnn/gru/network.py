@@ -42,7 +42,7 @@ class PPO_GRU(RecurrentPPO):
                 hidden_state_dim,
                 recurrent_layers_num,
                 batch_first=True,
-            )
+            ),
         )
 
         self.hidden_layers_dims = hidden_layers_dims
@@ -160,8 +160,8 @@ class PPO_GRU(RecurrentPPO):
                             where actions are equal to len(ALL_ACTIONS) which comes
                             from Engine.Splendor.gym.envs.actions
         :param hidden_state: hidden state of the recurrent unit.
-                  expected shape: (batch_size, num_layers, hidden_state_dim) or
-                                  (num_layers, hidden_state_dim).
+                             expected shape: (batch_size, num_layers, hidden_state_dim) or
+                             (num_layers, hidden_state_dim).
         :return: the actions probabilities, the value estimate and the next hidden state.
         """
         x = self._order_x_shape(x)

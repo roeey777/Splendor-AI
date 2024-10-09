@@ -28,7 +28,7 @@ class PPOAgent(PPOAgentBase):
         self,
         actions: List[ActionType],
         game_state: SplendorState,
-        game_rule: SplendorGameRule
+        game_rule: SplendorGameRule,
     ) -> ActionType:
         """
         select an action to play from the given actions.
@@ -49,9 +49,7 @@ class PPOAgent(PPOAgentBase):
                 .to(self.device)
             )
 
-            action_pred, _ = self.net(
-                state_tesnor, action_mask
-            )
+            action_pred, _ = self.net(state_tesnor, action_mask)
             chosen_action = action_pred.argmax()
             mapping = create_action_mapping(actions, game_state, self.id)
 

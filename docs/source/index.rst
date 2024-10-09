@@ -23,5 +23,6 @@ tweeking the game engine a bit for our needs (like adding the ``generatePredeces
    installation
    run_splendor
    developing_agents
+   generate_docs
    modules
    agents

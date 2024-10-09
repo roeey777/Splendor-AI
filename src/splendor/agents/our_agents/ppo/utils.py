@@ -1,5 +1,6 @@
 from typing import Optional
 from pathlib import Path
+from functools import cache
 
 import torch
 import gymnasium as gym
@@ -13,12 +14,13 @@ from .network import PPO, DROPOUT
 DEFAULT_SAVED_PPO_PATH = Path(__file__).parent / "ppo_model.pth"
 
 
+@cache
 def load_saved_model(
-        path: Path,
-        ppo_factory: PPOBaseFactory,
-        *args,
-        **kwargs,
-    ) -> PPOBase:
+    path: Path,
+    ppo_factory: PPOBaseFactory,
+    *args,
+    **kwargs,
+) -> PPOBase:
     """
     Load saved weights of a PPO model from a given path, if no path was given
     the installed weights of the PPO agent will be loaded.
@@ -48,6 +50,7 @@ def load_saved_model(
     return net
 
 
+@cache
 def load_saved_ppo(path: Optional[Path] = None) -> PPO:
     """
     Load saved weights of a PPO model from a given path, if no path was given

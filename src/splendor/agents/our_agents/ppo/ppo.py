@@ -78,12 +78,8 @@ def save_model(model: nn.Module, path: Path):
 
 
 def evaluate(
-        env: gym.Env,
-        policy: nn.Module,
-        is_recurrent: bool,
-        seed: int,
-        device: torch.device
-    ) -> float:
+    env: gym.Env, policy: nn.Module, is_recurrent: bool, seed: int, device: torch.device
+) -> float:
     policy.eval().to(device)
 
     done = False

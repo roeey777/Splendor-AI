@@ -73,9 +73,7 @@ def calculate_policy_loss(
 
 
 def calculate_loss(
-    policy_loss: torch.Tensor,
-    value_loss: torch.Tensor,
-    entropy_bonus: torch.Tensor
+    policy_loss: torch.Tensor, value_loss: torch.Tensor, entropy_bonus: torch.Tensor
 ) -> torch.Tensor:
     """
     final loss of clipped objective PPO, as seen here:
@@ -88,4 +86,3 @@ def calculate_loss(
     )
 
     return loss
-

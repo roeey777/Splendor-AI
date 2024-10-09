@@ -29,7 +29,7 @@ def train_single_episode(
     loss_fn: Loss_Fn,
     seed: int,
     device: torch.device,
-    is_recurrent: bool
+    is_recurrent: bool,
 ):
     policy = policy.to(device)
     policy.train()

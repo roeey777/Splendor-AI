@@ -107,8 +107,8 @@ class PPO(PPOBase):
                             where actions are equal to len(ALL_ACTIONS) which comes
                             from Engine.Splendor.gym.envs.actions
         :param hidden_state: hidden state of the recurrent unit.
-                  expected shape: (batch_size, num_layers, hidden_state_dim) or
-                                  (num_layers, hidden_state_dim).
+                             expected shape: (batch_size, num_layers, hidden_state_dim) or
+                             (num_layers, hidden_state_dim).
         :return: the actions probabilities and the value estimate.
         """
         x = self._order_x_shape(x)

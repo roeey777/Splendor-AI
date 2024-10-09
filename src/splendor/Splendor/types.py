@@ -29,8 +29,10 @@ ActionTypeLiteral = Literal[CollectActionType, ReserveActionType, BuyActionType]
 GemsCount = Dict[Color, int]
 NobleType = Tuple[str, GemsCount]
 
+
 class YellowGemCount(TypedDict):
     yellow: Optional[Literal[1]]
+
 
 class CollectAction(TypedDict):
     type: CollectActionType
@@ -38,16 +40,19 @@ class CollectAction(TypedDict):
     returned_gems: GemsCount
     noble: NobleType
 
+
 class ReserveAction(TypedDict):
     type: ReserveActionType
     collected_gems: YellowGemCount
     returned_gems: GemsCount
     noble: NobleType
 
+
 class BuyAction(TypedDict):
     type: BuyActionType
     card: Card
     returned_gems: GemsCount
     noble: NobleType
+
 
 ActionType = Union[CollectAction, ReserveAction, BuyAction]

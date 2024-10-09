@@ -31,7 +31,7 @@ class PpoGruAgent(PPOAgentBase):
         self,
         actions: List[ActionType],
         game_state: SplendorState,
-        game_rule: SplendorGameRule
+        game_rule: SplendorGameRule,
     ) -> ActionType:
         with torch.no_grad():
             state: np.array = extract_metrics_with_cards(game_state, self.id).astype(
