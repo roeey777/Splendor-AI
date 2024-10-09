@@ -1,7 +1,8 @@
 from pathlib import Path
 
 from splendor.agents.our_agents.genetic_algorithm.genes import (
-    ManagerGene, StrategyGene,
+    ManagerGene,
+    StrategyGene,
 )
 from splendor.Splendor.features import extract_metrics, normalize_metrics
 from splendor.template import Agent
