@@ -1,16 +1,16 @@
-from typing import Tuple, List, Union
-
 import torch
 import torch.nn as nn
 
+from .constants import VERY_SMALL_EPSILON
+
 
 class InputNormalization(nn.Module):
-    def __init__(self, num_features, epsilon=1e-10):
+    def __init__(self, num_features, epsilon=VERY_SMALL_EPSILON):
         super().__init__()
         self.num_features = num_features
         self.epsilon = epsilon
-        self.register_buffer("running_mean", torch.zeros(num_features))
-        self.register_buffer("running_var", torch.ones(num_features))
+        self.register_buffer("running_mean", torch.zeros(1, num_features))
+        self.register_buffer("running_var", torch.ones(1, num_features))
 
     def forward(self, x):
         if self.training:

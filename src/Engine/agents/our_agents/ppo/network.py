@@ -11,11 +11,13 @@ from jaxtyping import Float
 from .input_norm import InputNormalization
 
 
-DROPOUT = 0.2
-HUGE_NEG = -1e8
-HIDDEN_DIMS: List[int] = [128, 128, 128, 128]
-HIDDEN_STATE_DIM = 64
-RECURRENT_LAYERS_AMOUNT = 1
+from .constants import (
+    DROPOUT,
+    HUGE_NEG,
+    HIDDEN_DIMS,
+    HIDDEN_STATE_DIM,
+    RECURRENT_LAYERS_AMOUNT,
+)
 
 
 class PPO(nn.Module):

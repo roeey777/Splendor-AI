@@ -10,13 +10,12 @@ import torch.distributions as distributions
 from torch.nn.modules.loss import _Loss as Loss_Fn
 
 
-ENTROPY_COEFFICIENT = 0.01
-VALUE_COEFFICIENT = 0.5
-VERY_SMALL_EPSILON = 1e-8
-
-# Global Gradient Norm Clipping as suggested by (bullet #11):
-# https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
-MAX_GRADIENT_NORM = 1.0
+from .constants import (
+    ENTROPY_COEFFICIENT,
+    VALUE_COEFFICIENT,
+    VERY_SMALL_EPSILON,
+    MAX_GRADIENT_NORM,
+)
 
 
 def calculate_returns(rewards, discount_factor, normalize=True):

@@ -3,7 +3,7 @@ import random
 from datetime import datetime
 from argparse import ArgumentParser
 from itertools import chain
-from typing import List
+from typing import List, Optional
 from pathlib import Path
 
 import numpy as np
@@ -15,15 +15,33 @@ from csv import writer as csv_writer
 
 from Engine.Splendor.splendor_model import SplendorState
 
-from .network import PPO, DROPOUT
-from .training import train_single_episode
-
 # import this would register splendor as one of gym's environments.
 import Engine.Splendor.gym
 
 from Engine.agents.generic.random import myAgent as RandomAgent
+from Engine.agents.our_agents.minmax import myAgent as MinMaxAgent
 
-opponents = [RandomAgent(0)]
+from .network import PPO, DROPOUT
+from .training import train_single_episode
+from .utils import load_saved_ppo
+from .constants import (
+    SEED,
+    LEARNING_RATE,
+    WEIGHT_DECAY,
+    MAX_EPISODES,
+    DISCOUNT_FACTOR,
+    N_TRIALS,
+    PPO_STEPS,
+    PPO_CLIP,
+)
+
+OPPONENTS_AGENTS = {
+    "random": [RandomAgent(0)],
+    "minimax": [MinMaxAgent(0)],
+}
+DEFAULT_OPPONENT = "random"
+DEFAULT_TEST_OPPONENT = "minimax"
+OPPONENTS_CHOICES = OPPONENTS_AGENTS.keys()
 
 WORKING_DIR = Path().absolute()
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
@@ -42,16 +60,6 @@ STATS_HEADERS = (
     "train_reward",
     "test_reward",
 )
-
-SEED = 1234
-LEARNING_RATE = 1e-5
-WEIGHT_DECAY = 1e-4
-MAX_EPISODES = 50000
-
-DISCOUNT_FACTOR = 0.99
-N_TRIALS = 10
-PPO_STEPS = 10
-PPO_CLIP = 0.2
 
 
 def save_model(model: nn.Module, path: Path):
@@ -83,10 +91,10 @@ def evaluate(env: gym.Env, policy: nn.Module, seed: int, device: torch.device) -
     state, info = env.reset(seed=seed)
     hidden = policy.init_hidden_state().to(device)
 
-    while not done:
-        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
+    with torch.no_grad():
+        while not done:
+            state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
 
-        with torch.no_grad():
             action_mask = (
                 torch.from_numpy(env.unwrapped.get_legal_actions_mask())
                 .double()
@@ -94,10 +102,10 @@ def evaluate(env: gym.Env, policy: nn.Module, seed: int, device: torch.device) -
             )
             action_prob, _, hidden = policy(state, action_mask, hidden)
 
-        action = torch.argmax(action_prob, dim=-1)
-        next_state, reward, done, _, __ = env.step(action.item())
-        episode_reward += reward
-        state = next_state
+            action = torch.argmax(action_prob, dim=-1)
+            next_state, reward, done, _, __ = env.step(action.item())
+            episode_reward += reward
+            state = next_state
 
     return episode_reward
 
@@ -122,8 +130,15 @@ def train(
     weight_decay: float = WEIGHT_DECAY,
     seed: int = SEED,
     device: str = "cpu",
+    transfer_learning: bool = False,
+    saved_weights: Optional[Path] = None,
+    opponent: str = DEFAULT_OPPONENT,
+    test_opponent: str = DEFAULT_TEST_OPPONENT,
 ):
     device = torch.device(device if getattr(torch, device).is_available() else "cpu")
+
+    opponents = OPPONENTS_AGENTS[opponent]
+    test_opponents = OPPONENTS_AGENTS[test_opponent]
 
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -133,12 +148,15 @@ def train(
     models_folder = folder / "models"
     models_folder.mkdir(parents=True)
     train_env = gym.make("splendor-v1", agents=opponents)
-    test_env = gym.make("splendor-v1", agents=opponents)
+    test_env = gym.make("splendor-v1", agents=test_opponents)
 
     input_dim = train_env.observation_space.shape[0]
     output_dim = train_env.action_space.n
 
-    policy = PPO(input_dim, output_dim, dropout=DROPOUT).double().to(device)
+    if transfer_learning:
+        policy = load_saved_ppo(saved_weights)
+    else:
+        policy = PPO(input_dim, output_dim, dropout=DROPOUT).double().to(device)
 
     optimizer = optim.Adam(
         policy.parameters(),
@@ -150,7 +168,7 @@ def train(
     train_rewards = []
     test_rewards = []
 
-    with open(folder / STATS_FILE, "w", newline="\n") as stats_file:
+    with open(folder / STATS_FILE, "w", newline="\n", encoding="ascii") as stats_file:
         stats_csv = csv_writer(stats_file)
         stats_csv.writerow(STATS_HEADERS)
 
@@ -183,10 +201,10 @@ def train(
             if (episode + 1) % N_TRIALS == 0:
                 mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
                 mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
-                train_rewards_std = np.std(train_rewards[-N_TRIALS:])
-                test_rewards_std = np.std(test_rewards[-N_TRIALS:])
+                # train_rewards_std = np.std(train_rewards[-N_TRIALS:])
+                # test_rewards_std = np.std(test_rewards[-N_TRIALS:])
                 print(
-                    f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.1f} | Mean Test Rewards: {mean_test_rewards:5.1f} |"
+                    f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.2f} | Mean Test Rewards: {mean_test_rewards:5.2f} |"
                 )
                 save_model(
                     policy,
@@ -229,7 +247,38 @@ def main():
         help="Seed to set for numpy's, torch's and random's random number generators.",
     )
     parser.add_argument(
-        "--device", default="cuda", type=str, choices=("cuda", "cpu", "mps")
+        "-t",
+        "--transfer-learning",
+        action="store_true",
+        help="Learn from previosly learned model, i.e. trasfer learning from previos training sessions",
+    )
+    parser.add_argument(
+        "--saved-weights",
+        default=None,
+        type=Path,
+        help="Path to the weights to start from a new learning session (ignored if not in transfer-learning mode)",
+    )
+    parser.add_argument(
+        "-o",
+        "--opponent",
+        type=str,
+        default=DEFAULT_OPPONENT,
+        choices=OPPONENTS_CHOICES,
+        help="Against whom the PPO should train",
+    )
+    parser.add_argument(
+        "--test-opponent",
+        type=str,
+        default=DEFAULT_TEST_OPPONENT,
+        choices=OPPONENTS_CHOICES,
+        help="Against whom the PPO should be evaluated",
+    )
+    parser.add_argument(
+        "--device",
+        default="cuda",
+        type=str,
+        choices=("cuda", "cpu", "mps"),
+        help="On which device to do heavy mathematical computation",
     )
 
     options = parser.parse_args()
