@@ -164,27 +164,29 @@ def single_game(agents) -> tuple[Game, dict]:
 
 
 def _evaluate_multiprocess(
-    population: list[GeneAlgoAgent], players_count: int,
+    population: list[GeneAlgoAgent],
+    players_count: int,
 ) -> list[tuple[Game, dict]]:
-    """
-    """
+    """ """
     games = len(population) // players_count
     if players_count == FOUR_PLAYERS:
-        agents_generator = (population[i : i + FOUR_PLAYERS]
-                            for i in range(0, len(population), FOUR_PLAYERS))
+        agents_generator = (
+            population[i : i + FOUR_PLAYERS]
+            for i in range(0, len(population), FOUR_PLAYERS)
+        )
     else:
-        agents_generator = (population[i::games]
-                            for i in range(games))
+        agents_generator = (population[i::games] for i in range(games))
 
     with Pool(MAX_PROCESS) as pool:
         return pool.map(single_game, agents_generator)
 
 
 def _evaluate(
-    population: list[GeneAlgoAgent], players_count: int, quiet: bool,
+    population: list[GeneAlgoAgent],
+    players_count: int,
+    quiet: bool,
 ) -> list[tuple[Game, dict]]:
-    """
-    """
+    """ """
     results = list()
     games = len(population) // players_count
 
@@ -205,7 +207,9 @@ def _evaluate(
 
 
 def evaluate(
-    population: list[GeneAlgoAgent], quiet: bool, multiprocess: bool,
+    population: list[GeneAlgoAgent],
+    quiet: bool,
+    multiprocess: bool,
 ) -> dict[GeneAlgoAgent, int]:
     """
     Measures the fitness of each individual by having them play against each
@@ -235,16 +239,17 @@ def evaluate(
                 players_count,
                 len(result["actions"]) // players_count,
                 players_count + 1 - len(game.game_rule.current_game_state.board.nobles),
-                np.mean(tuple(result["scores"].values()))
+                np.mean(tuple(result["scores"].values())),
             ]
-            stats.extend(result["scores"].get(i, "None")
-                         for i in range(FOUR_PLAYERS))
+            stats.extend(result["scores"].get(i, "None") for i in range(FOUR_PLAYERS))
             cards_in_play = zip(
                 game.game_rule.current_game_state.board.decks,
-                game.game_rule.current_game_state.board.dealt
+                game.game_rule.current_game_state.board.dealt,
             )
-            stats.extend(len(deck) + len(tuple(filter(None, dealt)))
-                         for deck, dealt in cards_in_play)
+            stats.extend(
+                len(deck) + len(tuple(filter(None, dealt)))
+                for deck, dealt in cards_in_play
+            )
             games_stats.append(stats)
 
     return evaluation, games_stats
@@ -264,13 +269,11 @@ def sort_by_fitness(
         agent.population_id = i
 
     evaluation, games_stats = evaluate(population, quiet, multiprocess)
-    population.sort(key=lambda agent: evaluation[agent.population_id],
-                    reverse=True)
+    population.sort(key=lambda agent: evaluation[agent.population_id], reverse=True)
 
     if not quiet:
         print(
-            '    Saving the best agent '
-            f'({evaluation[population[0].population_id]})'
+            "    Saving the best agent " f"({evaluation[population[0].population_id]})"
         )
     folder.mkdir()
     population[0].save(folder)
@@ -332,11 +335,13 @@ def evolve(
         for generation in range(generations):
             progress = generation / generations
             generation += 1
-            games_stats = sort_by_fitness(population,
-                                          folder / str(generation),
-                                          f'Gen {generation}',
-                                          quiet,
-                                          multiprocess)
+            games_stats = sort_by_fitness(
+                population,
+                folder / str(generation),
+                f"Gen {generation}",
+                quiet,
+                multiprocess,
+            )
 
             for stats in games_stats:
                 stats.insert(0, generation)
@@ -349,11 +354,9 @@ def evolve(
             population = parents + children
             np.random.shuffle(population)
 
-        games_stats = sort_by_fitness(population,
-                                      folder / "final",
-                                      "Final",
-                                      quiet,
-                                      multiprocess)
+        games_stats = sort_by_fitness(
+            population, folder / "final", "Final", quiet, multiprocess
+        )
         for stats in games_stats:
             stats.insert(0, "final")
             stats_csv.writerow(stats)
@@ -404,10 +407,11 @@ def main():
         help="Seed to set for numpy's random number generator",
     )
     parser.add_argument(
-        "--multiprocess", action='store_true',
+        "--multiprocess",
+        action="store_true",
         help="Use multiprocessing to evolve faster",
     )
-    parser.add_argument('-q', '--quiet', action='store_true')
+    parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--version", action="version", version=get_version())
 
     options = parser.parse_args()

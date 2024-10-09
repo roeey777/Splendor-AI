@@ -1,7 +1,8 @@
 from pathlib import Path
 
 from splendor.agents.our_agents.genetic_algorithm.genes import (
-    ManagerGene, StrategyGene,
+    ManagerGene,
+    StrategyGene,
 )
 from splendor.Splendor.features import extract_metrics, normalize_metrics
 from splendor.template import Agent
@@ -55,7 +56,6 @@ class GeneAlgoAgent(Agent):
             self._strategy_gene_3,
         )
 
-
     def save(self, folder: Path):
         """
         Saves the genes of the given agent to the provided folder.
@@ -65,7 +65,6 @@ class GeneAlgoAgent(Agent):
         self._strategy_gene_1.save(folder / self.STRATEGY_1_PATH.name)
         self._strategy_gene_2.save(folder / self.STRATEGY_2_PATH.name)
         self._strategy_gene_3.save(folder / self.STRATEGY_3_PATH.name)
-
 
     def evaluate_action(self, strategy, action, game_state, game_rule):
         """
@@ -78,7 +77,6 @@ class GeneAlgoAgent(Agent):
         game_rule.generatePredecessor(game_state, action, self.id)
 
         return evaluation
-
 
     def SelectAction(self, actions, game_state, game_rule):
         """

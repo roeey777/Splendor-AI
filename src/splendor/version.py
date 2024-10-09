@@ -1,4 +1,4 @@
-import importlib
+from importlib.metadata import version
 
 from functools import cache
 
@@ -8,4 +8,4 @@ def get_version() -> str:
     """
     extract the package version using importlib.
     """
-    return importlib.metadata.version("splendor")
+    return version("splendor")
