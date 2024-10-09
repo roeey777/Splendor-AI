@@ -112,6 +112,12 @@ Interactively play against the trained PPO agent:
 
    splendor -a splendor.agents.our_agents.ppo.ppo_agent --agent_names=ppo,human --interactive
 
+Interactively play against the trained a recurrent PPO agent (using GRU):
+
+::
+
+   splendor -a splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent --agent_names=ppo_gru,human --interactive
+
 Let them play by them selves
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -133,5 +139,11 @@ Let the PPO agent play against minimax (with alpha-beta pruning) agent for 10 co
 
 ::
 
-        splendor -a splendor.agents.our_agents.ppo.ppo_agent,splendor.agents.our_agents.minmax –agent_names=ppo,minimax -t -m 10
+        splendor -a splendor.agents.our_agents.ppo.ppo_agent,splendor.agents.our_agents.minmax --agent_names=ppo,minimax -t -m 10
+
+Let the PPO agent play against the recurrent PPO (with GRU) agent for 10 consecutive games (only text display):
+
+::
+
+        splendor -a splendor.agents.our_agents.ppo.ppo_agent,splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent --agent_names=ppo,recurrent_ppo -t -m 10
 
