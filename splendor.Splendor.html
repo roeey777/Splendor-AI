@@ -49,7 +49,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of Splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_splendor.html">Run the game</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">splendor</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="splendor.html">splendor package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="splendor.html#subpackages">Subpackages</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">splendor.Splendor package</a></li>
@@ -61,6 +62,7 @@
 <li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.general_game_runner">splendor.general_game_runner module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.template">splendor.template module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.utils">splendor.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.version">splendor.version module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor">Module contents</a></li>
 </ul>
 </li>
@@ -83,7 +85,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">splendor</a></li>
           <li class="breadcrumb-item"><a href="splendor.html">splendor package</a></li>
       <li class="breadcrumb-item active">splendor.Splendor package</li>
       <li class="wy-breadcrumbs-aside">
@@ -128,22 +130,6 @@
 <section id="module-splendor.Splendor.features">
 <span id="splendor-splendor-features-module"></span><h2>splendor.Splendor.features module<a class="headerlink" href="#module-splendor.Splendor.features" title="Link to this heading"></a></h2>
 <p>Features extraction from SplendorState</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="splendor.Splendor.features.Noble">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.Splendor.features.</span></span><span class="sig-name descname"><span class="pre">Noble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">code</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/Splendor/features.html#Noble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.Splendor.features.Noble" title="Link to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="splendor.Splendor.features.Noble.code">
-<span class="sig-name descname"><span class="pre">code</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#splendor.Splendor.features.Noble.code" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="splendor.Splendor.features.Noble.cost">
-<span class="sig-name descname"><span class="pre">cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.features.Noble.cost" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="splendor.Splendor.features.agent_buying_power">
 <span class="sig-prename descclassname"><span class="pre">splendor.Splendor.features.</span></span><span class="sig-name descname"><span class="pre">agent_buying_power</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#splendor.Splendor.splendor_model.SplendorState.AgentState" title="splendor.Splendor.splendor_model.SplendorState.AgentState"><span class="pre">AgentState</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/Splendor/features.html#agent_buying_power"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.Splendor.features.agent_buying_power" title="Link to this definition"></a></dt>
@@ -556,6 +542,99 @@ also describe which cards are present.</p>
 <dt class="sig sig-object py" id="splendor.Splendor.splendor_utils.convert_filename">
 <span class="sig-prename descclassname"><span class="pre">splendor.Splendor.splendor_utils.</span></span><span class="sig-name descname"><span class="pre">convert_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/Splendor/splendor_utils.html#convert_filename"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.Splendor.splendor_utils.convert_filename" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</section>
+<section id="module-splendor.Splendor.types">
+<span id="splendor-splendor-types-module"></span><h2>splendor.Splendor.types module<a class="headerlink" href="#module-splendor.Splendor.types" title="Link to this heading"></a></h2>
+<p>define useful type hints.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.Splendor.types.BuyAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.Splendor.types.</span></span><span class="sig-name descname"><span class="pre">BuyAction</span></span><a class="reference internal" href="_modules/splendor/Splendor/types.html#BuyAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.Splendor.types.BuyAction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.BuyAction.card">
+<span class="sig-name descname"><span class="pre">card</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#splendor.Splendor.splendor_model.Card" title="splendor.Splendor.splendor_model.Card"><span class="pre">Card</span></a></em><a class="headerlink" href="#splendor.Splendor.types.BuyAction.card" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.BuyAction.noble">
+<span class="sig-name descname"><span class="pre">noble</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.BuyAction.noble" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.BuyAction.returned_gems">
+<span class="sig-name descname"><span class="pre">returned_gems</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.BuyAction.returned_gems" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.BuyAction.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'buy_available'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'buy_reserve'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.BuyAction.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.Splendor.types.CollectAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.Splendor.types.</span></span><span class="sig-name descname"><span class="pre">CollectAction</span></span><a class="reference internal" href="_modules/splendor/Splendor/types.html#CollectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.Splendor.types.CollectAction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.CollectAction.collected_gems">
+<span class="sig-name descname"><span class="pre">collected_gems</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.CollectAction.collected_gems" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.CollectAction.noble">
+<span class="sig-name descname"><span class="pre">noble</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.CollectAction.noble" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.CollectAction.returned_gems">
+<span class="sig-name descname"><span class="pre">returned_gems</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.CollectAction.returned_gems" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.CollectAction.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'collect_diff'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'collect_same'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.CollectAction.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.Splendor.types.ReserveAction">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.Splendor.types.</span></span><span class="sig-name descname"><span class="pre">ReserveAction</span></span><a class="reference internal" href="_modules/splendor/Splendor/types.html#ReserveAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.Splendor.types.ReserveAction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.ReserveAction.collected_gems">
+<span class="sig-name descname"><span class="pre">collected_gems</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#splendor.Splendor.types.YellowGemCount" title="splendor.Splendor.types.YellowGemCount"><span class="pre">YellowGemCount</span></a></em><a class="headerlink" href="#splendor.Splendor.types.ReserveAction.collected_gems" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.ReserveAction.noble">
+<span class="sig-name descname"><span class="pre">noble</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.ReserveAction.noble" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.ReserveAction.returned_gems">
+<span class="sig-name descname"><span class="pre">returned_gems</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'black'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'red'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'yellow'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'green'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'blue'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'white'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.ReserveAction.returned_gems" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.ReserveAction.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'reserve'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#splendor.Splendor.types.ReserveAction.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.Splendor.types.YellowGemCount">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.Splendor.types.</span></span><span class="sig-name descname"><span class="pre">YellowGemCount</span></span><a class="reference internal" href="_modules/splendor/Splendor/types.html#YellowGemCount"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.Splendor.types.YellowGemCount" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">TypedDict</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.Splendor.types.YellowGemCount.yellow">
+<span class="sig-name descname"><span class="pre">yellow</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Literal</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#splendor.Splendor.types.YellowGemCount.yellow" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
 
 </section>
 <section id="module-splendor.Splendor.utils">

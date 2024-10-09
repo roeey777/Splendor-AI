@@ -22,7 +22,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="splendor.Splendor package" href="splendor.Splendor.html" />
-    <link rel="prev" title="Modules" href="modules.html" /> 
+    <link rel="prev" title="splendor" href="modules.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -49,7 +49,8 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of Splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="run_splendor.html">Run the game</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">Modules</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">splendor</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">splendor package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a></li>
@@ -86,6 +87,10 @@
 <li class="toctree-l4"><a class="reference internal" href="#splendor.utils.raiseNotDefined"><code class="docutils literal notranslate"><span class="pre">raiseNotDefined()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-splendor.version">splendor.version module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#splendor.version.get_version"><code class="docutils literal notranslate"><span class="pre">get_version()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#module-splendor">Module contents</a></li>
 </ul>
 </li>
@@ -108,7 +113,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="modules.html">Modules</a></li>
+          <li class="breadcrumb-item"><a href="modules.html">splendor</a></li>
       <li class="breadcrumb-item active">splendor package</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/splendor.rst.txt" rel="nofollow"> View page source</a>
@@ -137,11 +142,6 @@
 <li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.constants">splendor.Splendor.constants module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.features">splendor.Splendor.features module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.Noble"><code class="docutils literal notranslate"><span class="pre">Noble</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.Noble.code"><code class="docutils literal notranslate"><span class="pre">Noble.code</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.Noble.cost"><code class="docutils literal notranslate"><span class="pre">Noble.cost</span></code></a></li>
-</ul>
-</li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.agent_buying_power"><code class="docutils literal notranslate"><span class="pre">agent_buying_power()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.agent_won"><code class="docutils literal notranslate"><span class="pre">agent_won()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.build_array"><code class="docutils literal notranslate"><span class="pre">build_array()</span></code></a></li>
@@ -225,6 +225,34 @@
 <li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.BoardToString"><code class="docutils literal notranslate"><span class="pre">BoardToString()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.GemsToString"><code class="docutils literal notranslate"><span class="pre">GemsToString()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.convert_filename"><code class="docutils literal notranslate"><span class="pre">convert_filename()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.types">splendor.Splendor.types module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction"><code class="docutils literal notranslate"><span class="pre">BuyAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.card"><code class="docutils literal notranslate"><span class="pre">BuyAction.card</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.noble"><code class="docutils literal notranslate"><span class="pre">BuyAction.noble</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">BuyAction.returned_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.type"><code class="docutils literal notranslate"><span class="pre">BuyAction.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction"><code class="docutils literal notranslate"><span class="pre">CollectAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.collected_gems"><code class="docutils literal notranslate"><span class="pre">CollectAction.collected_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.noble"><code class="docutils literal notranslate"><span class="pre">CollectAction.noble</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">CollectAction.returned_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.type"><code class="docutils literal notranslate"><span class="pre">CollectAction.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction"><code class="docutils literal notranslate"><span class="pre">ReserveAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.collected_gems"><code class="docutils literal notranslate"><span class="pre">ReserveAction.collected_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.noble"><code class="docutils literal notranslate"><span class="pre">ReserveAction.noble</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">ReserveAction.returned_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.type"><code class="docutils literal notranslate"><span class="pre">ReserveAction.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.YellowGemCount"><code class="docutils literal notranslate"><span class="pre">YellowGemCount</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.YellowGemCount.yellow"><code class="docutils literal notranslate"><span class="pre">YellowGemCount.yellow</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.utils">splendor.Splendor.utils module</a><ul>
@@ -460,6 +488,15 @@ from the command line:</p>
 <dd></dd></dl>
 
 </section>
+<section id="module-splendor.version">
+<span id="splendor-version-module"></span><h2>splendor.version module<a class="headerlink" href="#module-splendor.version" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="splendor.version.get_version">
+<span class="sig-prename descclassname"><span class="pre">splendor.version.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/splendor/version.html#get_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.version.get_version" title="Link to this definition"></a></dt>
+<dd><p>extract the package version using importlib.</p>
+</dd></dl>
+
+</section>
 <section id="module-splendor">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-splendor" title="Link to this heading"></a></h2>
 </section>
@@ -469,7 +506,7 @@ from the command line:</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-left" title="Modules" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="modules.html" class="btn btn-neutral float-left" title="splendor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="splendor.Splendor.html" class="btn btn-neutral float-right" title="splendor.Splendor package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

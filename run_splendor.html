@@ -68,7 +68,8 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
 </ul>
 
@@ -190,6 +191,10 @@ random agents to fill the void.</p></li>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo</span><span class="p">,</span><span class="n">human</span> <span class="o">--</span><span class="n">interactive</span>
 </pre></div>
 </div>
+<p>Interactively play against the trained a recurrent PPO agent (using GRU):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_rnn</span><span class="o">.</span><span class="n">gru</span><span class="o">.</span><span class="n">ppo_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo_gru</span><span class="p">,</span><span class="n">human</span> <span class="o">--</span><span class="n">interactive</span>
+</pre></div>
+</div>
 </section>
 <section id="let-them-play-by-them-selves">
 <h3>Let them play by them selves<a class="headerlink" href="#let-them-play-by-them-selves" title="Link to this heading"></a></h3>
@@ -204,7 +209,11 @@ pruning) agent for 10 consecutive games (only text display):</p>
 </pre></div>
 </div>
 <p>Let the PPO agent play against minimax (with alpha-beta pruning) agent for 10 consecutive games (only text display):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>splendor -a splendor.agents.our_agents.ppo.ppo_agent,splendor.agents.our_agents.minmax –agent_names=ppo,minimax -t -m 10
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">minmax</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo</span><span class="p">,</span><span class="n">minimax</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">m</span> <span class="mi">10</span>
+</pre></div>
+</div>
+<p>Let the PPO agent play against the recurrent PPO (with GRU) agent for 10 consecutive games (only text display):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_rnn</span><span class="o">.</span><span class="n">gru</span><span class="o">.</span><span class="n">ppo_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo</span><span class="p">,</span><span class="n">recurrent_ppo</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">m</span> <span class="mi">10</span>
 </pre></div>
 </div>
 </section>

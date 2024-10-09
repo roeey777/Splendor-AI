@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.agents.our_agents.ppo.arguments_parsing &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.agents.our_agents.ppo.arguments_parsing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.agents.our_agents.ppo.arguments_parsing</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span> <span class="nn">splendor.version</span> <span class="kn">import</span> <span class="n">get_version</span>
+
+<span class="kn">from</span> <span class="nn">splendor.agents.generic.random</span> <span class="kn">import</span> <span class="n">myAgent</span> <span class="k">as</span> <span class="n">RandomAgent</span>
+<span class="kn">from</span> <span class="nn">splendor.agents.our_agents.minmax</span> <span class="kn">import</span> <span class="n">myAgent</span> <span class="k">as</span> <span class="n">MinMaxAgent</span>
+
+<span class="kn">from</span> <span class="nn">.ppo_rnn.gru.network</span> <span class="kn">import</span> <span class="n">PPO_GRU</span>
+<span class="kn">from</span> <span class="nn">.ppo_rnn.gru.ppo_agent</span> <span class="kn">import</span> <span class="n">DEFAULT_SAVED_PPO_GRU_PATH</span>
+<span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">PPO</span>
+<span class="kn">from</span> <span class="nn">.ppo_agent</span> <span class="kn">import</span> <span class="n">DEFAULT_SAVED_PPO_PATH</span>
+<span class="kn">from</span> <span class="nn">.ppo_base</span> <span class="kn">import</span> <span class="n">PPOBaseFactory</span>
+<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SEED</span><span class="p">,</span>
+    <span class="n">LEARNING_RATE</span><span class="p">,</span>
+    <span class="n">WEIGHT_DECAY</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="NeuralNetArch">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">NeuralNetArch</span><span class="p">:</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">ppo_factory</span><span class="p">:</span> <span class="n">PPOBaseFactory</span>
+    <span class="n">is_recurrent</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">default_saved_weights</span><span class="p">:</span> <span class="n">Path</span></div>
+
+
+
+<span class="n">OPPONENTS_AGENTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;random&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">RandomAgent</span><span class="p">(</span><span class="mi">0</span><span class="p">)],</span>
+    <span class="s2">&quot;minimax&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">MinMaxAgent</span><span class="p">(</span><span class="mi">0</span><span class="p">)],</span>
+<span class="p">}</span>
+<span class="n">DEFAULT_OPPONENT</span> <span class="o">=</span> <span class="s2">&quot;random&quot;</span>
+<span class="n">DEFAULT_TEST_OPPONENT</span> <span class="o">=</span> <span class="s2">&quot;minimax&quot;</span>
+<span class="n">OPPONENTS_CHOICES</span> <span class="o">=</span> <span class="n">OPPONENTS_AGENTS</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="n">NN_ARCHITECTURES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;mlp&quot;</span><span class="p">:</span> <span class="n">NeuralNetArch</span><span class="p">(</span><span class="s2">&quot;ppo_mlp&quot;</span><span class="p">,</span> <span class="n">PPO</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">DEFAULT_SAVED_PPO_PATH</span><span class="p">),</span>
+    <span class="s2">&quot;gru&quot;</span><span class="p">:</span> <span class="n">NeuralNetArch</span><span class="p">(</span><span class="s2">&quot;ppo_gru&quot;</span><span class="p">,</span> <span class="n">PPO_GRU</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">DEFAULT_SAVED_PPO_GRU_PATH</span><span class="p">),</span>
+<span class="p">}</span>
+<span class="n">NN_ARCHITECTURES_CHOICES</span> <span class="o">=</span> <span class="n">NN_ARCHITECTURES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="n">DEFAULT_ARCHITECTURE</span> <span class="o">=</span> <span class="s2">&quot;mlp&quot;</span>
+
+<span class="n">WORKING_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="parse_args">
+<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.parse_args">[docs]</a>
+<span class="k">def</span> <span class="nf">parse_args</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse command-line arguments.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
+        <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;ppo&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Train a PPO agent.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">get_version</span><span class="p">())</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-l&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--learning-rate&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">LEARNING_RATE</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The learning rate to use during training with gradient descent&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--weight-decay&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">WEIGHT_DECAY</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The weight decay (L2 regularization) to use during training with gradient descent&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-w&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--working-dir&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">WORKING_DIR</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to directory to work in (will create a directory with &quot;</span>
+        <span class="s2">&quot;current timestamp for each run)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--seed&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">SEED</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Seed to set for numpy&#39;s, torch&#39;s and random&#39;s random number generators.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--transfer-learning&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Learn from previosly learned model, i.e. trasfer learning from previos training sessions&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--saved-weights&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to the weights to start from a new learning session (ignored if not in transfer-learning mode)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-o&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--opponent&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_OPPONENT</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">OPPONENTS_CHOICES</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Against whom the PPO should train&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--test-opponent&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_TEST_OPPONENT</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">OPPONENTS_CHOICES</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Against whom the PPO should be evaluated&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--device&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;mps&quot;</span><span class="p">),</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;On which device to do heavy mathematical computation&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--architecture&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">DEFAULT_ARCHITECTURE</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">NN_ARCHITECTURES_CHOICES</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;What type of architecture of the neural network should be used&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">options</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

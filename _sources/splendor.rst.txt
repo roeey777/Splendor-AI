@@ -45,6 +45,14 @@ splendor.utils module
    :undoc-members:
    :show-inheritance:
 
+splendor.version module
+-----------------------
+
+.. automodule:: splendor.version
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
