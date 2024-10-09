@@ -23,7 +23,6 @@ DEFAULT_SAVED_PPO_PATH = Path(__file__).parent / "ppo_model.pth"
 class PPOAgent(PPOAgentBase):
     def __init__(self, _id):
         super().__init__(_id)
-        self.hidden_state = self.net.init_hidden_state().to(self.device)
 
     def SelectAction(
         self,
@@ -50,12 +49,11 @@ class PPOAgent(PPOAgentBase):
                 .to(self.device)
             )
 
-            action_pred, _, next_hidden_state = self.net(
-                state_tesnor, action_mask, self.hidden_state
+            action_pred, _ = self.net(
+                state_tesnor, action_mask
             )
             chosen_action = action_pred.argmax()
             mapping = create_action_mapping(actions, game_state, self.id)
-            self.hidden_state = next_hidden_state
 
         return mapping[chosen_action.item()]
 
