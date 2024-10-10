@@ -84,6 +84,14 @@ splendor.agents.our\_agents.ppo.ppo\_base module
    :undoc-members:
    :show-inheritance:
 
+splendor.agents.our\_agents.ppo.rollout module
+----------------------------------------------
+
+.. automodule:: splendor.agents.our_agents.ppo.rollout
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 splendor.agents.our\_agents.ppo.training module
 -----------------------------------------------
 
