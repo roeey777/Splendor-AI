@@ -1,6 +1,7 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from splendor.version import get_version
 
@@ -8,6 +9,7 @@ from splendor.agents.generic.random import myAgent as RandomAgent
 from splendor.agents.our_agents.minmax import myAgent as MinMaxAgent
 
 from .ppo_rnn.gru.network import PPO_GRU
+from .ppo_rnn.gru.network import HIDDEN_STATE_DIM as GRU_HIDDEN_STATE_DIM
 from .ppo_rnn.gru.ppo_agent import DEFAULT_SAVED_PPO_GRU_PATH
 from .network import PPO
 from .ppo_agent import DEFAULT_SAVED_PPO_PATH
@@ -25,6 +27,7 @@ class NeuralNetArch:
     ppo_factory: PPOBaseFactory
     is_recurrent: bool
     default_saved_weights: Path
+    hidden_state_dim: Optional[int] = None
 
 
 OPPONENTS_AGENTS = {
@@ -37,7 +40,9 @@ OPPONENTS_CHOICES = OPPONENTS_AGENTS.keys()
 
 NN_ARCHITECTURES = {
     "mlp": NeuralNetArch("ppo_mlp", PPO, False, DEFAULT_SAVED_PPO_PATH),
-    "gru": NeuralNetArch("ppo_gru", PPO_GRU, True, DEFAULT_SAVED_PPO_GRU_PATH),
+    "gru": NeuralNetArch(
+        "ppo_gru", PPO_GRU, True, DEFAULT_SAVED_PPO_GRU_PATH, GRU_HIDDEN_STATE_DIM
+    ),
 }
 NN_ARCHITECTURES_CHOICES = NN_ARCHITECTURES.keys()
 DEFAULT_ARCHITECTURE = "mlp"
