@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import gymnasium as gym
 
@@ -8,15 +8,16 @@ import torch.nn.functional as F
 from torch.optim.optimizer import Optimizer
 import torch.distributions as distributions
 from torch.nn.modules.loss import _Loss as Loss_Fn
+from gymnasium.spaces.utils import flatdim
 
-from .constants import MAX_GRADIENT_NORM
+from .constants import MAX_GRADIENT_NORM, ROLLOUT_BUFFER_SIZE
 
 from .common import (
-    calculate_returns,
-    calculate_advantages,
     calculate_policy_loss,
     calculate_loss,
 )
+
+from .rollout import RolloutBuffer
 
 
 def train_single_episode(
@@ -30,17 +31,19 @@ def train_single_episode(
     seed: int,
     device: torch.device,
     is_recurrent: bool,
+    hidden_states_dim: Optional[int] = None,
 ):
     policy = policy.to(device)
     policy.train()
 
-    hidden_states = []
-    states = []
-    actions = []
-    action_mask_history = []
-    log_prob_actions = []
-    values = []
-    rewards = []
+    rollout_buffer = RolloutBuffer(
+        ROLLOUT_BUFFER_SIZE,
+        flatdim(env.observation_space),
+        flatdim(env.action_space),
+        is_recurrent,
+        hidden_states_dim,
+    )
+
     done = False
     episode_reward = 0
 
@@ -50,11 +53,6 @@ def train_single_episode(
 
     while not done:
         state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
-        # append state here, not after we get the next state from env.step()
-        states.append(state)
-
-        if is_recurrent:
-            hidden_states.append(hidden)
 
         action_mask = (
             torch.from_numpy(env.unwrapped.get_legal_actions_mask())
@@ -72,37 +70,27 @@ def train_single_episode(
         action = dist.sample()
         log_prob_action = dist.log_prob(action)
         next_state, reward, done, _, __ = env.step(action.detach().cpu().item())
-        actions.append(action.unsqueeze(0))
-        action_mask_history.append(action_mask)
-        log_prob_actions.append(log_prob_action.unsqueeze(0))
-        values.append(value_pred)
-        rewards.append(reward)
-        episode_reward += reward
+
+        rollout_buffer.remember(
+            state,
+            action.unsqueeze(0),
+            action_mask,
+            log_prob_action.unsqueeze(0),
+            value_pred,
+            reward,
+            done,
+            hidden if is_recurrent else None,
+        )
+
         state = next_state
+
         if is_recurrent:
             hidden = next_hidden
 
-    if is_recurrent:
-        hidden_states = torch.cat(hidden_states).to(device)
-
-    states = torch.cat(states).to(device)
-    actions = torch.cat(actions).to(device)
-    action_mask_history = torch.cat(action_mask_history).to(device)
-    log_prob_actions = torch.cat(log_prob_actions).to(device)
-    values = torch.cat(values).squeeze(-1).to(device)
-
-    returns = calculate_returns(rewards, discount_factor).to(device)
-    advantages = calculate_advantages(returns, values).to(device)
-
     policy_loss, value_loss = update_policy(
         policy,
-        hidden_states,
-        states,
-        actions,
-        action_mask_history,
-        log_prob_actions,
-        advantages,
-        returns,
+        rollout_buffer,
+        discount_factor,
         optimizer,
         ppo_steps,
         ppo_clip,
@@ -116,13 +104,8 @@ def train_single_episode(
 
 def update_policy(
     policy: nn.Module,
-    hidden_states: torch.Tensor,
-    states: torch.Tensor,
-    actions: torch.Tensor,
-    action_masks: torch.Tensor,
-    log_prob_actions: torch.Tensor,
-    advantages: torch.Tensor,
-    returns: torch.Tensor,
+    rollout_buffer: RolloutBuffer,
+    discount_factor: float,
     optimizer: Optimizer,
     ppo_steps: int,
     ppo_clip: float,
@@ -133,13 +116,16 @@ def update_policy(
     total_policy_loss = 0
     total_value_loss = 0
 
-    if is_recurrent:
-        hidden_states = hidden_states.detach()
-
-    advantages = advantages.detach()
-    log_prob_actions = log_prob_actions.detach()
-    actions = actions.detach()
-    action_masks = action_masks.detach()
+    (
+        hidden_states,
+        states,
+        actions,
+        action_masks,
+        log_prob_actions,
+        advantages,
+        returns,
+        _,
+    ) = rollout_buffer.unpack(discount_factor)
 
     for _ in range(ppo_steps):
         # get new log prob of actions for all input states

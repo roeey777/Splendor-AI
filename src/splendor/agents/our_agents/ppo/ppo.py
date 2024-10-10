@@ -193,6 +193,7 @@ def train(
                 seed,
                 device,
                 nn_arch.is_recurrent,
+                nn_arch.hidden_state_dim,
             )
             test_reward = evaluate(test_env, policy, nn_arch.is_recurrent, seed, device)
 
