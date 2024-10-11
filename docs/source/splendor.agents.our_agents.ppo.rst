@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    splendor.agents.our_agents.ppo.ppo_rnn
+   splendor.agents.our_agents.ppo.self_attn
 
 Submodules
 ----------
@@ -80,6 +81,14 @@ splendor.agents.our\_agents.ppo.ppo\_base module
 ------------------------------------------------
 
 .. automodule:: splendor.agents.our_agents.ppo.ppo_base
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+splendor.agents.our\_agents.ppo.rollout module
+----------------------------------------------
+
+.. automodule:: splendor.agents.our_agents.ppo.rollout
    :members:
    :undoc-members:
    :show-inheritance:
