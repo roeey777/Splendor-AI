@@ -5,7 +5,7 @@ This repository uses ``black`` as a formatter for the code.
 There is also pre-commit hook which uses ``black`` for automation.
 In order to activate this hook one should execute the following command:
 
-.. code-black:: bash
+.. code-block:: bash
 
    pre-commit install
 
