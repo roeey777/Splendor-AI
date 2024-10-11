@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.agents.our_agents.ppo.self_attn package &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="_static/doctools.js?v=9a2dae69"></script>
+        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Agents" href="agents.html" />
+    <link rel="prev" title="splendor.agents.our_agents.ppo.ppo_rnn.gru package" href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">splendor</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="splendor.html">splendor package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="splendor.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.game">splendor.game module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.general_game_runner">splendor.general_game_runner module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.template">splendor.template module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.utils">splendor.utils module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor.version">splendor.version module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.html#module-splendor">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">splendor</a></li>
+          <li class="breadcrumb-item"><a href="splendor.html">splendor package</a></li>
+          <li class="breadcrumb-item"><a href="splendor.agents.html">splendor.agents package</a></li>
+          <li class="breadcrumb-item"><a href="splendor.agents.our_agents.html">splendor.agents.our_agents package</a></li>
+          <li class="breadcrumb-item"><a href="splendor.agents.our_agents.ppo.html">splendor.agents.our_agents.ppo package</a></li>
+      <li class="breadcrumb-item active">splendor.agents.our_agents.ppo.self_attn package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/splendor.agents.our_agents.ppo.self_attn.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="splendor-agents-our-agents-ppo-self-attn-package">
+<h1>splendor.agents.our_agents.ppo.self_attn package<a class="headerlink" href="#splendor-agents-our-agents-ppo-self-attn-package" title="Link to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+</section>
+<section id="module-splendor.agents.our_agents.ppo.self_attn.constants">
+<span id="splendor-agents-our-agents-ppo-self-attn-constants-module"></span><h2>splendor.agents.our_agents.ppo.self_attn.constants module<a class="headerlink" href="#module-splendor.agents.our_agents.ppo.self_attn.constants" title="Link to this heading"></a></h2>
+</section>
+<section id="module-splendor.agents.our_agents.ppo.self_attn.network">
+<span id="splendor-agents-our-agents-ppo-self-attn-network-module"></span><h2>splendor.agents.our_agents.ppo.self_attn.network module<a class="headerlink" href="#module-splendor.agents.our_agents.ppo.self_attn.network" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.ppo.self_attn.network.</span></span><span class="sig-name descname"><span class="pre">PPOSelfAttention</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[128,</span> <span class="pre">128,</span> <span class="pre">128,</span> <span class="pre">128]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/self_attn/network.html#PPOSelfAttention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_base.PPOBase" title="splendor.agents.our_agents.ppo.ppo_base.PPOBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPOBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'batch</span> <span class="pre">sequence</span> <span class="pre">features'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'batch</span> <span class="pre">features'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'features'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_mask</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'batch</span> <span class="pre">actions'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'actions'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'batch</span> <span class="pre">actions'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Float</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'batch</span> <span class="pre">1'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/self_attn/network.html#PPOSelfAttention.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention.forward" title="Link to this definition"></a></dt>
+<dd><p>Pass input through the network to gain predictions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – the input to the network.
+expected shape: one of the following:
+(features,) or (batch_size, features) or (batch_size, sequance_length, features).</p></li>
+<li><p><strong>action_mask</strong> – a binary masking tensor, 1’s signals a valid action and 0’s signals an
+invalid action.
+expected shape: (actions,) or (batch_size, actions).
+where actions are equal to len(ALL_ACTIONS) which comes
+from Engine.Splendor.gym.envs.actions</p></li>
+<li><p><strong>hidden_state</strong> – hidden state of the recurrent unit.
+expected shape: (batch_size, num_layers, hidden_state_dim) or
+(num_layers, hidden_state_dim).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the actions probabilities and the value estimate.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention.init_hidden_state">
+<span class="sig-name descname"><span class="pre">init_hidden_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/self_attn/network.html#PPOSelfAttention.init_hidden_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention.init_hidden_state" title="Link to this definition"></a></dt>
+<dd><p>return the initial hidden state to be used.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-splendor.agents.our_agents.ppo.self_attn.ppo_agent">
+<span id="splendor-agents-our-agents-ppo-self-attn-ppo-agent-module"></span><h2>splendor.agents.our_agents.ppo.self_attn.ppo_agent module<a class="headerlink" href="#module-splendor.agents.our_agents.ppo.self_attn.ppo_agent" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.ppo.self_attn.ppo_agent.</span></span><span class="sig-name descname"><span class="pre">PPOSelfAttentionAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/self_attn/ppo_agent.html#PPOSelfAttentionAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase" title="splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPOAgentBase</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent.SelectAction">
+<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction" title="splendor.Splendor.types.CollectAction"><span class="pre">CollectAction</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction" title="splendor.Splendor.types.ReserveAction"><span class="pre">ReserveAction</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction" title="splendor.Splendor.types.BuyAction"><span class="pre">BuyAction</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState" title="splendor.Splendor.splendor_model.SplendorState"><span class="pre">SplendorState</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule" title="splendor.Splendor.splendor_model.SplendorGameRule"><span class="pre">SplendorGameRule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction" title="splendor.Splendor.types.CollectAction"><span class="pre">CollectAction</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction" title="splendor.Splendor.types.ReserveAction"><span class="pre">ReserveAction</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction" title="splendor.Splendor.types.BuyAction"><span class="pre">BuyAction</span></a></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/self_attn/ppo_agent.html#PPOSelfAttentionAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent.SelectAction" title="Link to this definition"></a></dt>
+<dd><p>select an action to play from the given actions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_base.PPOBase" title="splendor.agents.our_agents.ppo.ppo_base.PPOBase"><span class="pre">PPOBase</span></a></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/self_attn/ppo_agent.html#PPOSelfAttentionAgent.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent.load" title="Link to this definition"></a></dt>
+<dd><p>load the weights of the network.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.self_attn.ppo_agent.myAgent">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.ppo.self_attn.ppo_agent.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><a class="headerlink" href="#splendor.agents.our_agents.ppo.self_attn.ppo_agent.myAgent" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent" title="splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">PPOSelfAttentionAgent</span></code></a></p>
+</dd></dl>
+
+</section>
+<section id="module-splendor.agents.our_agents.ppo.self_attn">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-splendor.agents.our_agents.ppo.self_attn" title="Link to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html" class="btn btn-neutral float-left" title="splendor.agents.our_agents.ppo.ppo_rnn.gru package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="agents.html" class="btn btn-neutral float-right" title="Agents" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
