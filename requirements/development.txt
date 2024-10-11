@@ -3,5 +3,6 @@ ipython==8.27.0
 ipdb==0.13.13
 pandas==2.2.3
 black==24.8.0
+pre-commit==4.0.1
 sphinx==7.4.7
 sphinx-rtd-theme==2.0.0
