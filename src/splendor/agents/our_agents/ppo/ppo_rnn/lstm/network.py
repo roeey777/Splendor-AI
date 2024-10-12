@@ -20,7 +20,7 @@ from .constants import (
 )
 
 
-class PPO_GRU(RecurrentPPO):
+class PPO_LSTM(RecurrentPPO):
     """
     Implementation of PPO network architecture using a GRU.
     """
@@ -37,7 +37,7 @@ class PPO_GRU(RecurrentPPO):
         super().__init__(
             input_dim,
             output_dim,
-            nn.GRU(
+            nn.LSTM(
                 input_dim,
                 hidden_state_dim,
                 recurrent_layers_num,
@@ -107,26 +107,6 @@ class PPO_GRU(RecurrentPPO):
         ordered_x: Float[torch.Tensor, "batch sequence features"]
         return ordered_x
 
-    def _order_hidden_state_shape(
-        self,
-        hidden_state: Union[
-            Float[torch.Tensor, "batch num_layers hidden_dim"],
-            Float[torch.Tensor, "num_layers hidden_dim"],
-        ],
-    ) -> Float[torch.Tensor, "num_layers batch hidden_dim"]:
-        match len(hidden_state.shape):
-            case 2:
-                # add batch dimention as the second dimention.
-                ordered = hidden_state.unsqueeze(1)
-            case 3:
-                # re-organize the order of dimentions as GRU expects.
-                ordered = torch.permute(hidden_state, (1, 0, 2))
-            case _:
-                raise ValueError(
-                    f"Got hidden state tensor of unexpected shape! shape: {hidden_state.shape}"
-                )
-        return ordered
-
     def forward(
         self,
         x: Union[
@@ -137,16 +117,19 @@ class PPO_GRU(RecurrentPPO):
         action_mask: Union[
             Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
         ],
-        hidden_state: Union[
+        hidden_state: Tuple[
             Float[torch.Tensor, "batch num_layers hidden_dim"],
-            Float[torch.Tensor, "num_layers hidden_dim"],
+            Float[torch.Tensor, "batch num_layers hidden_dim"],
         ],
         *args,
         **kwargs,
     ) -> Tuple[
         Float[torch.Tensor, "batch actions"],
         Float[torch.Tensor, "batch 1"],
-        Float[torch.Tensor, "batch hidden_dim"],
+        Tuple[
+            Float[torch.Tensor, "batch num_layers hidden_dim"],
+            Float[torch.Tensor, "batch num_layers hidden_dim"],
+        ],
     ]:
         """
         Pass input through the network to gain predictions.
@@ -162,10 +145,9 @@ class PPO_GRU(RecurrentPPO):
         :param hidden_state: hidden state of the recurrent unit.
                              expected shape: (batch_size, num_layers, hidden_state_dim) or
                              (num_layers, hidden_state_dim).
-        :return: the actions probabilities, the value estimate and the next hidden state.
+        :return: the actions probabilities, the value estimate and the next hidden state + cell state.
         """
         x = self._order_x_shape(x)
-        hidden_state = self._order_hidden_state_shape(hidden_state)
 
         x_normalized = self.input_norm(x)
 
@@ -178,15 +160,24 @@ class PPO_GRU(RecurrentPPO):
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1), next_hidden_state
 
-    def init_hidden_state(
-        self, device: torch.device
-    ) -> Float[torch.Tensor, "num_layers hidden_dim"]:
+    def init_hidden_state(self, device: torch.device) -> Tuple[
+        Float[torch.Tensor, "num_layers hidden_dim"],
+        Float[torch.Tensor, "num_layers hidden_dim"],
+    ]:
         """
-        return the initial hidden state to be used.
+        return the initial hidden state & initial cell state to be used.
         """
-        return (
+        hidden_state = (
             torch.zeros(self.recurrent_layers_num, self.hidden_state_dim)
             .double()
             .unsqueeze(0)
             .to(device)
         )
+        cell_state = (
+            torch.zeros(self.recurrent_layers_num, self.hidden_state_dim)
+            .double()
+            .unsqueeze(0)
+            .to(device)
+        )
+
+        return hidden_state, cell_state

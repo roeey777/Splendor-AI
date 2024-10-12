@@ -49,7 +49,7 @@ def train_single_episode(
 
     state, info = env.reset(seed=seed)
     if is_recurrent:
-        hidden = policy.init_hidden_state().to(device)
+        hidden = policy.init_hidden_state(device)
 
     while not done:
         state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
@@ -62,7 +62,7 @@ def train_single_episode(
         )
 
         if is_recurrent:
-            action_prob, value_pred, next_hidden = policy(state, action_mask, hidden)
+            action_prob, value_pred, *next_hidden = policy(state, action_mask, hidden)
         else:
             action_prob, value_pred = policy(state, action_mask)
 

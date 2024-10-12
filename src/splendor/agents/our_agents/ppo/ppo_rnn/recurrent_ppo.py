@@ -53,7 +53,7 @@ class RecurrentPPO(PPOBase):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_hidden_state(self) -> Any:
+    def init_hidden_state(self, device: torch.device) -> Any:
         """
         return the initial hidden state to be used.
         """

@@ -10,8 +10,13 @@ from splendor.agents.our_agents.minmax import myAgent as MinMaxAgent
 
 # recurrent PPO with GRU
 from .ppo_rnn.gru.network import PPO_GRU
-from .ppo_rnn.gru.network import HIDDEN_STATE_DIM as GRU_HIDDEN_STATE_DIM
+from .ppo_rnn.gru.constants import HIDDEN_STATE_SHAPE as GRU_HIDDEN_STATE_SHAPE
 from .ppo_rnn.gru.ppo_agent import DEFAULT_SAVED_PPO_GRU_PATH
+
+# recurrent PPO with LSTM
+from .ppo_rnn.lstm.network import PPO_LSTM
+from .ppo_rnn.lstm.constants import HIDDEN_STATE_SHAPE as LSTM_HIDDEN_STATE_SHAPE
+from .ppo_rnn.lstm.ppo_agent import DEFAULT_SAVED_PPO_LSTM_PATH
 
 # PPO with self-attention
 from .self_attn.network import PPOSelfAttention
@@ -49,10 +54,13 @@ OPPONENTS_CHOICES = OPPONENTS_AGENTS.keys()
 NN_ARCHITECTURES = {
     "mlp": NeuralNetArch("ppo_mlp", PPO, False, DEFAULT_SAVED_PPO_PATH),
     "gru": NeuralNetArch(
-        "ppo_gru", PPO_GRU, True, DEFAULT_SAVED_PPO_GRU_PATH, GRU_HIDDEN_STATE_DIM
+        "ppo_gru", PPO_GRU, True, DEFAULT_SAVED_PPO_GRU_PATH, GRU_HIDDEN_STATE_SHAPE
     ),
     "self_attn": NeuralNetArch(
         "ppo_self_attn", PPOSelfAttention, False, DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH
+    ),
+    "lstm": NeuralNetArch(
+        "ppo_lstm", PPO_LSTM, True, DEFAULT_SAVED_PPO_LSTM_PATH, LSTM_HIDDEN_STATE_SHAPE
     ),
 }
 NN_ARCHITECTURES_CHOICES = NN_ARCHITECTURES.keys()

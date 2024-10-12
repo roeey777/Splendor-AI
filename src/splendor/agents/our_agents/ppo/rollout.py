@@ -15,7 +15,7 @@ class RolloutBuffer:
     input_dim: int
     action_dim: int
     is_recurrent: bool = False
-    hidden_states_dim: Optional[int] = None
+    hidden_states_shape: Optional[Tuple[int, ...]] = None
     device: Optional[torch.device] = None
     states: torch.Tensor = field(init=False)
     actions: torch.Tensor = field(init=False)
@@ -50,13 +50,13 @@ class RolloutBuffer:
         self.dones = torch.zeros((self.size, 1), dtype=torch.bool).to(self.device)
 
         if self.is_recurrent:
-            if self.hidden_states_dim is None:
+            if self.hidden_states_shape is None:
                 raise ValueError(
-                    "hidden_states_dim must be an int when is_recurrent is set"
+                    "hidden_states_dim must be an valid shape when is_recurrent is set"
                 )
 
             self.hidden_states = torch.zeros(
-                (self.size, 1, self.hidden_states_dim), dtype=torch.float64
+                (self.size, 1, *self.hidden_states_shape), dtype=torch.float64
             ).to(self.device)
         else:
             self.hidden_states = torch.zeros(self.size, dtype=torch.float64)

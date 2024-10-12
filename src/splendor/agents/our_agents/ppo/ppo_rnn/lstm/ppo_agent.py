@@ -16,13 +16,13 @@ from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 from splendor.agents.our_agents.ppo.utils import load_saved_model
 
-from .network import PPO_GRU
+from .network import PPO_LSTM
 
 
-DEFAULT_SAVED_PPO_GRU_PATH = Path(__file__).parent / "ppo_gru_model.pth"
+DEFAULT_SAVED_PPO_LSTM_PATH = Path(__file__).parent / "ppo_lstm_model.pth"
 
 
-class PpoGruAgent(PPOAgentBase):
+class PpoLstmAgent(PPOAgentBase):
     def __init__(self, _id):
         super().__init__(_id)
         self.hidden_state = self.net.init_hidden_state(self.device)
@@ -62,7 +62,7 @@ class PpoGruAgent(PPOAgentBase):
         """
         load the weights of the network.
         """
-        return load_saved_model(DEFAULT_SAVED_PPO_GRU_PATH, PPO_GRU)
+        return load_saved_model(DEFAULT_SAVED_PPO_LSTM_PATH, PPO_LSTM)
 
 
-myAgent = PpoGruAgent
+myAgent = PpoLstmAgent
