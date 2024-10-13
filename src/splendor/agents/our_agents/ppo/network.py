@@ -1,22 +1,15 @@
-from typing import Tuple, List, Union
+from typing import List, Tuple, Union
 
+import numpy as np
 import torch
+import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.distributions as distributions
-import numpy as np
-
 from jaxtyping import Float
 
+from .constants import DROPOUT, HIDDEN_DIMS, HUGE_NEG
 from .input_norm import InputNormalization
 from .ppo_base import PPOBase
-
-
-from .constants import (
-    DROPOUT,
-    HUGE_NEG,
-    HIDDEN_DIMS,
-)
 
 
 class PPO(PPOBase):

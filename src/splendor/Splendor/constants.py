@@ -2,7 +2,6 @@ from typing import Literal
 
 from .splendor_utils import COLOURS
 
-
 Color = Literal[*COLOURS.values()]
 WILDCARD = "yellow"
 RESERVED = WILDCARD

@@ -1,23 +1,22 @@
 from pathlib import Path
 from typing import List
 
+import gymnasium as gym
 import numpy as np
 import torch
-import gymnasium as gym
 
+from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
+from splendor.agents.our_agents.ppo.ppo_base import PPOBase
+from splendor.agents.our_agents.ppo.utils import load_saved_model
 from splendor.Splendor.features import extract_metrics_with_cards
 from splendor.Splendor.gym.envs.utils import (
     create_action_mapping,
     create_legal_actions_mask,
 )
-from splendor.Splendor.splendor_model import SplendorState, SplendorGameRule
+from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
 from splendor.Splendor.types import ActionType
-from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
-from splendor.agents.our_agents.ppo.ppo_base import PPOBase
-from splendor.agents.our_agents.ppo.utils import load_saved_model
 
 from .network import PPOSelfAttention
-
 
 DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH = Path(__file__).parent / "ppo_model.pth"
 

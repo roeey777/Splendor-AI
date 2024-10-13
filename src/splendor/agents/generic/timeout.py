@@ -1,5 +1,6 @@
-from splendor.template import Agent
 import time
+
+from splendor.template import Agent
 
 
 class myAgent(Agent):

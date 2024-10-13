@@ -1,24 +1,23 @@
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import dataclass
+from enum import Enum, auto
 from itertools import combinations, combinations_with_replacement
 from typing import Dict, Optional
-from enum import Enum, auto
-from dataclasses import dataclass
 
-import numpy as np
 import gymnasium as gym
+import numpy as np
 
 from splendor.Splendor import splendor_utils
 from splendor.Splendor.constants import (
-    RESERVED,
     MAX_NOBLES,
-    NUMBER_OF_TIERS,
+    MAX_RESERVED,
     MAX_TIER_CARDS,
     NORMAL_COLORS,
-    MAX_RESERVED,
+    NUMBER_OF_TIERS,
+    RESERVED,
 )
-
 
 ALL_GEMS_COLORS = splendor_utils.COLOURS.values()
 NOBLES_INDICES = list(range(MAX_NOBLES))

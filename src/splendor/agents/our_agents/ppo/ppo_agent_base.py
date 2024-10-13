@@ -1,14 +1,14 @@
-from pathlib import Path
 from abc import abstractmethod
+from pathlib import Path
 from typing import List
 
+import gymnasium as gym
 import numpy as np
 import torch
-import gymnasium as gym
 
-from splendor.template import Agent
-from splendor.Splendor.splendor_model import SplendorState, SplendorGameRule
+from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
 from splendor.Splendor.types import ActionType
+from splendor.template import Agent
 
 from .ppo_base import PPOBase
 

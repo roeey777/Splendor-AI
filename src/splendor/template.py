@@ -1,5 +1,6 @@
-from . import utils
 import random
+
+from . import utils
 
 
 class GameState:

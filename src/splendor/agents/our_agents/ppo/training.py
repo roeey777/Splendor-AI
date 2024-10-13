@@ -1,22 +1,16 @@
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import gymnasium as gym
-
 import torch
+import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.optim.optimizer import Optimizer
-import torch.distributions as distributions
-from torch.nn.modules.loss import _Loss as Loss_Fn
 from gymnasium.spaces.utils import flatdim
+from torch.nn.modules.loss import _Loss as Loss_Fn
+from torch.optim.optimizer import Optimizer
 
+from .common import calculate_loss, calculate_policy_loss
 from .constants import MAX_GRADIENT_NORM, ROLLOUT_BUFFER_SIZE
-
-from .common import (
-    calculate_policy_loss,
-    calculate_loss,
-)
-
 from .rollout import RolloutBuffer
 
 

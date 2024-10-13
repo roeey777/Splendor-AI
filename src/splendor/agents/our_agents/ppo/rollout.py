@@ -3,10 +3,7 @@ from typing import List, Optional, Tuple
 
 import torch
 
-from .common import (
-    calculate_returns,
-    calculate_advantages,
-)
+from .common import calculate_advantages, calculate_returns
 
 
 @dataclass

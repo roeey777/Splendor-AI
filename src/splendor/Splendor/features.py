@@ -3,42 +3,40 @@ Features extraction from SplendorState
 """
 
 from dataclasses import dataclass
+from functools import cache
 from itertools import chain, repeat
 from numbers import Number
 from typing import Dict, List, Optional, ValuesView
-from functools import cache
 
 import numpy as np
-
 from sklearn.preprocessing import OneHotEncoder
 
-from .splendor_model import Card, SplendorState
-from .splendor_utils import COLOURS
 from .constants import (
-    Color,
-    WILDCARD,
-    RESERVED,
-    NORMAL_COLORS,
-    NUMBER_OF_TIERS,
-    MAX_TIER_CARDS,
-    MAX_NOBLES,
-    MAX_RESERVED,
-    MAX_WILDCARDS,
-    MAX_GEMS,
-    WINNING_SCORE_TRESHOLD,
-    MAX_SCORE,
-    MAX_RIVALS,
-    ROUNDS_LIMIT,
     MAX_CARD_GEMS_DIST_1,
     MAX_CARD_GEMS_DIST_2,
     MAX_CARD_GEMS_DIST_3,
     MAX_CARD_TURNS_DIST_1,
     MAX_CARD_TURNS_DIST_2,
     MAX_CARD_TURNS_DIST_3,
+    MAX_GEMS,
     MAX_NOBLE_CARDS_DISTANCE,
     MAX_NOBLE_GEMS_DISTANCE,
+    MAX_NOBLES,
+    MAX_RESERVED,
+    MAX_RIVALS,
+    MAX_SCORE,
+    MAX_TIER_CARDS,
+    MAX_WILDCARDS,
+    NORMAL_COLORS,
+    NUMBER_OF_TIERS,
+    RESERVED,
+    ROUNDS_LIMIT,
+    WILDCARD,
+    WINNING_SCORE_TRESHOLD,
+    Color,
 )
-
+from .splendor_model import Card, SplendorState
+from .splendor_utils import COLOURS
 
 ### RANDOM VALUES (change?) ###
 MAX_CARDS_PER_COLOR = 8  # normal value is 5

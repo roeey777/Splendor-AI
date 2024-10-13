@@ -1,44 +1,42 @@
 import random
-
+from csv import writer as csv_writer
 from datetime import datetime
 from itertools import chain
-from typing import List, Optional
 from pathlib import Path
-from csv import writer as csv_writer
+from typing import List, Optional
 
-import numpy as np
 import gymnasium as gym
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 
-from splendor.Splendor.splendor_model import SplendorState
-
 # import this would register splendor as one of gym's environments.
 import splendor.Splendor.gym
+from splendor.Splendor.splendor_model import SplendorState
 
-from .training import train_single_episode
-from .utils import load_saved_model
-from .constants import (
-    SEED,
-    LEARNING_RATE,
-    WEIGHT_DECAY,
-    MAX_EPISODES,
-    DISCOUNT_FACTOR,
-    N_TRIALS,
-    PPO_STEPS,
-    PPO_CLIP,
-)
 from .arguments_parsing import (
-    parse_args,
-    NeuralNetArch,
-    WORKING_DIR,
-    OPPONENTS_AGENTS,
+    DEFAULT_ARCHITECTURE,
     DEFAULT_OPPONENT,
     DEFAULT_TEST_OPPONENT,
     NN_ARCHITECTURES,
-    DEFAULT_ARCHITECTURE,
+    OPPONENTS_AGENTS,
+    WORKING_DIR,
+    NeuralNetArch,
+    parse_args,
 )
+from .constants import (
+    DISCOUNT_FACTOR,
+    LEARNING_RATE,
+    MAX_EPISODES,
+    N_TRIALS,
+    PPO_CLIP,
+    PPO_STEPS,
+    SEED,
+    WEIGHT_DECAY,
+)
+from .training import train_single_episode
+from .utils import load_saved_model
 
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
 STATS_FILE = "stats.csv"

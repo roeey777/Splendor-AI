@@ -2,11 +2,10 @@
 define useful type hints.
 """
 
-from typing import Dict, Literal, Union, TypedDict, Tuple, Optional
+from typing import Dict, Literal, Optional, Tuple, TypedDict, Union
 
-from .splendor_model import Card
 from .constants import Color
-
+from .splendor_model import Card
 
 COLLECT_ACTION_TYPES = [
     "collect_diff",

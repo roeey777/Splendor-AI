@@ -2,19 +2,10 @@ from typing import Dict, List
 
 import numpy as np
 
-from splendor.Splendor.splendor_model import SplendorState, SplendorGameRule
-from splendor.Splendor.constants import (
-    NUMBER_OF_TIERS,
-    MAX_TIER_CARDS,
-    RESERVED,
-)
+from splendor.Splendor.constants import MAX_TIER_CARDS, NUMBER_OF_TIERS, RESERVED
+from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
 
-from .actions import (
-    ALL_ACTIONS,
-    ActionType,
-    Action,
-    CardPosition,
-)
+from .actions import ALL_ACTIONS, Action, ActionType, CardPosition
 
 
 def _valid_position(state: SplendorState, position: CardPosition) -> bool:

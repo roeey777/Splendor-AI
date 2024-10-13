@@ -1,6 +1,5 @@
-from importlib.metadata import version
-
 from functools import cache
+from importlib.metadata import version
 
 
 @cache

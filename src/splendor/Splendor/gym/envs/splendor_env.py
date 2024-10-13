@@ -2,19 +2,18 @@
 Implementation of Splendor as a gym.Env
 """
 
-from typing import Dict, Literal, List, Tuple, Optional, Any
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
-import numpy as np
 import gymnasium as gym
+import numpy as np
 
-from splendor.template import Agent
-from splendor.Splendor.splendor_model import SplendorState, SplendorGameRule
+from splendor.Splendor import features, splendor_utils
+from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
 from splendor.Splendor.utils import LimitRoundsGameRule
-from splendor.Splendor import splendor_utils
-from splendor.Splendor import features
+from splendor.template import Agent
 
-from .actions import ALL_ACTIONS, ActionType, Action, CardPosition
-from .utils import create_legal_actions_mask, create_action_mapping
+from .actions import ALL_ACTIONS, Action, ActionType, CardPosition
+from .utils import create_action_mapping, create_legal_actions_mask
 
 
 class SplendorEnv(gym.Env):

@@ -6,3 +6,9 @@ black==24.8.0
 pre-commit==4.0.1
 sphinx==7.4.7
 sphinx-rtd-theme==2.0.0
+pylint==3.3.1
+pyright==1.1.384
+mypy==1.11.2
+pydocstyle==6.3.0
+bandit==1.7.10
+isort==5.13.2

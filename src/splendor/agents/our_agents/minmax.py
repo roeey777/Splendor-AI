@@ -1,5 +1,7 @@
 import random
+
 import numpy as np
+
 from splendor.template import Agent
 
 # This agent supports only a game of 2 players

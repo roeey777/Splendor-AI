@@ -1,5 +1,6 @@
-from splendor.Splendor.features import METRICS_SHAPE, build_array
 import numpy as np
+
+from splendor.Splendor.features import METRICS_SHAPE, build_array
 
 
 class Gene:

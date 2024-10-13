@@ -1,5 +1,5 @@
-from .splendor_model import SplendorGameRule
 from . import features
+from .splendor_model import SplendorGameRule
 
 
 class LimitRoundsGameRule(SplendorGameRule):

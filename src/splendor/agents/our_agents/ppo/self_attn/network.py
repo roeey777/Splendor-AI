@@ -1,21 +1,16 @@
-from typing import Tuple, List, Union
+from typing import List, Tuple, Union
 
+import numpy as np
 import torch
+import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.distributions as distributions
-import numpy as np
-
 from jaxtyping import Float
 
 from splendor.agents.our_agents.ppo.input_norm import InputNormalization
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 
-from .constants import (
-    HUGE_NEG,
-    HIDDEN_DIMS,
-    DROPOUT,
-)
+from .constants import DROPOUT, HIDDEN_DIMS, HUGE_NEG
 
 
 class PPOSelfAttention(PPOBase):

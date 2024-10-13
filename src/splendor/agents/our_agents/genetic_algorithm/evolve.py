@@ -2,8 +2,10 @@ import shutil
 from argparse import ArgumentParser
 from csv import writer as csv_writer
 from datetime import datetime
-from multiprocessing import cpu_count, Pool
+from multiprocessing import Pool, cpu_count
 from pathlib import Path
+
+import numpy as np
 
 from splendor.agents.our_agents.genetic_algorithm.genes import (
     Gene,
@@ -17,9 +19,6 @@ from splendor.game import Game
 from splendor.Splendor import features
 from splendor.Splendor.utils import LimitRoundsGameRule
 from splendor.version import get_version
-
-import numpy as np
-
 
 POPULATION_SIZE = 24  # 60
 GENERATIONS = 100
