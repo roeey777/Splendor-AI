@@ -12,7 +12,6 @@ from .ppo_base import PPOBase, PPOBaseFactory
 DEFAULT_SAVED_PPO_PATH = Path(__file__).parent / "ppo_model.pth"
 
 
-@cache
 def load_saved_model(
     path: Path,
     ppo_factory: PPOBaseFactory,

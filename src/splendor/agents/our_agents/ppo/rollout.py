@@ -82,6 +82,9 @@ class RolloutBuffer:
             self.dones[self.index] = done
 
             if self.is_recurrent:
+                # those assertion is only for mypy.
+                assert self.hidden_states is not None
+                assert hidden_state is not None
                 self.hidden_states[self.index] = hidden_state
 
             self.index += 1
@@ -120,7 +123,11 @@ class RolloutBuffer:
         torch.Tensor,
         torch.Tensor,
     ]:
-        hidden_states = self.hidden_states[: self.index]
+        if self.hidden_states is not None:
+            hidden_states = self.hidden_states[: self.index]
+        else:
+            hidden_states = torch.empty(1)
+
         states = self.states[: self.index]
         actions = self.actions[: self.index]
         action_masks = self.action_mask_history[: self.index]

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, override
 
 import numpy as np
 import torch
@@ -32,7 +32,7 @@ class PPOSelfAttention(PPOBase):
         # 1 is for using a single-headed attention.
         self.self_attention = nn.MultiheadAttention(input_dim, 1, dropout=dropout)
 
-        layers = []
+        layers: List[nn.Module] = []
         prev_dim = input_dim
         for next_dim in hidden_layers_dims:
             layers.append(nn.Linear(prev_dim, next_dim))

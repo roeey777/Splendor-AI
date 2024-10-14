@@ -126,6 +126,7 @@ def parse_args():
         default="cuda",
         type=str,
         choices=("cuda", "cpu", "mps"),
+        dest="device_name",
         help="On which device to do heavy mathematical computation",
     )
     parser.add_argument(

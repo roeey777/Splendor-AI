@@ -90,6 +90,7 @@ class PPO_GRU(RecurrentPPO):
             Float[torch.Tensor, "features"],
         ],
     ) -> Float[torch.Tensor, "batch sequence features"]:
+        ordered_x: Float[torch.Tensor, "batch sequence features"]
         match len(x.shape):
             case 1:
                 # assumes that both the batch & the sequance dimentions are missing.
@@ -103,7 +104,6 @@ class PPO_GRU(RecurrentPPO):
                 raise ValueError(
                     f"Got tensor of unexpected shape! shape: {x.shape}. there are just to many dimentions."
                 )
-        ordered_x: Float[torch.Tensor, "batch sequence features"]
         return ordered_x
 
     def _order_hidden_state_shape(

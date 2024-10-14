@@ -4,6 +4,7 @@ from typing import List, override
 import gymnasium as gym
 import numpy as np
 import torch
+from numpy.typing import NDArray
 
 from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
@@ -33,7 +34,7 @@ class PPOSelfAttentionAgent(PPOAgentBase):
         select an action to play from the given actions.
         """
         with torch.no_grad():
-            state: np.array = extract_metrics_with_cards(game_state, self.id).astype(
+            state: NDArray = extract_metrics_with_cards(game_state, self.id).astype(
                 np.float32
             )
             state_tesnor: torch.Tensor = (

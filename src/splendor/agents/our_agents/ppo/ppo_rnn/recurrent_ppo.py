@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Tuple, Union
 
 import torch
 import torch.nn as nn
@@ -57,6 +57,3 @@ class RecurrentPPO(PPOBase):
         return the initial hidden state to be used.
         """
         raise NotImplementedError()
-
-
-PPOBaseFactory = Callable[[int, int, ...], PPOBase]
