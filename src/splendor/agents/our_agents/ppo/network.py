@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, override
 
 import numpy as np
 import torch
@@ -72,6 +72,7 @@ class PPO(PPOBase):
         ordered_x: Float[torch.Tensor, "batch features"]
         return ordered_x
 
+    @override
     def forward(
         self,
         x: Union[
@@ -112,6 +113,7 @@ class PPO(PPOBase):
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1)
 
+    @override
     def init_hidden_state(self) -> None:
         """
         return the initial hidden state to be used.

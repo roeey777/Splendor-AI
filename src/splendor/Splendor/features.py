@@ -5,10 +5,10 @@ Features extraction from SplendorState
 from dataclasses import dataclass
 from functools import cache
 from itertools import chain, repeat
-from numbers import Number
-from typing import Dict, List, Optional, ValuesView
+from typing import Dict, List, Optional, Tuple, Union, ValuesView
 
 import numpy as np
+from numpy.typing import NDArray
 from sklearn.preprocessing import OneHotEncoder
 
 from .constants import (
@@ -69,11 +69,11 @@ def agent_buying_power(agent: SplendorState.AgentState) -> Dict[Color, int]:
     }
 
 
-def diminish_return(value: Number) -> float:
+def diminish_return(value: Union[int, float]) -> float:
     if value <= -1:
         raise ValueError(f"log(1 + value) isn't defined for the value {value}")
 
-    return np.log(1 + value)
+    return np.log(1 + float(value))
 
 
 def agent_won(agent: SplendorState.AgentState) -> bool:
@@ -89,7 +89,7 @@ def turns_made_by_agent(agent: SplendorState.AgentState) -> int:
 
 def missing_gems_to_card(
     card: Card, buying_power: Dict[Color, int]
-) -> [Dict[Color, int]]:
+) -> Dict[Color, int]:
     return {
         color: cost - buying_power[color]
         for color, cost in card.cost.items()
@@ -103,7 +103,7 @@ def turns_to_buy_card(missing_gems: ValuesView[int]) -> int:
     return max(np.ceil(sum(missing_gems) / 3), *missing_gems)
 
 
-def build_array(base_array: np.array, instruction: tuple[int]) -> np.array:
+def build_array(base_array: NDArray, instruction: Tuple[int, ...]) -> NDArray:
     building_blocks = zip(base_array, instruction, strict=True)
     iters = (repeat(value, times) for value, times in building_blocks)
     match len(base_array.shape):
@@ -118,7 +118,7 @@ def build_array(base_array: np.array, instruction: tuple[int]) -> np.array:
 # ********************************
 # Features Extraction Functions
 # ********************************
-METRICS_SHAPE: tuple[int] = (
+METRICS_SHAPE: Tuple[int, ...] = (
     1,  # constant (hopefully would be used by the manager)
     1,  # agent's turns count
     1,  # agent's score
@@ -145,7 +145,7 @@ METRICS_SHAPE: tuple[int] = (
     MAX_NOBLES,  # distances to nobles in cards
 )
 
-METRIC_NORMALIZATION = np.array(
+METRIC_NORMALIZATION: NDArray = np.array(
     [
         1,  # constant (hopefully would be used by the manager)
         ROUNDS_LIMIT,  # agent's turns count
@@ -176,12 +176,15 @@ METRIC_NORMALIZATION = np.array(
 )
 
 
-def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
+def extract_metrics(game_state: SplendorState, agent_index: int) -> NDArray:
     agent = get_agent(game_state, agent_index)
     buying_power = agent_buying_power(agent)
     owned_cards = sum(len(agent.cards[color]) for color in NORMAL_COLORS)
 
-    card_distance_per_color = {color: list() for color in NORMAL_COLORS}
+    card_distance_per_color: Dict[Color, List[float]] = {
+        color: list() for color in NORMAL_COLORS
+    }
+    distance_in_gems: float = 0
 
     cards_distances_in_gems: list[int] = list()
     cards_distances_in_turns: list[int] = list()
@@ -193,14 +196,14 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
         else:
             card_missing_gems = missing_gems_to_card(card, buying_power)
             distance_in_gems = sum(card_missing_gems.values())
-            cards_distances_in_gems.append(distance_in_gems)
+            cards_distances_in_gems.append(int(distance_in_gems))
             cards_distances_in_turns.append(
                 turns_to_buy_card(card_missing_gems.values())
             )
             card_distance_per_color[card.colour].append(distance_in_gems)
 
-    reserved_distances_in_gems = [MISSING_CARD_GEMS_DEFAULT] * MAX_RESERVED
-    reserved_distances_in_turns = [MISSING_CARD_TURNS_DEFAULT] * MAX_RESERVED
+    reserved_distances_in_gems: List[float] = [MISSING_CARD_GEMS_DEFAULT] * MAX_RESERVED
+    reserved_distances_in_turns: List[int] = [MISSING_CARD_TURNS_DEFAULT] * MAX_RESERVED
     for i, card in enumerate(agent.cards[RESERVED]):
         card_missing_gems = missing_gems_to_card(card, buying_power)
         distance_in_gems = sum(card_missing_gems.values())
@@ -211,8 +214,8 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
     for distances in card_distance_per_color.values():
         distances.sort()
 
-    nobles_distances_in_cards = [MISSING_NOBLE_CARDS_DISTANCE] * MAX_NOBLES
-    nobles_distances_in_gems = [MISSING_NOBLE_GEMS_DISTANCE] * MAX_NOBLES
+    nobles_distances_in_cards: List[int] = [MISSING_NOBLE_CARDS_DISTANCE] * MAX_NOBLES
+    nobles_distances_in_gems: List[float] = [MISSING_NOBLE_GEMS_DISTANCE] * MAX_NOBLES
     for i, (_, noble_cost) in enumerate(game_state.board.nobles):
         missing_cards = {
             color: cost - len(agent.cards[color])
@@ -264,7 +267,7 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> np.array:
     )
 
 
-def normalize_metrics(metrics: np.array) -> np.array:
+def normalize_metrics(metrics: NDArray) -> NDArray:
     normalizer = build_array(METRIC_NORMALIZATION, METRICS_SHAPE)
     normalized = metrics / normalizer
     return normalized.clip(-1, 1)
@@ -283,7 +286,7 @@ def get_color_encoder() -> OneHotEncoder:
 
     # sklearn's OneHotEncoder requires it's input to be of a 2-dimensional
     # array
-    all_colors = np.array(list(COLOURS.values())).reshape(-1, 1)
+    all_colors: NDArray = np.array(list(COLOURS.values())).reshape(-1, 1)
 
     encoder.fit(all_colors)
 
@@ -300,7 +303,7 @@ def get_yellow_gem_index() -> int:
 
     # sklearn's OneHotEncoder requires it's input to be of a 2-dimensional
     # array
-    yellow = np.array(["yellow"]).reshape(-1, 1)
+    yellow: NDArray = np.array(["yellow"]).reshape(-1, 1)
     onehot_yellow = encoder.transform(yellow)
 
     # only the index of yellow would be "1", the rest would be "0".
@@ -308,19 +311,19 @@ def get_yellow_gem_index() -> int:
 
 
 @cache
-def get_indices_access_by_color(color_name: str) -> np.array:
+def get_indices_access_by_color(color_name: str) -> NDArray:
     """ """
     encoder: OneHotEncoder = get_color_encoder()
     yellow_index = get_yellow_gem_index()
 
-    color = np.array([color_name]).reshape(-1, 1)
+    color: NDArray = np.array([color_name]).reshape(-1, 1)
     onehot_color = encoder.transform(color).squeeze().astype(bool)
     indices_access = np.delete(onehot_color, yellow_index)
 
     return indices_access
 
 
-def vectorize_card(card: Optional[Card]) -> np.array:
+def vectorize_card(card: Optional[Card]) -> NDArray:
     """
     Return the vector form a given card.
     This is required when supplying an agent such as the DQN or PPO
@@ -361,7 +364,7 @@ def vectorize_card(card: Optional[Card]) -> np.array:
 
 def extract_reserved_cards(
     game_state: SplendorState, agent_index: int
-) -> List[np.array]:
+) -> List[NDArray]:
     """
     Extract all the vector representations of the cards (only reserved).
 
@@ -376,7 +379,7 @@ def extract_reserved_cards(
     """
     agent = get_agent(game_state, agent_index)
 
-    reserved: List[np.array] = []
+    reserved: List[NDArray] = []
     for card in agent.cards[RESERVED]:
         reserved.append(vectorize_card(card))
 
@@ -386,7 +389,7 @@ def extract_reserved_cards(
     return reserved
 
 
-def extract_cards(game_state: SplendorState, agent_index: int) -> np.array:
+def extract_cards(game_state: SplendorState, agent_index: int) -> NDArray:
     """
     Extract all the vector representations of the cards (both dealt & reserved).
 
@@ -403,9 +406,9 @@ def extract_cards(game_state: SplendorState, agent_index: int) -> np.array:
            if for example there aren't any reserved cards then the 3 reserved cards slots would
            be filled with zeros.
     """
-    reserved: List[np.array] = extract_reserved_cards(game_state, agent_index)
+    reserved: List[NDArray] = extract_reserved_cards(game_state, agent_index)
 
-    dealt: List[np.array] = []
+    dealt: List[NDArray] = []
     for deck in game_state.board.dealt:
         for card in deck:
             dealt.append(vectorize_card(card))
@@ -413,7 +416,7 @@ def extract_cards(game_state: SplendorState, agent_index: int) -> np.array:
     return np.hstack((*dealt, *reserved))
 
 
-def extract_metrics_with_cards(game_state: SplendorState, agent_index: int) -> np.array:
+def extract_metrics_with_cards(game_state: SplendorState, agent_index: int) -> NDArray:
     """
     Extract metrics from state & encoded the cards as vectors.
 

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, override
 
 import numpy as np
 import torch
@@ -51,7 +51,7 @@ class PPO_GRU(RecurrentPPO):
 
         self.input_norm = InputNormalization(input_dim)
 
-        layers = []
+        layers: List[nn.Module] = []
         prev_dim = hidden_state_dim
         for next_dim in hidden_layers_dims:
             layers.append(nn.Linear(prev_dim, next_dim))
@@ -126,6 +126,7 @@ class PPO_GRU(RecurrentPPO):
                 )
         return ordered
 
+    @override
     def forward(
         self,
         x: Union[
@@ -177,6 +178,7 @@ class PPO_GRU(RecurrentPPO):
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1), next_hidden_state
 
+    @override
     def init_hidden_state(self) -> Float[torch.Tensor, "num_layers hidden_dim"]:
         """
         return the initial hidden state to be used.

@@ -57,6 +57,7 @@ class PPOSelfAttention(PPOBase):
             nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
             module.bias.data.zero_()
 
+    @override
     def forward(
         self,
         x: Union[
@@ -97,6 +98,7 @@ class PPOSelfAttention(PPOBase):
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1)
 
+    @override
     def init_hidden_state(self) -> None:
         """
         return the initial hidden state to be used.

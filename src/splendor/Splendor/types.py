@@ -7,22 +7,20 @@ from typing import Dict, Literal, Optional, Tuple, TypedDict, Union
 from .constants import Color
 from .splendor_model import Card
 
-COLLECT_ACTION_TYPES = [
+COLLECT_ACTION_TYPES = (
     "collect_diff",
     "collect_same",
-]
-CollectActionType = Literal[*COLLECT_ACTION_TYPES]
+)
+CollectActionType = Literal[COLLECT_ACTION_TYPES]
 
-RESERVE_ACTION_TPYES = [
-    "reserve",
-]
-ReserveActionType = Literal[*RESERVE_ACTION_TPYES]
+RESERVE_ACTION_TPYES = ("reserve",)
+ReserveActionType = Literal[RESERVE_ACTION_TPYES]
 
-BUY_ACTION_TYPES = [
+BUY_ACTION_TYPES = (
     "buy_available",
     "buy_reserve",
-]
-BuyActionType = Literal[*BUY_ACTION_TYPES]
+)
+BuyActionType = Literal[BUY_ACTION_TYPES]
 ActionTypeLiteral = Literal[CollectActionType, ReserveActionType, BuyActionType]
 
 GemsCount = Dict[Color, int]

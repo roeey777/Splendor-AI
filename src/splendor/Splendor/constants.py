@@ -1,11 +1,13 @@
-from typing import Literal
+from typing import Literal, cast
 
 from .splendor_utils import COLOURS
 
-Color = Literal[*COLOURS.values()]
+Color = Literal["black", "red", "yellow", "green", "blue", "white"]
 WILDCARD = "yellow"
 RESERVED = WILDCARD
-NORMAL_COLORS = list(color for color in COLOURS.values() if color != WILDCARD)
+NORMAL_COLORS = list(
+    cast(Color, color) for color in COLOURS.values() if color != WILDCARD
+)
 NUMBER_OF_TIERS = 3
 MAX_TIER_CARDS = 4
 MAX_NOBLES = 5

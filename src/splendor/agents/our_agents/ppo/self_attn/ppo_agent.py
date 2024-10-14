@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, override
 
 import gymnasium as gym
 import numpy as np
@@ -22,6 +22,7 @@ DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH = Path(__file__).parent / "ppo_model.pth"
 
 
 class PPOSelfAttentionAgent(PPOAgentBase):
+    @override
     def SelectAction(
         self,
         actions: List[ActionType],
@@ -53,6 +54,7 @@ class PPOSelfAttentionAgent(PPOAgentBase):
 
         return mapping[chosen_action.item()]
 
+    @override
     def load(self) -> PPOBase:
         """
         load the weights of the network.

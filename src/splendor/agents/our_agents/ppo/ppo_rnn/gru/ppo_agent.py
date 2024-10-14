@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import List
+from typing import List, override
 
 import gymnasium as gym
 import numpy as np
@@ -26,6 +26,7 @@ class PpoGruAgent(PPOAgentBase):
         super().__init__(_id)
         self.hidden_state = self.net.init_hidden_state().to(self.device)
 
+    @override
     def SelectAction(
         self,
         actions: List[ActionType],
@@ -57,6 +58,7 @@ class PpoGruAgent(PPOAgentBase):
 
         return mapping[chosen_action.item()]
 
+    @override
     def load(self) -> PPOBase:
         """
         load the weights of the network.
