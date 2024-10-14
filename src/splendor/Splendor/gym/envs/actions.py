@@ -22,8 +22,6 @@ from splendor.Splendor.types import ActionType, BuyAction, GemsCount
 ALL_GEMS_COLORS = splendor_utils.COLOURS.values()
 NOBLES_INDICES = list(range(MAX_NOBLES))
 
-# GemsDict = Dict[str, int]
-
 
 class ActionEnum(Enum):
     PASS = auto()

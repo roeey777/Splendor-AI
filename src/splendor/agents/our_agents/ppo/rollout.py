@@ -82,7 +82,7 @@ class RolloutBuffer:
             self.dones[self.index] = done
 
             if self.is_recurrent:
-                # those assertion is only for mypy.
+                # those assertion are only for mypy.
                 assert self.hidden_states is not None
                 assert hidden_state is not None
                 self.hidden_states[self.index] = hidden_state
