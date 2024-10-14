@@ -81,13 +81,20 @@
              
   <section id="development">
 <h1>Development<a class="headerlink" href="#development" title="Link to this heading"></a></h1>
-<p>This repository uses <code class="docutils literal notranslate"><span class="pre">black</span></code> as a formatter for the code.
-There is also pre-commit hook which uses <code class="docutils literal notranslate"><span class="pre">black</span></code> for automation.
+<p>This repository uses multiple automatic tools in order to reach a high standard.
+The tools used are:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">black</span></code> as a formatter for the code.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">isort</span></code> is used for organizing the imports.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mypy</span></code> is used for type validation.</p></li>
+</ol>
+<p>There is also pre-commit hook which uses executes both <code class="docutils literal notranslate"><span class="pre">black</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">isort</span></code> automatically before every commit.
 In order to activate this hook one should execute the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install
 </pre></div>
 </div>
-<p>This tool installes into <code class="docutils literal notranslate"><span class="pre">.git/hooks/</span></code> the hook which activates <code class="docutils literal notranslate"><span class="pre">black</span></code>.</p>
+<p>This tool installs into <code class="docutils literal notranslate"><span class="pre">.git/hooks/</span></code> the hook which activates <code class="docutils literal notranslate"><span class="pre">black</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">isort</span></code>.</p>
+<p>There is an issue when it comes to using <code class="docutils literal notranslate"><span class="pre">mypy</span></code> as a pre-commit hook as well, for more details you can look at <a class="reference external" href="https://github.com/python/mypy/issues/13916">this issue</a>.</p>
 </section>
 
 
