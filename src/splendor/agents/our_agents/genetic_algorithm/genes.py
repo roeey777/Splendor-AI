@@ -1,4 +1,7 @@
+from typing import Optional, Tuple
+
 import numpy as np
+from numpy.typing import NDArray
 
 from splendor.Splendor.features import METRICS_SHAPE, build_array
 
@@ -10,9 +13,9 @@ class Gene:
 
     LOWER_BOUND = -20
     UPPER_BOUND = 20
-    SHAPE = None
+    SHAPE: Optional[Tuple[int, ...]] = None
 
-    def __init__(self, dna: np.array):
+    def __init__(self, dna: NDArray):
         assert dna.shape == self.SHAPE, "Given DNA has the wrong shape"
         self._dna = dna
         self._prepared_dna = None
@@ -38,13 +41,13 @@ class Gene:
         return cls(np.random.uniform(cls.LOWER_BOUND, cls.UPPER_BOUND, cls.SHAPE))
 
     @classmethod
-    def load(cls, path_or_file):
+    def load(cls, path_or_file: str):
         """
         Initiate a gene with DNA from a saved file.
         """
         return cls(np.load(path_or_file))
 
-    def save(self, path_or_file):
+    def save(self, path_or_file: str):
         """
         Saves a gene's DNA to a file.
         """
@@ -55,6 +58,9 @@ class Gene:
         Mutates a gene's DNA (in place).
         Should be the only thing that edits the DNA of an existing gene.
         """
+        # this assertion is only for mypy.
+        assert self.SHAPE is not None
+
         for pos in np.ndindex(self.SHAPE):
             if np.random.rand() < mutate_rate:
                 self._dna[pos] = mutator(self._dna[pos])
@@ -69,7 +75,7 @@ class StrategyGene(Gene):
 
     SHAPE = (len(METRICS_SHAPE),)
 
-    def evaluate_state(self, state_metrics):
+    def evaluate_state(self, state_metrics: NDArray):
         """
         Evaluates a state's value according to its metrics
         """
@@ -84,7 +90,7 @@ class ManagerGene(Gene):
     SHAPE = (len(METRICS_SHAPE), 3)
 
     def select_strategy(
-        self, state_metrics, strategies: tuple[StrategyGene]
+        self, state_metrics, strategies: Tuple[StrategyGene, ...]
     ) -> StrategyGene:
         output = np.matmul(state_metrics, self.dna)
         assert len(output) == len(strategies), f"Mismatching lengths ({output.shape})"
