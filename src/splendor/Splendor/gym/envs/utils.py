@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 import numpy as np
+from numpy.typing import NDArray
 
 from splendor.Splendor.constants import MAX_TIER_CARDS, NUMBER_OF_TIERS, RESERVED
 from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
@@ -148,7 +149,7 @@ def create_legal_actions_mask(
     legal_actions,
     state: SplendorState,
     agent_index: int,
-) -> np.array:
+) -> NDArray:
     """
     Create an array of shape (len(ALL_ACTIONS),) whose values are 0's or 1's.
     If the at the i'th index the mask[i] == 1 then the i'th action is legal,

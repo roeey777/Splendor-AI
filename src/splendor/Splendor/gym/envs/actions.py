@@ -18,6 +18,7 @@ from splendor.Splendor.constants import (
     NUMBER_OF_TIERS,
     RESERVED,
 )
+from splendor.Splendor.splendor_model import SplendorState
 
 ALL_GEMS_COLORS = splendor_utils.COLOURS.values()
 NOBLES_INDICES = list(range(MAX_NOBLES))
