@@ -1,11 +1,10 @@
-from typing import Tuple, List, Union
+from typing import List, Tuple, Union, override
 
+import numpy as np
 import torch
+import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.distributions as distributions
-import numpy as np
-
 from jaxtyping import Float
 
 from splendor.agents.our_agents.ppo.input_norm import InputNormalization
@@ -13,9 +12,9 @@ from splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo import RecurrentPPO
 
 from .constants import (
     DROPOUT,
-    HUGE_NEG,
     HIDDEN_DIMS,
     HIDDEN_STATE_DIM,
+    HUGE_NEG,
     RECURRENT_LAYERS_AMOUNT,
 )
 
@@ -52,7 +51,7 @@ class PPO_GRU(RecurrentPPO):
 
         self.input_norm = InputNormalization(input_dim)
 
-        layers = []
+        layers: List[nn.Module] = []
         prev_dim = hidden_state_dim
         for next_dim in hidden_layers_dims:
             layers.append(nn.Linear(prev_dim, next_dim))
@@ -91,6 +90,7 @@ class PPO_GRU(RecurrentPPO):
             Float[torch.Tensor, "features"],
         ],
     ) -> Float[torch.Tensor, "batch sequence features"]:
+        ordered_x: Float[torch.Tensor, "batch sequence features"]
         match len(x.shape):
             case 1:
                 # assumes that both the batch & the sequance dimentions are missing.
@@ -104,7 +104,6 @@ class PPO_GRU(RecurrentPPO):
                 raise ValueError(
                     f"Got tensor of unexpected shape! shape: {x.shape}. there are just to many dimentions."
                 )
-        ordered_x: Float[torch.Tensor, "batch sequence features"]
         return ordered_x
 
     def _order_hidden_state_shape(
@@ -127,6 +126,7 @@ class PPO_GRU(RecurrentPPO):
                 )
         return ordered
 
+    @override
     def forward(
         self,
         x: Union[
@@ -178,6 +178,7 @@ class PPO_GRU(RecurrentPPO):
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1), next_hidden_state
 
+    @override
     def init_hidden_state(self) -> Float[torch.Tensor, "num_layers hidden_dim"]:
         """
         return the initial hidden state to be used.

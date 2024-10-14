@@ -3,30 +3,25 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
-from splendor.version import get_version
-
 from splendor.agents.generic.random import myAgent as RandomAgent
 from splendor.agents.our_agents.minmax import myAgent as MinMaxAgent
+from splendor.version import get_version
+
+from .constants import LEARNING_RATE, SEED, WEIGHT_DECAY
+
+# vanilla PPO
+from .network import PPO
+from .ppo_agent import DEFAULT_SAVED_PPO_PATH
+from .ppo_base import PPOBaseFactory
 
 # recurrent PPO with GRU
-from .ppo_rnn.gru.network import PPO_GRU
 from .ppo_rnn.gru.network import HIDDEN_STATE_DIM as GRU_HIDDEN_STATE_DIM
+from .ppo_rnn.gru.network import PPO_GRU
 from .ppo_rnn.gru.ppo_agent import DEFAULT_SAVED_PPO_GRU_PATH
 
 # PPO with self-attention
 from .self_attn.network import PPOSelfAttention
 from .self_attn.ppo_agent import DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH
-
-# vanilla PPO
-from .network import PPO
-from .ppo_agent import DEFAULT_SAVED_PPO_PATH
-
-from .ppo_base import PPOBaseFactory
-from .constants import (
-    SEED,
-    LEARNING_RATE,
-    WEIGHT_DECAY,
-)
 
 
 @dataclass
@@ -131,6 +126,7 @@ def parse_args():
         default="cuda",
         type=str,
         choices=("cuda", "cpu", "mps"),
+        dest="device_name",
         help="On which device to do heavy mathematical computation",
     )
     parser.add_argument(

@@ -1,21 +1,16 @@
-from typing import Tuple, List, Union
+from typing import List, Tuple, Union, override
 
+import numpy as np
 import torch
+import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.distributions as distributions
-import numpy as np
-
 from jaxtyping import Float
 
 from splendor.agents.our_agents.ppo.input_norm import InputNormalization
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 
-from .constants import (
-    HUGE_NEG,
-    HIDDEN_DIMS,
-    DROPOUT,
-)
+from .constants import DROPOUT, HIDDEN_DIMS, HUGE_NEG
 
 
 class PPOSelfAttention(PPOBase):
@@ -37,7 +32,7 @@ class PPOSelfAttention(PPOBase):
         # 1 is for using a single-headed attention.
         self.self_attention = nn.MultiheadAttention(input_dim, 1, dropout=dropout)
 
-        layers = []
+        layers: List[nn.Module] = []
         prev_dim = input_dim
         for next_dim in hidden_layers_dims:
             layers.append(nn.Linear(prev_dim, next_dim))
@@ -62,6 +57,7 @@ class PPOSelfAttention(PPOBase):
             nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
             module.bias.data.zero_()
 
+    @override
     def forward(
         self,
         x: Union[
@@ -102,6 +98,7 @@ class PPOSelfAttention(PPOBase):
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1)
 
+    @override
     def init_hidden_state(self) -> None:
         """
         return the initial hidden state to be used.

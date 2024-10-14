@@ -11,8 +11,9 @@ import copy
 import itertools
 import random
 
+from splendor.template import GameRule, GameState
+
 from .splendor_utils import *
-from splendor.template import GameState, GameRule
 
 # CLASS DEF ----------------------------------------------------------------------------------------------------------#
 

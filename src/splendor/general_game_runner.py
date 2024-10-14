@@ -10,28 +10,26 @@
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
 
-import sys
-import os
-import importlib
-import traceback
+import contextlib
 import datetime
-import time
+import importlib
+import json
+import logging
+import os
 import pickle
 import random
-import contextlib
 import shutil
-import logging
-import json
-
+import sys
+import time
+import traceback
 from optparse import OptionParser
 
 import git
 import pytz
 
-from .template import Agent as DummyAgent
 from .game import Game, GameReplayer
+from .template import Agent as DummyAgent
 from .version import get_version
-
 
 # CONSTANTS ----------------------------------------------------------------------------------------------------------#
 

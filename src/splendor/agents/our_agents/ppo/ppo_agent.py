@@ -1,21 +1,21 @@
 from pathlib import Path
 from typing import List
 
+import gymnasium as gym
 import numpy as np
 import torch
-import gymnasium as gym
+from numpy.typing import NDArray
 
 from splendor.Splendor.features import extract_metrics_with_cards
 from splendor.Splendor.gym.envs.utils import (
     create_action_mapping,
     create_legal_actions_mask,
 )
-from splendor.Splendor.splendor_model import SplendorState, SplendorGameRule
+from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
 from splendor.Splendor.types import ActionType
 
 from .ppo_agent_base import PPOAgentBase, PPOBase
 from .utils import load_saved_ppo
-
 
 DEFAULT_SAVED_PPO_PATH = Path(__file__).parent / "ppo_model.pth"
 
@@ -34,7 +34,7 @@ class PPOAgent(PPOAgentBase):
         select an action to play from the given actions.
         """
         with torch.no_grad():
-            state: np.array = extract_metrics_with_cards(game_state, self.id).astype(
+            state: NDArray = extract_metrics_with_cards(game_state, self.id).astype(
                 np.float32
             )
             state_tesnor: torch.Tensor = (

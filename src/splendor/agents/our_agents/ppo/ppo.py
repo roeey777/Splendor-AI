@@ -1,44 +1,45 @@
 import random
-
+from csv import writer as csv_writer
 from datetime import datetime
 from itertools import chain
-from typing import List, Optional
 from pathlib import Path
-from csv import writer as csv_writer
+from typing import List, Optional, cast
 
-import numpy as np
 import gymnasium as gym
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
-from splendor.Splendor.splendor_model import SplendorState
+from gymnasium.spaces.utils import flatdim
+from numpy.typing import NDArray
 
 # import this would register splendor as one of gym's environments.
 import splendor.Splendor.gym
+from splendor.Splendor.gym.envs.splendor_env import SplendorEnv
+from splendor.Splendor.splendor_model import SplendorState
 
-from .training import train_single_episode
-from .utils import load_saved_model
-from .constants import (
-    SEED,
-    LEARNING_RATE,
-    WEIGHT_DECAY,
-    MAX_EPISODES,
-    DISCOUNT_FACTOR,
-    N_TRIALS,
-    PPO_STEPS,
-    PPO_CLIP,
-)
 from .arguments_parsing import (
-    parse_args,
-    NeuralNetArch,
-    WORKING_DIR,
-    OPPONENTS_AGENTS,
+    DEFAULT_ARCHITECTURE,
     DEFAULT_OPPONENT,
     DEFAULT_TEST_OPPONENT,
     NN_ARCHITECTURES,
-    DEFAULT_ARCHITECTURE,
+    OPPONENTS_AGENTS,
+    WORKING_DIR,
+    NeuralNetArch,
+    parse_args,
 )
+from .constants import (
+    DISCOUNT_FACTOR,
+    LEARNING_RATE,
+    MAX_EPISODES,
+    N_TRIALS,
+    PPO_CLIP,
+    PPO_STEPS,
+    SEED,
+    WEIGHT_DECAY,
+)
+from .training import train_single_episode
+from .utils import load_saved_model
 
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
 STATS_FILE = "stats.csv"
@@ -82,20 +83,22 @@ def evaluate(
 ) -> float:
     policy.eval().to(device)
 
-    done = False
-    episode_reward = 0
+    custom_env = cast(SplendorEnv, env.unwrapped)
 
-    state, _ = env.reset(seed=seed)
+    done = False
+    episode_reward: float = 0
+
+    state_vector: NDArray
+    state_vector, _ = custom_env.reset(seed=seed)
+    state = torch.from_numpy(state_vector).double().unsqueeze(0).to(device)
 
     if is_recurrent:
         hidden = policy.init_hidden_state().to(device)
 
     with torch.no_grad():
         while not done:
-            state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
-
             action_mask = (
-                torch.from_numpy(env.unwrapped.get_legal_actions_mask())
+                torch.from_numpy(custom_env.get_legal_actions_mask())
                 .double()
                 .to(device)
             )
@@ -106,9 +109,9 @@ def evaluate(
                 action_prob, _ = policy(state, action_mask)
 
             action = torch.argmax(action_prob, dim=-1)
-            next_state, reward, done, _, __ = env.step(action.item())
+            next_state, reward, done, _, __ = custom_env.step(int(action.item()))
             episode_reward += reward
-            state = next_state
+            state = torch.from_numpy(next_state).double().unsqueeze(0).to(device)
 
     return episode_reward
 
@@ -132,14 +135,16 @@ def train(
     learning_rate: float = LEARNING_RATE,
     weight_decay: float = WEIGHT_DECAY,
     seed: int = SEED,
-    device: str = "cpu",
+    device_name: str = "cpu",
     transfer_learning: bool = False,
     saved_weights: Optional[Path] = None,
     opponent: str = DEFAULT_OPPONENT,
     test_opponent: str = DEFAULT_TEST_OPPONENT,
     architecture: str = DEFAULT_ARCHITECTURE,
 ):
-    device = torch.device(device if getattr(torch, device).is_available() else "cpu")
+    device = torch.device(
+        device_name if getattr(torch, device_name).is_available() else "cpu"
+    )
 
     nn_arch: NeuralNetArch = NN_ARCHITECTURES[architecture]
     opponents = OPPONENTS_AGENTS[opponent]
@@ -152,11 +157,12 @@ def train(
     folder = working_dir / f"{start_time.strftime(FOLDER_FORMAT)}__arch_{nn_arch.name}"
     models_folder = folder / "models"
     models_folder.mkdir(parents=True)
-    train_env = gym.make("splendor-v1", agents=opponents)
-    test_env = gym.make("splendor-v1", agents=test_opponents)
+    train_env: gym.Env = gym.make("splendor-v1", agents=opponents)
+    test_env: gym.Env = gym.make("splendor-v1", agents=test_opponents)
+    custom_train_env = cast(SplendorEnv, train_env.unwrapped)
 
-    input_dim = train_env.observation_space.shape[0]
-    output_dim = train_env.action_space.n
+    input_dim = flatdim(train_env.observation_space)
+    output_dim = flatdim(train_env.action_space)
 
     if transfer_learning and saved_weights is not None:
         policy = load_saved_model(saved_weights, nn_arch.ppo_factory)
@@ -197,9 +203,7 @@ def train(
             )
             test_reward = evaluate(test_env, policy, nn_arch.is_recurrent, seed, device)
 
-            stats = extract_game_stats(
-                train_env.unwrapped.state, train_env.unwrapped.my_turn
-            )
+            stats = extract_game_stats(custom_train_env.state, custom_train_env.my_turn)
             stats.insert(0, episode)
             stats.extend([policy_loss, value_loss, train_reward, test_reward])
             stats_csv.writerow(stats)

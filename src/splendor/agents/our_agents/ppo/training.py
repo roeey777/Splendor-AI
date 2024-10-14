@@ -1,22 +1,19 @@
-from typing import Tuple, Optional
+from typing import Optional, Tuple, cast
 
 import gymnasium as gym
-
 import torch
+import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.optim.optimizer import Optimizer
-import torch.distributions as distributions
-from torch.nn.modules.loss import _Loss as Loss_Fn
 from gymnasium.spaces.utils import flatdim
+from numpy.typing import NDArray
+from torch.nn.modules.loss import _Loss as Loss_Fn
+from torch.optim.optimizer import Optimizer
 
+from splendor.Splendor.gym.envs.splendor_env import SplendorEnv
+
+from .common import calculate_loss, calculate_policy_loss
 from .constants import MAX_GRADIENT_NORM, ROLLOUT_BUFFER_SIZE
-
-from .common import (
-    calculate_policy_loss,
-    calculate_loss,
-)
-
 from .rollout import RolloutBuffer
 
 
@@ -36,10 +33,12 @@ def train_single_episode(
     policy = policy.to(device)
     policy.train()
 
+    custom_env = cast(SplendorEnv, env.unwrapped)
+
     rollout_buffer = RolloutBuffer(
         ROLLOUT_BUFFER_SIZE,
-        flatdim(env.observation_space),
-        flatdim(env.action_space),
+        flatdim(custom_env.observation_space),
+        flatdim(custom_env.action_space),
         is_recurrent,
         hidden_states_dim,
     )
@@ -47,15 +46,16 @@ def train_single_episode(
     done = False
     episode_reward = 0
 
-    state, info = env.reset(seed=seed)
+    state_vector: NDArray
+    state_vector, _ = custom_env.reset(seed=seed)
+    state = torch.from_numpy(state_vector).double().unsqueeze(0).to(device)
+
     if is_recurrent:
         hidden = policy.init_hidden_state().to(device)
 
     while not done:
-        state = torch.tensor(state, dtype=torch.float64).unsqueeze(0).to(device)
-
         action_mask = (
-            torch.from_numpy(env.unwrapped.get_legal_actions_mask())
+            torch.from_numpy(custom_env.get_legal_actions_mask())
             .double()
             .unsqueeze(0)
             .to(device)
@@ -69,7 +69,7 @@ def train_single_episode(
         dist = distributions.Categorical(action_prob)
         action = dist.sample()
         log_prob_action = dist.log_prob(action)
-        next_state, reward, done, _, __ = env.step(action.detach().cpu().item())
+        next_state, reward, done, _, __ = custom_env.step(action.detach().cpu().item())
 
         rollout_buffer.remember(
             state,
@@ -82,7 +82,7 @@ def train_single_episode(
             hidden if is_recurrent else None,
         )
 
-        state = next_state
+        state = torch.from_numpy(next_state).double().unsqueeze(0).to(device)
 
         if is_recurrent:
             hidden = next_hidden
@@ -113,8 +113,8 @@ def update_policy(
     device: torch.device,
     is_recurrent: bool,
 ):
-    total_policy_loss = 0
-    total_value_loss = 0
+    total_policy_loss: float = 0
+    total_value_loss: float = 0
 
     (
         hidden_states,

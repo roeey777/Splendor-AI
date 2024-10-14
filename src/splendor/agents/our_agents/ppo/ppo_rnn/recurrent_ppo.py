@@ -1,9 +1,8 @@
 from abc import abstractmethod
-from typing import Any, Union, Tuple, Callable
+from typing import Any, Tuple, Union
 
 import torch
 import torch.nn as nn
-
 from jaxtyping import Float
 
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
@@ -58,6 +57,3 @@ class RecurrentPPO(PPOBase):
         return the initial hidden state to be used.
         """
         raise NotImplementedError()
-
-
-PPOBaseFactory = Callable[[int, int, ...], PPOBase]

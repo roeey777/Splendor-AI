@@ -1,16 +1,11 @@
 from typing import Tuple
 
 import torch
+import torch.distributions as distributions
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.distributions as distributions
 
-
-from .constants import (
-    ENTROPY_COEFFICIENT,
-    VALUE_COEFFICIENT,
-    VERY_SMALL_EPSILON,
-)
+from .constants import ENTROPY_COEFFICIENT, VALUE_COEFFICIENT, VERY_SMALL_EPSILON
 
 
 def calculate_returns(rewards, discount_factor, normalize=True):
