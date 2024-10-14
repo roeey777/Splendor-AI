@@ -1,6 +1,6 @@
 from functools import cache
 from pathlib import Path
-from typing import Optional
+from typing import Optional, cast
 
 import gymnasium as gym
 import torch
@@ -57,4 +57,4 @@ def load_saved_ppo(path: Optional[Path] = None) -> PPO:
     if path is None:
         path = DEFAULT_SAVED_PPO_PATH
 
-    return load_saved_model(path, PPO, dropout=DROPOUT)
+    return cast(PPO, load_saved_model(path, PPO, dropout=DROPOUT))

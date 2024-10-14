@@ -27,7 +27,7 @@ class PPO(PPOBase):
 
         self.input_norm = InputNormalization(input_dim)
 
-        layers = []
+        layers: List[nn.Module] = []
         prev_dim = input_dim
         for next_dim in hidden_layers_dims:
             layers.append(nn.Linear(prev_dim, next_dim))
@@ -59,6 +59,8 @@ class PPO(PPOBase):
             Float[torch.Tensor, "features"],
         ],
     ) -> Float[torch.Tensor, "batch features"]:
+        ordered_x: Float[torch.Tensor, "batch features"]
+
         match len(x.shape):
             case 1:
                 # assumes that the batch dimention is missing.
@@ -69,7 +71,6 @@ class PPO(PPOBase):
                 raise ValueError(
                     f"Got tensor of unexpected shape! shape: {x.shape}. there are just to many dimentions."
                 )
-        ordered_x: Float[torch.Tensor, "batch features"]
         return ordered_x
 
     @override

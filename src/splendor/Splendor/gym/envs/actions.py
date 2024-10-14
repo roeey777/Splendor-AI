@@ -1,10 +1,8 @@
-from __future__ import annotations
-
 from collections import Counter
 from dataclasses import dataclass
 from enum import Enum, auto
 from itertools import combinations, combinations_with_replacement
-from typing import Dict, Optional
+from typing import Dict, Optional, Self, cast
 
 import gymnasium as gym
 import numpy as np
@@ -19,14 +17,15 @@ from splendor.Splendor.constants import (
     RESERVED,
 )
 from splendor.Splendor.splendor_model import SplendorState
+from splendor.Splendor.types import ActionType, BuyAction, GemsCount
 
 ALL_GEMS_COLORS = splendor_utils.COLOURS.values()
 NOBLES_INDICES = list(range(MAX_NOBLES))
 
-GemsDict = Dict[str, int]
+# GemsDict = Dict[str, int]
 
 
-class ActionType(Enum):
+class ActionEnum(Enum):
     PASS = auto()
     COLLECT_SAME = auto()
     COLLECT_DIFF = auto()
@@ -44,22 +43,22 @@ class CardPosition:
 
 @dataclass
 class Action:
-    type: ActionType
-    collected_gems: Optional[GemsDict] = None
-    returned_gems: Optional[GemsDict] = None
+    type: ActionEnum
+    collected_gems: Optional[GemsCount] = None
+    returned_gems: Optional[GemsCount] = None
     position: Optional[CardPosition] = None
     noble_index: Optional[int] = None
 
     @classmethod
     def to_action_element(
-        cls, action: Dict, state: SplendorState, agent_index: int
-    ) -> Action:
+        cls, action: ActionType, state: SplendorState, agent_index: int
+    ) -> Self:
         """
         Convert an action in SplendorGameRule format to Action.
         """
-        action_type = ActionType[action["type"].upper()]
-        collected_gems = action.get("collected_gems")
-        returned_gems = action.get("returned_gems")
+        action_type = ActionEnum[action["type"].upper()]
+        collected_gems = cast(Optional[GemsCount], action.get("collected_gems"))
+        returned_gems = cast(Optional[GemsCount], action.get("returned_gems"))
         noble_index = None
         position = None
 
@@ -67,8 +66,9 @@ class Action:
             noble_index = state.board.nobles.index(action["noble"])
 
         if action.get("card") is not None:
-            card = action["card"]
-            if action_type == ActionType.BUY_RESERVE:
+            buy_action = cast(BuyAction, action)
+            card = buy_action["card"]
+            if action_type == ActionEnum.BUY_RESERVE:
                 position = CardPosition(
                     -1, -1, state.agents[agent_index].cards[RESERVED].index(card)
                 )
@@ -79,8 +79,8 @@ class Action:
                 position = CardPosition(tier, card_index, -1)
 
         if (
-            action_type == ActionType.BUY_AVAILABLE
-            or action_type == ActionType.BUY_RESERVE
+            action_type == ActionEnum.BUY_AVAILABLE
+            or action_type == ActionEnum.BUY_RESERVE
         ):
             # ignore cost of buying a card by set returned_gems to None.
             # this minimizes by order of magnitude the length of ALL_ACTIONS.
@@ -101,7 +101,7 @@ def generate_all_reserve_card_actions():
         for noble_index in [None] + NOBLES_INDICES:
             # reserve a card, without collecting the yellow gem.
             yield Action(
-                type=ActionType.RESERVE,
+                type=ActionEnum.RESERVE,
                 collected_gems={},
                 returned_gems={},
                 position=position,
@@ -109,7 +109,7 @@ def generate_all_reserve_card_actions():
             )
             # reserve a card, collect a yellow gem
             yield Action(
-                type=ActionType.RESERVE,
+                type=ActionEnum.RESERVE,
                 collected_gems={"yellow": 1},
                 returned_gems={},
                 position=position,
@@ -118,7 +118,7 @@ def generate_all_reserve_card_actions():
             for c in NORMAL_COLORS:
                 # reserve a card, collect a yellow gem, and return a gem.
                 yield Action(
-                    type=ActionType.RESERVE,
+                    type=ActionEnum.RESERVE,
                     collected_gems={"yellow": 1},
                     returned_gems={c: 1},
                     position=position,
@@ -131,7 +131,7 @@ def generate_all_collect_same_actions():
         for noble_index in [None] + NOBLES_INDICES:
             # no gems are returned.
             yield Action(
-                type=ActionType.COLLECT_SAME,
+                type=ActionEnum.COLLECT_SAME,
                 noble_index=noble_index,
                 collected_gems={c: 2},
                 returned_gems={},
@@ -139,7 +139,7 @@ def generate_all_collect_same_actions():
             # return 2 gems of different colors.
             for c1, c2 in combinations(filter(lambda x: x != c, ALL_GEMS_COLORS), 2):
                 yield Action(
-                    type=ActionType.COLLECT_SAME,
+                    type=ActionEnum.COLLECT_SAME,
                     noble_index=noble_index,
                     collected_gems={c: 2},
                     returned_gems={c1: 1, c2: 1},
@@ -148,7 +148,7 @@ def generate_all_collect_same_actions():
             for num_gems_to_return in [1, 2]:
                 for c_other in filter(lambda x: x != c, ALL_GEMS_COLORS):
                     yield Action(
-                        type=ActionType.COLLECT_SAME,
+                        type=ActionEnum.COLLECT_SAME,
                         noble_index=noble_index,
                         collected_gems={c: 2},
                         returned_gems={c_other: num_gems_to_return},
@@ -161,7 +161,7 @@ def generate_all_collect_different_actions():
             for noble_index in [None] + NOBLES_INDICES:
                 # no gems are returned.
                 yield Action(
-                    type=ActionType.COLLECT_DIFF,
+                    type=ActionEnum.COLLECT_DIFF,
                     noble_index=noble_index,
                     collected_gems={color: 1 for color in combination},
                     returned_gems={},
@@ -172,7 +172,7 @@ def generate_all_collect_different_actions():
                         num_gems_to_return,
                     ):
                         yield Action(
-                            type=ActionType.COLLECT_DIFF,
+                            type=ActionEnum.COLLECT_DIFF,
                             noble_index=noble_index,
                             collected_gems={color: 1 for color in combination},
                             returned_gems=dict(Counter(to_return)),
@@ -183,7 +183,7 @@ def generate_all_buy_reserve_card_actions():
     for reserved_index in range(MAX_RESERVED):
         for noble_index in [None] + NOBLES_INDICES:
             yield Action(
-                type=ActionType.BUY_RESERVE,
+                type=ActionEnum.BUY_RESERVE,
                 noble_index=noble_index,
                 position=CardPosition(-1, -1, reserved_index),
             )
@@ -193,7 +193,7 @@ def generate_all_buy_available_card_actions():
     for position in card_gen():
         for noble_index in [None] + NOBLES_INDICES:
             yield Action(
-                type=ActionType.BUY_AVAILABLE,
+                type=ActionEnum.BUY_AVAILABLE,
                 noble_index=noble_index,
                 position=position,
             )
@@ -201,9 +201,9 @@ def generate_all_buy_available_card_actions():
 
 ALL_ACTIONS = [
     # # Do nothing.
-    Action(type=ActionType.PASS),
+    Action(type=ActionEnum.PASS),
     # Only acquire a noble.
-    *[Action(type=ActionType.PASS, noble_index=noble) for noble in NOBLES_INDICES],
+    *[Action(type=ActionEnum.PASS, noble_index=noble) for noble in NOBLES_INDICES],
     # Reserve a card
     *list(generate_all_reserve_card_actions()),
     # Collect 2 stones of the same color.

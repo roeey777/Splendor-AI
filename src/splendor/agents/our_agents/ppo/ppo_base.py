@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable, Tuple, Union
+from typing import Any, Protocol, Tuple, Union
 
 import torch
 import torch.nn as nn
@@ -53,4 +53,6 @@ class PPOBase(nn.Module, ABC):
         raise NotImplementedError()
 
 
-PPOBaseFactory = Callable[[int, int, ...], PPOBase]
+class PPOBaseFactory(Protocol):
+    def __call__(self, input_dim: int, output_dim: int, *args, **kwargs) -> PPOBase:
+        pass

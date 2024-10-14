@@ -5,8 +5,9 @@ from numpy.typing import NDArray
 
 from splendor.Splendor.constants import MAX_TIER_CARDS, NUMBER_OF_TIERS, RESERVED
 from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.Splendor.types import ActionType
 
-from .actions import ALL_ACTIONS, Action, ActionType, CardPosition
+from .actions import ALL_ACTIONS, Action, ActionEnum, CardPosition
 
 
 def _valid_position(state: SplendorState, position: CardPosition) -> bool:
@@ -78,26 +79,26 @@ def build_action(
     )
 
     match action.type:
-        case ActionType.PASS:
+        case ActionEnum.PASS:
             action_to_execute = {
                 "type": "pass",
                 "noble": noble,
             }
-        case ActionType.COLLECT_SAME:
+        case ActionEnum.COLLECT_SAME:
             action_to_execute = {
                 "type": "collect_same",
                 "noble": noble,
                 "collected_gems": action.collected_gems,
                 "returned_gems": action.returned_gems,
             }
-        case ActionType.COLLECT_DIFF:
+        case ActionEnum.COLLECT_DIFF:
             action_to_execute = {
                 "type": "collect_diff",
                 "noble": noble,
                 "collected_gems": action.collected_gems,
                 "returned_gems": action.returned_gems,
             }
-        case ActionType.RESERVE:
+        case ActionEnum.RESERVE:
             action_to_execute = {
                 "type": "reserve",
                 "noble": noble,
@@ -105,7 +106,7 @@ def build_action(
                 "collected_gems": action.collected_gems,
                 "returned_gems": action.returned_gems,
             }
-        case ActionType.BUY_AVAILABLE:
+        case ActionEnum.BUY_AVAILABLE:
             if card is None:
                 # this might happen when buying a card but with a
                 # wrong index (there is no card at that position).
@@ -121,7 +122,7 @@ def build_action(
                 "card": card,
                 "returned_gems": returned_gems,
             }
-        case ActionType.BUY_RESERVE:
+        case ActionEnum.BUY_RESERVE:
             if reserved_card is None:
                 # this might happen when buying a reserved card but with a
                 # wrong index.
@@ -146,7 +147,7 @@ def build_action(
 
 
 def create_legal_actions_mask(
-    legal_actions,
+    legal_actions: List[ActionType],
     state: SplendorState,
     agent_index: int,
 ) -> NDArray:
@@ -165,8 +166,8 @@ def create_legal_actions_mask(
 
 
 def create_action_mapping(
-    legal_actions: List[Dict], state: SplendorState, agent_index: int
-) -> Dict:
+    legal_actions: List[ActionType], state: SplendorState, agent_index: int
+) -> Dict[int, ActionType]:
     """
     Create the mapping between action indices to legal actions.
     This would be in use by both SplendorEnv & by the PPO agent.
