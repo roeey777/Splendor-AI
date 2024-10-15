@@ -7,4 +7,4 @@ def get_version() -> str:
     """
     extract the package version using importlib.
     """
-    return version("splendor")
+    return version(__package__)

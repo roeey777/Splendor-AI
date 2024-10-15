@@ -1,6 +1,7 @@
 import random
 from csv import writer as csv_writer
 from datetime import datetime
+from importlib import import_module
 from itertools import chain
 from pathlib import Path
 from typing import List, Optional, cast
@@ -23,9 +24,10 @@ from .arguments_parsing import (
     DEFAULT_OPPONENT,
     DEFAULT_TEST_OPPONENT,
     NN_ARCHITECTURES,
-    OPPONENTS_AGENTS,
+    OPPONENTS_AGENTS_FACTORY,
     WORKING_DIR,
     NeuralNetArch,
+    OpponentsFactory,
     parse_args,
 )
 from .constants import (
@@ -38,7 +40,8 @@ from .constants import (
     SEED,
     WEIGHT_DECAY,
 )
-from .training import train_single_episode
+from .ppo_agent_base import PPOAgentBase
+from .training import LearningParams, evaluate, train_single_episode
 from .utils import load_saved_model
 
 FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
@@ -60,6 +63,12 @@ STATS_HEADERS = (
 
 
 def save_model(model: nn.Module, path: Path):
+    """
+    Save given model weights into a file at given path.
+
+    :param model: the model whose weights should be stored.
+    :param path: Where to store the weights.
+    """
     torch.save(
         {
             "model_state_dict": model.cpu().state_dict(),
@@ -78,45 +87,14 @@ def save_model(model: nn.Module, path: Path):
     )
 
 
-def evaluate(
-    env: gym.Env, policy: nn.Module, is_recurrent: bool, seed: int, device: torch.device
-) -> float:
-    policy.eval().to(device)
+def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> List[float]:
+    """
+    Extract game statistics from the final (terminal) game state.
 
-    custom_env = cast(SplendorEnv, env.unwrapped)
-
-    done = False
-    episode_reward: float = 0
-
-    state_vector: NDArray
-    state_vector, _ = custom_env.reset(seed=seed)
-    state = torch.from_numpy(state_vector).double().unsqueeze(0).to(device)
-
-    if is_recurrent:
-        hidden = policy.init_hidden_state().to(device)
-
-    with torch.no_grad():
-        while not done:
-            action_mask = (
-                torch.from_numpy(custom_env.get_legal_actions_mask())
-                .double()
-                .to(device)
-            )
-
-            if is_recurrent:
-                action_prob, _, hidden = policy(state, action_mask, hidden)
-            else:
-                action_prob, _ = policy(state, action_mask)
-
-            action = torch.argmax(action_prob, dim=-1)
-            next_state, reward, done, _, __ = custom_env.step(int(action.item()))
-            episode_reward += reward
-            state = torch.from_numpy(next_state).double().unsqueeze(0).to(device)
-
-    return episode_reward
-
-
-def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> List:
+    :param final_game_state: the final, terminal state of the game.
+    :param agent_id: the ID (turn) of the PPO agent in training.
+    :return: list of the statistics values.
+    """
     agent_state = final_game_state.agents[agent_id]
     stats = [
         len(final_game_state.agents),  # players_count
@@ -141,14 +119,57 @@ def train(
     opponent: str = DEFAULT_OPPONENT,
     test_opponent: str = DEFAULT_TEST_OPPONENT,
     architecture: str = DEFAULT_ARCHITECTURE,
-):
+) -> nn.Module:
+    """
+    Train a PPO agent.
+
+    :param working_dir: Where to store the statistics and weights.
+    :param learning_rate: The learning rate of the gradient descent based learning.
+    :param weight_decay: L2 regularization coefficient.
+    :param seed: Which seed to use during training.
+    :param device_name: Name of the device used for mathematical computations.
+    :param transfer_learning: Whether or not the PPO agent should be initialized from
+                              a pre-trained weights.
+    :param saved_weights: Path to the weights of a pre-trained PPO agent that would be
+                          loaded and used as initialization for this training session.
+                          This argument would be ignored if ``transfer_learning`` is ``False``
+                          and required if ``transfer_learning`` is ``True``.
+    :param opponent: Opponent agent name that the PPO would train against.
+    :param test_opponent: Test opponent name that the PPO would be evaluated against.
+    :param architecture: PPO network architecture name that should be used.
+    :return: The trained model (PPO agent).
+    """
     device = torch.device(
         device_name if getattr(torch, device_name).is_available() else "cpu"
     )
 
     nn_arch: NeuralNetArch = NN_ARCHITECTURES[architecture]
-    opponents = OPPONENTS_AGENTS[opponent]
-    test_opponents = OPPONENTS_AGENTS[test_opponent]
+
+    load_net_later = False
+    if opponent in OPPONENTS_AGENTS_FACTORY.keys():
+        opponents_factory: OpponentsFactory = OPPONENTS_AGENTS_FACTORY[opponent]
+        opponents = opponents_factory(0)
+    else:
+        # assume that the PPO is meant to train against itself.
+        m = import_module(nn_arch.agent_relative_import_path, package=__package__)
+        opponents = [m.myAgent(0, load_net=False)]
+        load_net_later = True
+
+    load_test_net_later = False
+    if test_opponent in OPPONENTS_AGENTS_FACTORY.keys():
+        test_opponents_factory: OpponentsFactory = OPPONENTS_AGENTS_FACTORY[
+            test_opponent
+        ]
+        test_opponents = test_opponents_factory(0)
+    else:
+        # assume that the PPO is meant to be evaluated against itself.
+        m = import_module(nn_arch.agent_relative_import_path, package=__package__)
+        test_opponents = [m.myAgent(0, load_net=False)]
+        load_test_net_later = True
+
+    print(
+        f"Training PPO (arch: {nn_arch.name}) against opponent: {opponent} and test opponent: {test_opponent}"
+    )
 
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -164,12 +185,26 @@ def train(
     input_dim = flatdim(train_env.observation_space)
     output_dim = flatdim(train_env.action_space)
 
-    if transfer_learning and saved_weights is not None:
-        policy = load_saved_model(saved_weights, nn_arch.ppo_factory)
-    elif transfer_learning:
-        policy = load_saved_model(nn_arch.default_saved_weights, nn_arch.ppo_factory)
+    if transfer_learning:
+        print("Using pre-trained weights as initialization")
+        if saved_weights is not None:
+            policy = load_saved_model(saved_weights, nn_arch.ppo_factory)
+        else:
+            policy = load_saved_model(
+                nn_arch.default_saved_weights, nn_arch.ppo_factory
+            )
     else:
         policy = nn_arch.ppo_factory(input_dim, output_dim).double().to(device)
+
+    if load_net_later:
+        for o in opponents:
+            ppo_opponent = cast(PPOAgentBase, o)
+            ppo_opponent.load_policy(policy)
+
+    if load_test_net_later:
+        for o in test_opponents:
+            ppo_test_opponent = cast(PPOAgentBase, o)
+            ppo_test_opponent.load_policy(policy)
 
     optimizer = optim.Adam(
         policy.parameters(),
@@ -185,21 +220,25 @@ def train(
         stats_csv = csv_writer(stats_file)
         stats_csv.writerow(STATS_HEADERS)
 
+        learning_params = LearningParams(
+            optimizer,
+            DISCOUNT_FACTOR,
+            PPO_STEPS,
+            PPO_CLIP,
+            loss_function,
+            seed,
+            device,
+            nn_arch.is_recurrent,
+            nn_arch.hidden_state_dim,
+        )
+
         # Main training loop
         for episode in range(MAX_EPISODES):
             print(f"Episode {episode + 1}")
             policy_loss, value_loss, train_reward = train_single_episode(
                 train_env,
                 policy,
-                optimizer,
-                DISCOUNT_FACTOR,
-                PPO_STEPS,
-                PPO_CLIP,
-                loss_function,
-                seed,
-                device,
-                nn_arch.is_recurrent,
-                nn_arch.hidden_state_dim,
+                learning_params,
             )
             test_reward = evaluate(test_env, policy, nn_arch.is_recurrent, seed, device)
 
@@ -224,8 +263,13 @@ def train(
                     models_folder / f"ppo_model_{episode + 1 // N_TRIALS}.pth",
                 )
 
+    return policy
+
 
 def main():
+    """
+    Entry-point for the ``ppo`` console script.
+    """
     options = parse_args()
     train(**options.__dict__)
 
