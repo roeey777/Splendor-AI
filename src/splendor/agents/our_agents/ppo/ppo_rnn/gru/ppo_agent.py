@@ -4,6 +4,7 @@ from typing import List, override
 import gymnasium as gym
 import numpy as np
 import torch
+import torch.nn as nn
 from numpy.typing import NDArray
 
 from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
@@ -23,9 +24,14 @@ DEFAULT_SAVED_PPO_GRU_PATH = Path(__file__).parent / "ppo_gru_model.pth"
 
 
 class PpoGruAgent(PPOAgentBase):
-    def __init__(self, _id):
-        super().__init__(_id)
-        self.hidden_state = self.net.init_hidden_state().to(self.device)
+    @override
+    def __init__(self, _id: int, load_net: bool = True):
+        super().__init__(_id, load_net)
+
+        if load_net:
+            # this assertion is only for mypy
+            assert self.net is not None
+            self.hidden_state = self.net.init_hidden_state().to(self.device)
 
     @override
     def SelectAction(
@@ -50,6 +56,9 @@ class PpoGruAgent(PPOAgentBase):
                 .to(self.device)
             )
 
+            # this assertion is only for mypy.
+            assert self.net is not None
+
             action_pred, _, next_hidden_state = self.net(
                 state_tesnor, action_mask, self.hidden_state
             )
@@ -65,6 +74,14 @@ class PpoGruAgent(PPOAgentBase):
         load the weights of the network.
         """
         return load_saved_model(DEFAULT_SAVED_PPO_GRU_PATH, PPO_GRU)
+
+    @override
+    def load_policy(self, policy: nn.Module):
+        super().load_policy(policy)
+
+        # this assertion is only for mypy
+        assert self.net is not None
+        self.hidden_state = self.net.init_hidden_state().to(self.device)
 
 
 myAgent = PpoGruAgent
