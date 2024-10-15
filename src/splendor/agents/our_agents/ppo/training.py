@@ -21,17 +21,18 @@ from .rollout import RolloutBuffer
 @dataclass
 class LearningParams:
     """
+    Placeholder for varius learning parameters.
+
     discount_factor: by how much the reward decays over environment
-                     steps (turns in the game).
+    steps (turns in the game).
     optimizer: Which optimizer should be used (Adam, SGD, etc).
     ppo_steps: how many gradient descent steps should be performed.
     ppo_clip: which "epsilon" to use the policy loss clipping.
     loss_fn: Which loss function should be used as the loss of
-             he value-regression (L1, L2, Huber, etc).
+    he value-regression (L1, L2, Huber, etc).
     device: On which device to execute the calculations.
     is_recurrent: Is the given policy incorporates a recurrent unit in it's architecture.
-                  This parameter is here to tell if the hidden states should be
-                  ignored or not.
+    This parameter is here to tell if the hidden states should be ignored or not.
     """
 
     optimizer: Optimizer
