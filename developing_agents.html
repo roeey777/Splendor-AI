@@ -60,6 +60,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
 </ul>
@@ -109,23 +110,42 @@ hyper-parameters: 1. Specify the population size in each generation to
 be 24 (should be a multiple of 12). 2. Train for 20 generations. 3. Fix
 the mutation rate chance to be 0.1(%). 4. Use a fixed random seed. Use
 the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">evolve</span> <span class="o">--</span><span class="n">population</span><span class="o">-</span><span class="n">size</span> <span class="mi">24</span> <span class="o">--</span><span class="n">generations</span> <span class="mi">20</span> <span class="o">--</span><span class="n">mutation</span><span class="o">-</span><span class="n">rate</span> <span class="mf">0.1</span> <span class="o">--</span><span class="n">seed</span> <span class="mi">1234</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>evolve<span class="w"> </span>--population-size<span class="w"> </span><span class="m">24</span><span class="w"> </span>--generations<span class="w"> </span><span class="m">20</span><span class="w"> </span>--mutation-rate<span class="w"> </span><span class="m">0</span>.1<span class="w"> </span>--seed<span class="w"> </span><span class="m">1234</span>
 </pre></div>
 </div>
 </section>
 <section id="training-the-ppo-agent">
 <h2>Training The PPO Agent:<a class="headerlink" href="#training-the-ppo-agent" title="Link to this heading"></a></h2>
 <p>In order to train the PPO agent you should run the following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ppo</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ppo
 </pre></div>
 </div>
 <p>This command will train the PPO agent with the default training
 hyper-parameters.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ppo</span> <span class="o">--</span><span class="n">device</span> <span class="n">cuda</span> <span class="o">--</span><span class="n">working</span><span class="o">-</span><span class="nb">dir</span> <span class="n">runs</span> <span class="o">--</span><span class="n">transfer</span><span class="o">-</span><span class="n">learning</span> <span class="o">--</span><span class="n">opponent</span> <span class="n">minimax</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ppo<span class="w"> </span>--device<span class="w"> </span>cuda<span class="w"> </span>--working-dir<span class="w"> </span>runs<span class="w"> </span>--transfer-learning<span class="w"> </span>--opponent<span class="w"> </span>minimax
 </pre></div>
 </div>
 <p>This command will use GPU during it’s training, it will use the installed weights as initialization of the network
 and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files (weights stored in <code class="docutils literal notranslate"><span class="pre">.pth</span></code> files and <code class="docutils literal notranslate"><span class="pre">stats.csv</span></code>) will be generated within the directory <code class="docutils literal notranslate"><span class="pre">runs/</span></code>.</p>
+<p>There are multiple available architectures for the neural network to be used by the PPO agent, for instance:</p>
+<ol class="arabic simple">
+<li><p>MLP - Multi-Layered Perceptron, also known as Fully-Connected Feed-Forward network.</p></li>
+<li><p>Self-Attention and then MLP.</p></li>
+<li><p>GRU (Gated Recurrent Unit) and then MLP.</p></li>
+</ol>
+<p>By default the MLP architecture will be used, however you can decide to train the PPO with a different architecture via the <code class="docutils literal notranslate"><span class="pre">--architecture</span></code> or via it’s shortcuts <code class="docutils literal notranslate"><span class="pre">-a</span></code> and <code class="docutils literal notranslate"><span class="pre">--arch</span></code>, here is an example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ppo<span class="w"> </span>--device<span class="w"> </span>cpu<span class="w"> </span>--opponent<span class="w"> </span>random<span class="w"> </span>--architecture<span class="w"> </span>gru
+</pre></div>
+</div>
+<p>There are also multiple opponents available to be trained or evaluated agaisnt, such as:</p>
+<ol class="arabic simple">
+<li><p>random</p></li>
+<li><p>minimax</p></li>
+<li><p>itself</p></li>
+<li><p>PPO (with MLP)</p></li>
+<li><p>PPO (with Self-Attention)</p></li>
+<li><p>PPO (with GRU)</p></li>
+</ol>
 </section>
 <section id="splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor">
 <h2><code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> - an OpenAI <code class="docutils literal notranslate"><span class="pre">gym</span></code> compatible simulator for the game Splendor<a class="headerlink" href="#splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor" title="Link to this heading"></a></h2>
@@ -143,7 +163,7 @@ or PPO.</p>
 <p>When creating an instance of <code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> you should tell it which
 agents will be used as opponents to you (the one who uses the env.). For
 the following example we’ll use a single random agent as an opponent.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">splendor.agents.generic.random</span> <span class="kn">import</span> <span class="n">myAgent</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">splendor.agents.generic.random</span> <span class="kn">import</span> <span class="n">myAgent</span>
 
 <span class="n">opponents</span> <span class="o">=</span> <span class="p">[</span><span class="n">myAgent</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
 </pre></div>
@@ -151,7 +171,7 @@ the following example we’ll use a single random agent as an opponent.</p>
 <ol class="arabic simple" start="4">
 <li><p>creating the environment:</p></li>
 </ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;splendor-v1&quot;</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="n">opponents</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;splendor-v1&quot;</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="n">opponents</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -179,7 +199,7 @@ which masks all the illegal action of
 </li>
 </ol>
 <p>You can access those like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">my_turn</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">my_turn</span>
 </pre></div>
 </div>
 </section>

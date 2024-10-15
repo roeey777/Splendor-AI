@@ -184,6 +184,7 @@
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#module-splendor.agents.our_agents.ppo.arguments_parsing">splendor.agents.our_agents.ppo.arguments_parsing module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.agent_relative_import_path"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch.agent_relative_import_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.default_saved_weights"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch.default_saved_weights</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.hidden_state_dim"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch.hidden_state_dim</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.is_recurrent"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch.is_recurrent</span></code></a></li>
@@ -218,7 +219,6 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#module-splendor.agents.our_agents.ppo.ppo">splendor.agents.our_agents.ppo.ppo module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.extract_game_stats"><code class="docutils literal notranslate"><span class="pre">extract_game_stats()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.save_model"><code class="docutils literal notranslate"><span class="pre">save_model()</span></code></a></li>
@@ -238,6 +238,7 @@
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase"><code class="docutils literal notranslate"><span class="pre">PPOAgentBase</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase.SelectAction"><code class="docutils literal notranslate"><span class="pre">PPOAgentBase.SelectAction()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase.load"><code class="docutils literal notranslate"><span class="pre">PPOAgentBase.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase.load_policy"><code class="docutils literal notranslate"><span class="pre">PPOAgentBase.load_policy()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -278,6 +279,19 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#module-splendor.agents.our_agents.ppo.training">splendor.agents.our_agents.ppo.training module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams"><code class="docutils literal notranslate"><span class="pre">LearningParams</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.device"><code class="docutils literal notranslate"><span class="pre">LearningParams.device</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.discount_factor"><code class="docutils literal notranslate"><span class="pre">LearningParams.discount_factor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.hidden_states_dim"><code class="docutils literal notranslate"><span class="pre">LearningParams.hidden_states_dim</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.is_recurrent"><code class="docutils literal notranslate"><span class="pre">LearningParams.is_recurrent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.loss_fn"><code class="docutils literal notranslate"><span class="pre">LearningParams.loss_fn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.optimizer"><code class="docutils literal notranslate"><span class="pre">LearningParams.optimizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.ppo_clip"><code class="docutils literal notranslate"><span class="pre">LearningParams.ppo_clip</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.ppo_steps"><code class="docutils literal notranslate"><span class="pre">LearningParams.ppo_steps</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.seed"><code class="docutils literal notranslate"><span class="pre">LearningParams.seed</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.train_single_episode"><code class="docutils literal notranslate"><span class="pre">train_single_episode()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.update_policy"><code class="docutils literal notranslate"><span class="pre">update_policy()</span></code></a></li>
 </ul>

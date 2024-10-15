@@ -91,6 +91,7 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -126,6 +127,8 @@
       <li><a href="splendor.html#splendor.template.Agent">Agent (class in splendor.template)</a>
 </li>
       <li><a href="splendor.Splendor.html#splendor.Splendor.features.agent_buying_power">agent_buying_power() (in module splendor.Splendor.features)</a>
+</li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.agent_relative_import_path">agent_relative_import_path (splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch attribute)</a>
 </li>
       <li><a href="splendor.Splendor.html#splendor.Splendor.features.agent_won">agent_won() (in module splendor.Splendor.features)</a>
 </li>
@@ -232,10 +235,16 @@
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.default_saved_weights">default_saved_weights (splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch attribute)</a>
 </li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.device">device (splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
+
+      <ul>
+        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.device">(splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="splendor.Splendor.html#splendor.Splendor.features.diminish_return">diminish_return() (in module splendor.Splendor.features)</a>
+</li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.discount_factor">discount_factor (splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
       <li><a href="splendor.html#splendor.template.Displayer">Displayer (class in splendor.template)</a>
 </li>
@@ -262,7 +271,7 @@
       <li><a href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.evaluate">evaluate() (in module splendor.agents.our_agents.genetic_algorithm.evolve)</a>
 
       <ul>
-        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.evaluate">(in module splendor.agents.our_agents.ppo.ppo)</a>
+        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.evaluate">(in module splendor.agents.our_agents.ppo.training)</a>
 </li>
       </ul></li>
       <li><a href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent.evaluate_action">evaluate_action() (splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent.GeneAlgoAgent method)</a>
@@ -412,7 +421,11 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.hidden_states_dim">hidden_states_dim (splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
+
+      <ul>
+        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.hidden_states_dim">(splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
+      </ul></li>
       <li><a href="splendor.html#splendor.general_game_runner.HidePrint">HidePrint (class in splendor.general_game_runner)</a>
 </li>
   </ul></td>
@@ -464,6 +477,8 @@
       <ul>
         <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.is_recurrent">(splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
 </li>
+        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.is_recurrent">(splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
+</li>
       </ul></li>
   </ul></td>
 </tr></table>
@@ -471,6 +486,8 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams">LearningParams (class in splendor.agents.our_agents.ppo.training)</a>
+</li>
       <li><a href="splendor.Splendor.html#splendor.Splendor.utils.LimitRoundsGameRule">LimitRoundsGameRule (class in splendor.Splendor.utils)</a>
 </li>
       <li><a href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.load">load() (splendor.agents.our_agents.genetic_algorithm.genes.Gene class method)</a>
@@ -485,6 +502,12 @@
         <li><a href="splendor.agents.our_agents.ppo.self_attn.html#splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent.load">(splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent method)</a>
 </li>
       </ul></li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase.load_policy">load_policy() (splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase method)</a>
+
+      <ul>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent.load_policy">(splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.utils.load_saved_model">load_saved_model() (in module splendor.agents.our_agents.ppo.utils)</a>
@@ -496,6 +519,8 @@
       <li><a href="splendor.html#splendor.general_game_runner.loadParameter">loadParameter() (in module splendor.general_game_runner)</a>
 </li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.log_prob_actions">log_prob_actions (splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
+</li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.loss_fn">loss_fn (splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
       <li><a href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.LOWER_BOUND">LOWER_BOUND (splendor.agents.our_agents.genetic_algorithm.genes.Gene attribute)</a>
 </li>
@@ -691,6 +716,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.optimizer">optimizer (splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -702,14 +735,18 @@
 </li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.network.PPO">PPO (class in splendor.agents.our_agents.ppo.network)</a>
 </li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.ppo_clip">ppo_clip (splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
+</li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.ppo_factory">ppo_factory (splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch attribute)</a>
 </li>
       <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.network.PPO_GRU">PPO_GRU (class in splendor.agents.our_agents.ppo.ppo_rnn.gru.network)</a>
 </li>
-      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent.PPOAgent">PPOAgent (class in splendor.agents.our_agents.ppo.ppo_agent)</a>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.ppo_steps">ppo_steps (splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent.PPOAgent">PPOAgent (class in splendor.agents.our_agents.ppo.ppo_agent)</a>
+</li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase">PPOAgentBase (class in splendor.agents.our_agents.ppo.ppo_agent_base)</a>
 </li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_base.PPOBase">PPOBase (class in splendor.agents.our_agents.ppo.ppo_base)</a>
@@ -787,6 +824,8 @@
 </li>
       </ul></li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.save_model">save_model() (in module splendor.agents.our_agents.ppo.ppo)</a>
+</li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.seed">seed (splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
       <li><a href="splendor.agents.our_agents.html#splendor.agents.our_agents.minmax.myAgent.select_action_recursion">select_action_recursion() (splendor.agents.our_agents.minmax.myAgent method)</a>
 </li>
