@@ -2,7 +2,7 @@
 define useful type hints.
 """
 
-from typing import Dict, Literal, Optional, Tuple, TypedDict, Union
+from typing import Dict, Literal, Optional, Required, Tuple, TypedDict, Union
 
 from .constants import Color
 from .splendor_model import Card
@@ -25,28 +25,28 @@ NobleType = Tuple[str, GemsCount]
 
 
 class YellowGemCount(TypedDict):
-    yellow: Optional[Literal[1]]
+    yellow: Required[Optional[Literal[1]]]
 
 
 class CollectAction(TypedDict):
-    type: CollectActionType
-    collected_gems: GemsCount
-    returned_gems: GemsCount
-    noble: NobleType
+    type: Required[CollectActionType]
+    collected_gems: Required[GemsCount]
+    returned_gems: Required[GemsCount]
+    noble: Required[NobleType]
 
 
 class ReserveAction(TypedDict):
-    type: ReserveActionType
-    collected_gems: YellowGemCount
-    returned_gems: GemsCount
-    noble: NobleType
+    type: Required[ReserveActionType]
+    collected_gems: Required[YellowGemCount]
+    returned_gems: Required[GemsCount]
+    noble: Required[NobleType]
 
 
 class BuyAction(TypedDict):
-    type: BuyActionType
-    card: Card
-    returned_gems: GemsCount
-    noble: NobleType
+    type: Required[BuyActionType]
+    card: Required[Card]
+    returned_gems: Required[GemsCount]
+    noble: Required[NobleType]
 
 
 ActionType = Union[CollectAction, ReserveAction, BuyAction]
