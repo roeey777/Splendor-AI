@@ -47,9 +47,11 @@ This command will use GPU during it's training, it will use the installed weight
 and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files (weights stored in ``.pth`` files and ``stats.csv``) will be generated within the directory ``runs/``.
 
 There are multiple available architectures for the neural network to be used by the PPO agent, for instance:
+
 #. MLP - Multi-Layered Perceptron, also known as Fully-Connected Feed-Forward network.
 #. Self-Attention and then MLP.
 #. GRU (Gated Recurrent Unit) and then MLP.
+
 By default the MLP architecture will be used, however you can decide to train the PPO with a different architecture via the ``--architecture`` or via it's shortcuts ``-a`` and ``--arch``, here is an example:
 
 .. code-block:: bash
@@ -57,6 +59,7 @@ By default the MLP architecture will be used, however you can decide to train th
    ppo --device cpu --opponent random --architecture gru
 
 There are also multiple opponents available to be trained or evaluated agaisnt, such as:
+
 #. random
 #. minimax
 #. itself
