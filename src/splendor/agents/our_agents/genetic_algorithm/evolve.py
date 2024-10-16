@@ -1,5 +1,8 @@
+"""
+Genetic algorithm based agent evolution program.
+"""
+
 import shutil
-from argparse import ArgumentParser
 from csv import writer as csv_writer
 from datetime import datetime
 from multiprocessing import Pool, cpu_count
@@ -20,35 +23,27 @@ from splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent import
 from splendor.game import Game
 from splendor.Splendor import features
 from splendor.Splendor.utils import LimitRoundsGameRule
-from splendor.version import get_version
 
-POPULATION_SIZE = 24  # 60
-GENERATIONS = 100
-MUTATION_RATE = 0.2
-DEPENDECY_DEGREE = 3
-FOUR_PLAYERS = 4
-PLAYERS_OPTIONS = (2, 3, 4)
-WORKING_DIR = Path().absolute()
-FOLDER_FORMAT = "%y-%m-%d_%H-%M-%S"
-# SELECTION = (POPULATION_SIZE // 3) or 2
-# RETURN_SIZE = (POPULATION_SIZE // 12) or 1
-WINNER_BONUS = 0
-MAX_PROCESS = cpu_count() // 2
-STATS_FILE = "stats.csv"
-STATS_HEADERS = (
-    "generation",
-    "players_count",
-    "rounds_count",
-    "nobles_taken",
-    "scores_mean",
-    "player1_score",
-    "player2_score",
-    "player3_score",
-    "player4_score",
-    "tier1_left",
-    "tier2_left",
-    "tier3_left",
+from .argument_parsing import parse_args
+from .constants import (
+    CHILDREN_PER_MATING,
+    DEPENDECY_DEGREE,
+    FOLDER_FORMAT,
+    FOUR_PLAYERS,
+    GENERATIONS,
+    MUTATION_RATE,
+    PARENTS_PER_MATING,
+    PLAYERS_OPTIONS,
+    POPULATION_SIZE,
+    STATS_FILE,
+    STATS_HEADERS,
+    WINNER_BONUS,
+    WORKING_DIR,
 )
+
+GamesStats = List[List[Union[int, float, str]]]
+
+MAX_PROCESS = cpu_count() // 2
 
 
 def mutate(gene: Gene, progress: float, mutate_rate: float):
@@ -75,10 +70,10 @@ def mutate_population(
     Mutates the genes of the population.
     """
     for agent in population:
-        mutate(agent._manager_gene, progress, mutation_rate)
-        mutate(agent._strategy_gene_1, progress, mutation_rate)
-        mutate(agent._strategy_gene_2, progress, mutation_rate)
-        mutate(agent._strategy_gene_3, progress, mutation_rate)
+        mutate(agent.manager_gene, progress, mutation_rate)
+        mutate(agent.stategy_gene_1, progress, mutation_rate)
+        mutate(agent.stategy_gene_2, progress, mutation_rate)
+        mutate(agent.stategy_gene_3, progress, mutation_rate)
 
 
 def _crossover(dna1: NDArray, dna2: NDArray) -> Tuple[NDArray, NDArray]:
@@ -112,11 +107,12 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
 
     match len(cls.SHAPE):
         case 1:
-            child_dna_1, child_dna_2 = _crossover(mom._dna, dad._dna)
+            child_dna_1, child_dna_2 = _crossover(mom.raw_dna, dad.raw_dna)
             return cls(child_dna_1), cls(child_dna_2)
         case 2:
             children_dna = (
-                _crossover(dna1, dna2) for dna1, dna2 in zip(mom._dna.T, dad._dna.T)
+                _crossover(dna1, dna2)
+                for dna1, dna2 in zip(mom.raw_dna.T, dad.raw_dna.T)
             )
             child_dna_1, child_dna_2 = zip(*children_dna)
             return (
@@ -132,18 +128,15 @@ def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAge
     Creates new individual by randomly choosing 2 parents and mating them till
     we got enough individuals.
     """
-    CHILDREN_PER_MATING = 2
-    PARENTS_PER_MATING = 2
-
     parents_array = np.array(parents)
-    children = list()
+    children = []
     matings = (population_size - len(parents)) // CHILDREN_PER_MATING
     for _ in range(matings):
         mom, dad = np.random.choice(parents_array, PARENTS_PER_MATING, False)
-        managers = crossover(mom._manager_gene, dad._manager_gene)
-        strategies_1 = crossover(mom._strategy_gene_1, dad._strategy_gene_1)
-        strategies_2 = crossover(mom._strategy_gene_2, dad._strategy_gene_2)
-        strategies_3 = crossover(mom._strategy_gene_3, dad._strategy_gene_3)
+        managers = crossover(mom.manager_gene, dad.manager_gene)
+        strategies_1 = crossover(mom.stategy_gene_1, dad.stategy_gene_1)
+        strategies_2 = crossover(mom.stategy_gene_2, dad.stategy_gene_2)
+        strategies_3 = crossover(mom.stategy_gene_3, dad.stategy_gene_3)
         for i in range(CHILDREN_PER_MATING):
             children.append(
                 GeneAlgoAgent(
@@ -159,7 +152,7 @@ def single_game(agents) -> tuple[Game, dict]:
     Runs a single game of Splendor (with the Engine) using the given agents.
     """
     np.random.shuffle(agents)
-    names = list()
+    names = []
     for i, agent in enumerate(agents):
         agent.id = i
         names.append(str(i))
@@ -178,7 +171,6 @@ def _evaluate_multiprocess(
     population: list[GeneAlgoAgent],
     players_count: int,
 ) -> list[tuple[Game, dict]]:
-    """ """
     games = len(population) // players_count
     if players_count == FOUR_PLAYERS:
         agents_generator = (
@@ -197,8 +189,7 @@ def _evaluate(
     players_count: int,
     quiet: bool,
 ) -> list[tuple[Game, dict]]:
-    """ """
-    results = list()
+    results = []
     games = len(population) // players_count
 
     for i in range(games):
@@ -221,12 +212,12 @@ def evaluate(
     population: list[GeneAlgoAgent],
     quiet: bool,
     multiprocess: bool,
-) -> Tuple[List[float], List[List[float]]]:
+) -> Tuple[List[float], GamesStats]:
     """
     Measures the fitness of each individual by having them play against each
     other. Each individual plays in 3 games with 1,2 and 3 rivals.
     """
-    games_stats: List[List[float]] = list()
+    games_stats: GamesStats = []
     evaluation: List[float] = [0] * len(population)
 
     for players_count in PLAYERS_OPTIONS:
@@ -266,12 +257,22 @@ def evaluate(
 
 
 def sort_by_fitness(
-    population: list[GeneAlgoAgent],
+    population: List[GeneAlgoAgent],
     folder: Path,
     message: str,
     quiet: bool,
     multiprocess: bool,
-) -> list[list]:
+) -> GamesStats:
+    """
+    Sort the individuals of the population based on thier fitness score.
+
+    :param population: list of all the individuals comprizing the entire population.
+    :param folder: where to store the fittest individual of the population.
+    :param message: a message to print.
+    :param quiet: should print the given message or stay silent.
+    :param multiprocess: should the games simulations uses multi-processing or a single-process.
+    :return: the games statistics.
+    """
     if not quiet:
         print(message)
 
@@ -338,7 +339,7 @@ def evolve(
 
     population = generate_initial_population(population_size)
 
-    with open(folder / STATS_FILE, "w", newline="\n") as stats_file:
+    with open(folder / STATS_FILE, "w", newline="\n", encoding="ascii") as stats_file:
         stats_csv = csv_writer(stats_file)
         stats_csv.writerow(STATS_HEADERS)
 
@@ -377,65 +378,11 @@ def evolve(
 
 
 def main():
-    parser = ArgumentParser(
-        prog="evolve",
-        description="Evolves a Splendor agent using genetic algorithm.",
-    )
-    parser.add_argument(
-        "-p",
-        "--population-size",
-        default=POPULATION_SIZE,
-        type=int,
-        help="Size of the population (should be multiple of 12)",
-    )
-    parser.add_argument(
-        "-g",
-        "--generations",
-        default=GENERATIONS,
-        type=int,
-        help="Amount of generations",
-    )
-    parser.add_argument(
-        "-m",
-        "--mutation-rate",
-        default=MUTATION_RATE,
-        type=float,
-        help="Probability to mutate (should be in the range [0,1])",
-    )
-    parser.add_argument(
-        "-w",
-        "--working-dir",
-        default=WORKING_DIR,
-        type=Path,
-        help="Path to directory to work in (will create a directory with "
-        "current timestamp for each run)",
-    )
-    parser.add_argument(
-        "-s",
-        "--seed",
-        type=int,
-        help="Seed to set for numpy's random number generator",
-    )
-    parser.add_argument(
-        "--multiprocess",
-        action="store_true",
-        help="Use multiprocessing to evolve faster",
-    )
-    parser.add_argument("-q", "--quiet", action="store_true")
-    parser.add_argument("--version", action="version", version=get_version())
-
-    options = parser.parse_args()
-    if options.population_size <= 0 or (options.population_size % 12):
-        raise ValueError(
-            "To work properly, population size should be a "
-            f"multiple of 12 (not {options.population_size})"
-        )
-    if options.generations <= 0:
-        raise ValueError(f"Invalid amount of generations {options.generations}")
-    if not 0 <= options.mutation_rate <= 1:
-        raise ValueError(f"Invalid mutation rate value {options.mutation_rate}")
-
-    evolve(**options.__dict__)
+    """
+    entry-point for the ``evolve`` console script.
+    """
+    options = parse_args()
+    evolve(**options)
 
 
 if __name__ == "__main__":
