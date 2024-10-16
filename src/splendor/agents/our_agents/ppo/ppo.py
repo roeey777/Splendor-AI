@@ -275,7 +275,7 @@ def main():
     Entry-point for the ``ppo`` console script.
     """
     options = parse_args()
-    train(**options.__dict__)
+    train(**options)
 
 
 if __name__ == "__main__":

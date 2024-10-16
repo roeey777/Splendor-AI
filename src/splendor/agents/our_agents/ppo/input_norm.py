@@ -31,6 +31,9 @@ class InputNormalization(nn.Module):
         self.register_buffer("running_mean", torch.zeros(1, num_features))
         self.register_buffer("running_var", torch.ones(1, num_features))
 
+        self.running_mean: torch.Tensor
+        self.running_var: torch.Tensor
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # pylint: disable=attribute-defined-outside-init
         """
