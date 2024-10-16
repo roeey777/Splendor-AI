@@ -1,3 +1,7 @@
+"""
+Genetic Algorithm based agent.
+"""
+
 from pathlib import Path
 
 import numpy as np
@@ -103,4 +107,4 @@ class GeneAlgoAgent(Agent):
 
 
 # Required for the game engine to use this agent
-myAgent = GeneAlgoAgent
+myAgent = GeneAlgoAgent  # pylint: disable=invalid-name

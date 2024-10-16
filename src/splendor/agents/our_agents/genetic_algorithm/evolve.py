@@ -317,6 +317,7 @@ def evolve(
     quiet: bool = False,
     multiprocess: bool = False,
 ):
+    # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
     """
     Genetic algorithm evolution process.
     In each generation `selection_size` are kept and used for mating.

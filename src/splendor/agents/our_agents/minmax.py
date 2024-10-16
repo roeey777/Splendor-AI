@@ -28,7 +28,7 @@ class MiniMaxAgent(Agent):
         assert len(game_state.agents) == 2
         return self._select_action_recursion(game_state, game_rule, DEPTH)[0]
 
-    def _select_action_recursion(
+    def _select_action_recursion(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         game_state,
         game_rule,
@@ -74,7 +74,7 @@ class MiniMaxAgent(Agent):
 
         return best_action, best_value
 
-    def _evaluation_function(self, state):
+    def _evaluation_function(self, state):  # pylint: disable=too-many-locals
         agent_state = state.agents[self.id]
         score_factor = 2
         cards_factor = 0.7
