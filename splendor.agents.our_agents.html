@@ -7,6 +7,7 @@
   <title>splendor.agents.our_agents package &mdash; Splendor-AI 0.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
   
   <!--[if lt IE 9]>
@@ -18,6 +19,8 @@
         <script src="_static/documentation_options.js?v=e3a6060d"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -54,8 +57,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">splendor</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="splendor.html">splendor package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="splendor.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html">splendor.splendor package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.html#submodules">Submodules</a></li>
@@ -107,6 +110,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html">splendor.agents.our_agents.genetic_algorithm package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#module-splendor.agents.our_agents.genetic_algorithm.argument_parsing">splendor.agents.our_agents.genetic_algorithm.argument_parsing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.argument_parsing.parse_args"><code class="docutils literal notranslate"><span class="pre">parse_args()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#module-splendor.agents.our_agents.genetic_algorithm.constants">splendor.agents.our_agents.genetic_algorithm.constants module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#module-splendor.agents.our_agents.genetic_algorithm.evolve">splendor.agents.our_agents.genetic_algorithm.evolve module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.crossover"><code class="docutils literal notranslate"><span class="pre">crossover()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.evolve.evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate()</span></code></a></li>
@@ -129,6 +137,7 @@
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.load"><code class="docutils literal notranslate"><span class="pre">Gene.load()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.mutate"><code class="docutils literal notranslate"><span class="pre">Gene.mutate()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.random"><code class="docutils literal notranslate"><span class="pre">Gene.random()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.raw_dna"><code class="docutils literal notranslate"><span class="pre">Gene.raw_dna</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.save"><code class="docutils literal notranslate"><span class="pre">Gene.save()</span></code></a></li>
 </ul>
 </li>
@@ -183,6 +192,18 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#module-splendor.agents.our_agents.ppo.arguments_parsing">splendor.agents.our_agents.ppo.arguments_parsing module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments"><code class="docutils literal notranslate"><span class="pre">Arguments</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.architecture"><code class="docutils literal notranslate"><span class="pre">Arguments.architecture</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.device_name"><code class="docutils literal notranslate"><span class="pre">Arguments.device_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.learning_rate"><code class="docutils literal notranslate"><span class="pre">Arguments.learning_rate</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.opponent"><code class="docutils literal notranslate"><span class="pre">Arguments.opponent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.saved_weights"><code class="docutils literal notranslate"><span class="pre">Arguments.saved_weights</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.seed"><code class="docutils literal notranslate"><span class="pre">Arguments.seed</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.test_opponent"><code class="docutils literal notranslate"><span class="pre">Arguments.test_opponent</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.weight_decay"><code class="docutils literal notranslate"><span class="pre">Arguments.weight_decay</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.Arguments.working_dir"><code class="docutils literal notranslate"><span class="pre">Arguments.working_dir</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.agent_relative_import_path"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch.agent_relative_import_path</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.arguments_parsing.NeuralNetArch.default_saved_weights"><code class="docutils literal notranslate"><span class="pre">NeuralNetArch.default_saved_weights</span></code></a></li>
@@ -312,25 +333,25 @@
 </section>
 <section id="module-splendor.agents.our_agents.minmax">
 <span id="splendor-agents-our-agents-minmax-module"></span><h2>splendor.agents.our_agents.minmax module<a class="headerlink" href="#module-splendor.agents.our_agents.minmax" title="Link to this heading"></a></h2>
+<p>Implementation of an agent that selects the first legal action.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="splendor.agents.our_agents.minmax.myAgent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.minmax.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/minmax.html#myAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.minmax.myAgent" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.our_agents.minmax.MiniMaxAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.minmax.</span></span><span class="sig-name descname"><span class="pre">MiniMaxAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/minmax.html#MiniMaxAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.minmax.MiniMaxAgent" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="splendor.html#splendor.template.Agent" title="splendor.template.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a></p>
+<p>A Minimax agent, utilizing the zero-sum property of the game,
+there is only a single winner in each game, for determining which
+action to play.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="splendor.agents.our_agents.minmax.myAgent.SelectAction">
-<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/minmax.html#myAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.minmax.myAgent.SelectAction" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.our_agents.minmax.MiniMaxAgent.SelectAction">
+<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/minmax.html#MiniMaxAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.minmax.MiniMaxAgent.SelectAction" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="splendor.agents.our_agents.minmax.myAgent.evaluation_function">
-<span class="sig-name descname"><span class="pre">evaluation_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/minmax.html#myAgent.evaluation_function"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.minmax.myAgent.evaluation_function" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+</dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="splendor.agents.our_agents.minmax.myAgent.select_action_recursion">
-<span class="sig-name descname"><span class="pre">select_action_recursion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_maximizing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-inf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">inf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/minmax.html#myAgent.select_action_recursion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.minmax.myAgent.select_action_recursion" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.our_agents.minmax.myAgent">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.minmax.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><a class="headerlink" href="#splendor.agents.our_agents.minmax.myAgent" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#splendor.agents.our_agents.minmax.MiniMaxAgent" title="splendor.agents.our_agents.minmax.MiniMaxAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">MiniMaxAgent</span></code></a></p>
 </dd></dl>
 
 </section>

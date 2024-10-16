@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.splendor.gym.envs.actions &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.splendor.gym.envs.actions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.splendor.gym.envs.actions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Combinatorially define all possible actions in the game.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">auto</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span><span class="p">,</span> <span class="n">combinations_with_replacement</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Self</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span> <span class="nn">splendor.splendor</span> <span class="kn">import</span> <span class="n">splendor_utils</span>
+<span class="kn">from</span> <span class="nn">splendor.splendor.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MAX_NOBLES</span><span class="p">,</span>
+    <span class="n">MAX_RESERVED</span><span class="p">,</span>
+    <span class="n">MAX_TIER_CARDS</span><span class="p">,</span>
+    <span class="n">NORMAL_COLORS</span><span class="p">,</span>
+    <span class="n">NUMBER_OF_TIERS</span><span class="p">,</span>
+    <span class="n">RESERVED</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">splendor.splendor.splendor_model</span> <span class="kn">import</span> <span class="n">SplendorState</span>
+<span class="kn">from</span> <span class="nn">splendor.splendor.types</span> <span class="kn">import</span> <span class="n">ActionType</span><span class="p">,</span> <span class="n">BuyAction</span><span class="p">,</span> <span class="n">GemsCount</span>
+
+<span class="n">ALL_GEMS_COLORS</span> <span class="o">=</span> <span class="n">splendor_utils</span><span class="o">.</span><span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+<span class="n">NOBLES_INDICES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">MAX_NOBLES</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="ActionEnum">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.actions.ActionEnum">[docs]</a>
+<span class="k">class</span> <span class="nc">ActionEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enum for all action types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">PASS</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">COLLECT_SAME</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">COLLECT_DIFF</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">RESERVE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">BUY_AVAILABLE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span>
+    <span class="n">BUY_RESERVE</span> <span class="o">=</span> <span class="n">auto</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="CardPosition">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.actions.CardPosition">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">CardPosition</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    dataclass for representing where a card is located on the board.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">tier</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">card_index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">reserved_index</span><span class="p">:</span> <span class="nb">int</span></div>
+
+
+
+<div class="viewcode-block" id="Action">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.actions.Action">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Action</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represent an action as a dataclass with a more comfortable API.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">type</span><span class="p">:</span> <span class="n">ActionEnum</span>
+    <span class="n">collected_gems</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GemsCount</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">returned_gems</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GemsCount</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">position</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CardPosition</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">noble_index</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Action.to_action_element">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.actions.Action.to_action_element">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">to_action_element</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">ActionType</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert an action in SplendorGameRule format to Action.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">action_type</span> <span class="o">=</span> <span class="n">ActionEnum</span><span class="p">[</span><span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()]</span>
+        <span class="n">collected_gems</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">GemsCount</span><span class="p">],</span> <span class="n">action</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">))</span>
+        <span class="n">returned_gems</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Optional</span><span class="p">[</span><span class="n">GemsCount</span><span class="p">],</span> <span class="n">action</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">))</span>
+        <span class="n">noble_index</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;noble&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">noble_index</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;card&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">buy_action</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">BuyAction</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+            <span class="n">card</span> <span class="o">=</span> <span class="n">buy_action</span><span class="p">[</span><span class="s2">&quot;card&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">action_type</span> <span class="o">==</span> <span class="n">ActionEnum</span><span class="o">.</span><span class="n">BUY_RESERVE</span><span class="p">:</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">CardPosition</span><span class="p">(</span>
+                    <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_index</span><span class="p">]</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">RESERVED</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># available card (for buying or reserving).</span>
+                <span class="n">tier</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">deck_id</span>
+                <span class="n">card_index</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">tier</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+                <span class="n">position</span> <span class="o">=</span> <span class="n">CardPosition</span><span class="p">(</span><span class="n">tier</span><span class="p">,</span> <span class="n">card_index</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">action_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">BUY_AVAILABLE</span><span class="p">,</span> <span class="n">ActionEnum</span><span class="o">.</span><span class="n">BUY_RESERVE</span><span class="p">):</span>
+            <span class="c1"># ignore cost of buying a card by set returned_gems to None.</span>
+            <span class="c1"># this minimizes by order of magnitude the length of ALL_ACTIONS.</span>
+            <span class="n">collected_gems</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">returned_gems</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">action_type</span><span class="p">,</span> <span class="n">collected_gems</span><span class="p">,</span> <span class="n">returned_gems</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">noble_index</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">def</span> <span class="nf">_card_gen</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">deck_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUMBER_OF_TIERS</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">card_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_TIER_CARDS</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">CardPosition</span><span class="p">(</span><span class="n">deck_num</span><span class="p">,</span> <span class="n">card_num</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_all_reserve_card_actions</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">_card_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">noble_index</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">NOBLES_INDICES</span><span class="p">:</span>
+            <span class="c1"># reserve a card, without collecting the yellow gem.</span>
+            <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">RESERVE</span><span class="p">,</span>
+                <span class="n">collected_gems</span><span class="o">=</span><span class="p">{},</span>
+                <span class="n">returned_gems</span><span class="o">=</span><span class="p">{},</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+                <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="c1"># reserve a card, collect a yellow gem</span>
+            <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">RESERVE</span><span class="p">,</span>
+                <span class="n">collected_gems</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;yellow&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                <span class="n">returned_gems</span><span class="o">=</span><span class="p">{},</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+                <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">NORMAL_COLORS</span><span class="p">:</span>
+                <span class="c1"># reserve a card, collect a yellow gem, and return a gem.</span>
+                <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">RESERVE</span><span class="p">,</span>
+                    <span class="n">collected_gems</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;yellow&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                    <span class="n">returned_gems</span><span class="o">=</span><span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                    <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+                    <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_all_collect_same_actions</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">NORMAL_COLORS</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">noble_index</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">NOBLES_INDICES</span><span class="p">:</span>
+            <span class="c1"># no gems are returned.</span>
+            <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">COLLECT_SAME</span><span class="p">,</span>
+                <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                <span class="n">collected_gems</span><span class="o">=</span><span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                <span class="n">returned_gems</span><span class="o">=</span><span class="p">{},</span>
+            <span class="p">)</span>
+            <span class="c1"># return 2 gems of different colors.</span>
+            <span class="k">for</span> <span class="n">c1</span><span class="p">,</span> <span class="n">c2</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">c</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">color</span><span class="p">,</span> <span class="n">ALL_GEMS_COLORS</span><span class="p">),</span> <span class="mi">2</span>
+            <span class="p">):</span>
+                <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">COLLECT_SAME</span><span class="p">,</span>
+                    <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                    <span class="n">collected_gems</span><span class="o">=</span><span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                    <span class="n">returned_gems</span><span class="o">=</span><span class="p">{</span><span class="n">c1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="n">c2</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+                <span class="p">)</span>
+            <span class="c1"># return gems of the same color.</span>
+            <span class="k">for</span> <span class="n">num_gems_to_return</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">c_other</span> <span class="ow">in</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">c</span><span class="p">:</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">color</span><span class="p">,</span> <span class="n">ALL_GEMS_COLORS</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">COLLECT_SAME</span><span class="p">,</span>
+                        <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                        <span class="n">collected_gems</span><span class="o">=</span><span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+                        <span class="n">returned_gems</span><span class="o">=</span><span class="p">{</span><span class="n">c_other</span><span class="p">:</span> <span class="n">num_gems_to_return</span><span class="p">},</span>
+                    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_all_collect_different_actions</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">combination_length</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">combination</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">NORMAL_COLORS</span><span class="p">,</span> <span class="n">combination_length</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">noble_index</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">NOBLES_INDICES</span><span class="p">:</span>
+                <span class="c1"># no gems are returned.</span>
+                <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">COLLECT_DIFF</span><span class="p">,</span>
+                    <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                    <span class="n">collected_gems</span><span class="o">=</span><span class="p">{</span><span class="n">color</span><span class="p">:</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">combination</span><span class="p">},</span>
+                    <span class="n">returned_gems</span><span class="o">=</span><span class="p">{},</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">num_gems_to_return</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">combination_length</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">to_return</span> <span class="ow">in</span> <span class="n">combinations_with_replacement</span><span class="p">(</span>
+                        <span class="nb">filter</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">comb</span><span class="o">=</span><span class="n">combination</span><span class="p">:</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comb</span><span class="p">,</span> <span class="n">ALL_GEMS_COLORS</span>
+                        <span class="p">),</span>
+                        <span class="n">num_gems_to_return</span><span class="p">,</span>
+                    <span class="p">):</span>
+                        <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">COLLECT_DIFF</span><span class="p">,</span>
+                            <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                            <span class="n">collected_gems</span><span class="o">=</span><span class="p">{</span><span class="n">color</span><span class="p">:</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">combination</span><span class="p">},</span>
+                            <span class="n">returned_gems</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">to_return</span><span class="p">)),</span>
+                        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_all_buy_reserve_card_actions</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">reserved_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_RESERVED</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">noble_index</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">NOBLES_INDICES</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">BUY_RESERVE</span><span class="p">,</span>
+                <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">CardPosition</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">reserved_index</span><span class="p">),</span>
+            <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_all_buy_available_card_actions</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">position</span> <span class="ow">in</span> <span class="n">_card_gen</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">noble_index</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">+</span> <span class="n">NOBLES_INDICES</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">Action</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">BUY_AVAILABLE</span><span class="p">,</span>
+                <span class="n">noble_index</span><span class="o">=</span><span class="n">noble_index</span><span class="p">,</span>
+                <span class="n">position</span><span class="o">=</span><span class="n">position</span><span class="p">,</span>
+            <span class="p">)</span>
+
+
+<span class="n">ALL_ACTIONS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># # Do nothing.</span>
+    <span class="n">Action</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">PASS</span><span class="p">),</span>
+    <span class="c1"># Only acquire a noble.</span>
+    <span class="o">*</span><span class="p">[</span><span class="n">Action</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">ActionEnum</span><span class="o">.</span><span class="n">PASS</span><span class="p">,</span> <span class="n">noble_index</span><span class="o">=</span><span class="n">noble</span><span class="p">)</span> <span class="k">for</span> <span class="n">noble</span> <span class="ow">in</span> <span class="n">NOBLES_INDICES</span><span class="p">],</span>
+    <span class="c1"># Reserve a card</span>
+    <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">_generate_all_reserve_card_actions</span><span class="p">()),</span>
+    <span class="c1"># Collect 2 stones of the same color.</span>
+    <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">_generate_all_collect_same_actions</span><span class="p">()),</span>
+    <span class="c1"># Collect 3 stones of different colors.</span>
+    <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">_generate_all_collect_different_actions</span><span class="p">()),</span>
+    <span class="c1"># Buy a Reserved Card.</span>
+    <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">_generate_all_buy_reserve_card_actions</span><span class="p">()),</span>
+    <span class="c1"># Buy an Available Card.</span>
+    <span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">_generate_all_buy_available_card_actions</span><span class="p">()),</span>
+<span class="p">]</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

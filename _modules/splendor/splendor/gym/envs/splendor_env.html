@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.splendor.gym.envs.splendor_env &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.splendor.gym.envs.splendor_env</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.splendor.gym.envs.splendor_env</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implementation of Splendor as a gym.Env</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">override</span>
+
+<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
+
+<span class="kn">from</span> <span class="nn">splendor.splendor</span> <span class="kn">import</span> <span class="n">features</span>
+<span class="kn">from</span> <span class="nn">splendor.splendor.splendor_model</span> <span class="kn">import</span> <span class="n">SplendorState</span>
+<span class="kn">from</span> <span class="nn">splendor.splendor.utils</span> <span class="kn">import</span> <span class="n">LimitRoundsGameRule</span>
+<span class="kn">from</span> <span class="nn">splendor.template</span> <span class="kn">import</span> <span class="n">Agent</span>
+
+<span class="kn">from</span> <span class="nn">.actions</span> <span class="kn">import</span> <span class="n">ALL_ACTIONS</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">create_action_mapping</span><span class="p">,</span> <span class="n">create_legal_actions_mask</span>
+
+
+<div class="viewcode-block" id="SplendorEnv">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.splendor_env.SplendorEnv">[docs]</a>
+<span class="k">class</span> <span class="nc">SplendorEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Custom gym.Env for the game Splendor.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">agents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Agent</span><span class="p">],</span>
+        <span class="n">shuffle_turns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fixed_turn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">render_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new environment, which simulates the game of Splendor by</span>
+<span class="sd">        using SplendorGameRule.</span>
+
+<span class="sd">        :param agents: a list of all the opponents.</span>
+<span class="sd">        :param shuffle_turns: whether or not to shuffle the order of turns</span>
+<span class="sd">                              every time reset() is called.</span>
+<span class="sd">        :param fixed_turn: fix the turn of the player, if isn&#39;t supplied or</span>
+<span class="sd">                           out of range the turn of the player would be</span>
+<span class="sd">                           randomly chosen during reset().</span>
+<span class="sd">        :param render_mode: ignored (it&#39;s here for compatibility with gym).</span>
+
+<span class="sd">        :note: when using this environment one can use gymnasium.spaces.utils.flatdim</span>
+<span class="sd">               in order to understand the dimensions of the environment.</span>
+<span class="sd">               for example:</span>
+<span class="sd">                    from gymnasium.spaces.utils import flatdim</span>
+<span class="sd">                    num_actions = flatdim(env.action_space)</span>
+<span class="sd">                    flatten_state_features_length = flatdim(env.observation_space)</span>
+<span class="sd">               useful later for the DQN in order to define it&#39;s input &amp; output dimensions.</span>
+
+<span class="sd">               when creating an env using gym.make(...) gymnasium will automatically wrap</span>
+<span class="sd">               the Env object with some wrappers. in order for you to access the base Env</span>
+<span class="sd">               object without losing ones sanity you can use the .unwrapped property which</span>
+<span class="sd">               returns a reference to the base Env without any wrappers. this could be</span>
+<span class="sd">               useful when you want to use some custom methods of this Env such as</span>
+<span class="sd">               build_action &amp; get_legal_actions_mask.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="c1"># unused render_mode</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">render_mode</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fixed_turn</span> <span class="o">=</span> <span class="n">fixed_turn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_turns</span> <span class="o">=</span> <span class="n">shuffle_turns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agents</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">agents</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_players</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span> <span class="o">=</span> <span class="n">LimitRoundsGameRule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_players</span><span class="p">)</span>
+
+        <span class="c1"># define the action_space to be composed of len(ALL_ACTIONS)</span>
+        <span class="c1"># unique actions.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Discrete</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ALL_ACTIONS</span><span class="p">))</span>
+
+        <span class="c1"># define the observation_space to be a vector of continues values of length</span>
+        <span class="c1"># of features.METRICS_WITH_CARDS_SIZE.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">Box</span><span class="p">(</span>
+            <span class="n">low</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+            <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+            <span class="n">shape</span><span class="o">=</span><span class="n">features</span><span class="o">.</span><span class="n">METRICS_WITH_CARDS_SHAPE</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># this default value will be overridden by reset().</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+
+<div class="viewcode-block" id="SplendorEnv.reset">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.splendor_env.SplendorEnv.reset">[docs]</a>
+    <span class="nd">@override</span>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reset the environment - Create a new game.</span>
+
+<span class="sd">        :param seed: the seed to use in np_random.</span>
+<span class="sd">        :param options: ignored, both this parameter &amp; seed are passed in</span>
+<span class="sd">                        order to comply with gym.Env signature.</span>
+<span class="sd">        :return: the initial state of a new game and the id (turn) of</span>
+<span class="sd">                 my agent.</span>
+<span class="sd">        :note: the order of turns in randomly chosen each time reset is called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span> <span class="o">=</span> <span class="n">LimitRoundsGameRule</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_players</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shuffle_turns</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_turn</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fixed_turn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_players</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_players</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fixed_turn</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_opponents_ids</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_opponents</span><span class="p">()</span>
+
+        <span class="c1"># this assertion is for mypy, the shape is never None.</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vectorize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">),</span>
+            <span class="p">{</span><span class="s2">&quot;my_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SplendorEnv.step">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.splendor_env.SplendorEnv.step">[docs]</a>
+    <span class="nd">@override</span>
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">NDArray</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run one time-step of the environment&#39;s dynamics.</span>
+
+<span class="sd">        :param: which action to take.</span>
+<span class="sd">        :return: The new state (successor), the reward given, a flag indicating whether or</span>
+<span class="sd">                 not the game ended, truncated (will be ignored), additional</span>
+<span class="sd">                 information (will be ignored).</span>
+
+<span class="sd">        :note: this method returns 2 redundant variables (truncated &amp; info) only in</span>
+<span class="sd">               order to comply with gym.Env.step signature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ALL_ACTIONS</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2"> isn&#39;t a valid action&quot;</span><span class="p">)</span>
+
+        <span class="n">previous_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">]</span><span class="o">.</span><span class="n">score</span>
+
+        <span class="n">legal_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">getLegalActions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">)</span>
+
+        <span class="n">mapping</span> <span class="o">=</span> <span class="n">create_action_mapping</span><span class="p">(</span><span class="n">legal_actions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">)</span>
+
+        <span class="n">action_to_take</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">action</span><span class="p">]</span>
+
+        <span class="n">legal_actions_mask</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_legal_actions_mask</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">legal_actions_mask</span><span class="p">[</span><span class="n">action</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;the action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">action_to_take</span><span class="si">}</span><span class="s2">) is illegal!&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">action_to_take</span><span class="p">)</span>
+        <span class="n">current_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">]</span><span class="o">.</span><span class="n">score</span>
+
+        <span class="c1"># simulate opponents until my next turn</span>
+        <span class="n">terminated</span><span class="p">,</span> <span class="n">next_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_opponents</span><span class="p">()</span>
+
+        <span class="n">reward</span> <span class="o">=</span> <span class="n">current_score</span> <span class="o">-</span> <span class="n">previous_score</span>
+
+        <span class="c1"># this assertion is for mypy, the shape is never None.</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_vectorize</span><span class="p">(</span><span class="n">next_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">),</span>
+            <span class="n">reward</span><span class="p">,</span>
+            <span class="n">terminated</span><span class="p">,</span>
+            <span class="kc">False</span><span class="p">,</span>
+            <span class="p">{},</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SplendorEnv.render">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.splendor_env.SplendorEnv.render">[docs]</a>
+    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Don&#39;t render anything.</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SplendorEnv.get_legal_actions_mask">
+<a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.splendor_env.SplendorEnv.get_legal_actions_mask">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_legal_actions_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an array of shape (len(ALL_ACTIONS),) whose values are 0&#39;s or 1&#39;s.</span>
+<span class="sd">        If the at the i&#39;th index the mask[i] == 1 then the i&#39;th action is legal,</span>
+<span class="sd">        otherwise it&#39;s illegal (The legal actions are based on SplendorGameRule).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">legal_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">getLegalActions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">)</span>
+        <span class="n">legal_actions_mask</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">create_legal_actions_mask</span><span class="p">(</span>
+            <span class="n">legal_actions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">legal_actions_mask</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_get_opponent_by_turn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">turn</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Agent</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: the agent whose ID is equal to turn.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">turn</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">agent</span>
+
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid turn (</span><span class="si">{</span><span class="n">turn</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_vectorize</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">turn</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        extract the features vector out of the given state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">features</span><span class="o">.</span><span class="n">extract_metrics_with_cards</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">turn</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_opponents_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        assign IDs to all the agents of the opponents according to the turns</span>
+<span class="sd">        ordering.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_players</span><span class="p">))</span>
+        <span class="n">ids</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">agent</span><span class="p">,</span> <span class="n">agent_id</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agents</span><span class="p">,</span> <span class="n">ids</span><span class="p">):</span>
+            <span class="n">agent</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">agent_id</span>
+
+    <span class="k">def</span> <span class="nf">_simulate_opponents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">SplendorState</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Simulate the opponents moves from the current turn until self.my_turn</span>
+
+<span class="sd">        :return: whether or not the game has ended prior to the turn of self.my_turn</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">turn</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">my_turn</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">gameEnds</span><span class="p">():</span>
+            <span class="n">available_actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">getLegalActions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">turn</span><span class="p">)</span>
+            <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_opponent_by_turn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">turn</span><span class="p">)</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">SelectAction</span><span class="p">(</span><span class="n">available_actions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">gameEnds</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">turn</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return the turn of the player.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_agent_index</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SplendorState</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return the current game state itself, not the feature vector of that state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

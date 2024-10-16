@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>splendor.splendor.splendor_displayer &mdash; Splendor-AI 0.0.2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=e3a6060d"></script>
+        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            Splendor-AI
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation of Splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../run_splendor.html">Run the game</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../developing_agents.html">Developing an Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">splendor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../agents.html">Agents</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Splendor-AI</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">splendor.splendor.splendor_displayer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for splendor.splendor.splendor_displayer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># pylint: skip-file</span>
+
+<span class="c1"># INFORMATION ------------------------------------------------------------------------------------------------------- #</span>
+
+<span class="c1"># Author:  Steven Spratley, extending code by Guang Ho and Michelle Blom</span>
+<span class="c1"># Date:    04/01/2021</span>
+<span class="c1"># Purpose: Implements &quot;Splendor&quot; for the COMP90054 competitive game environment</span>
+
+<span class="c1"># IMPORTS ------------------------------------------------------------------------------------------------------------#</span>
+
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">tkinter</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">realpath</span>
+
+<span class="kn">from</span> <span class="nn">splendor.template</span> <span class="kn">import</span> <span class="n">Displayer</span>
+
+<span class="kn">from</span> <span class="nn">.splendor_utils</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">SPLENDOR_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+
+<span class="c1"># CLASS DEF ----------------------------------------------------------------------------------------------------------#</span>
+
+
+<div class="viewcode-block" id="make_label">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.make_label">[docs]</a>
+<span class="k">def</span> <span class="nf">make_label</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">w</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">pack_propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">label</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">label</span></div>
+
+
+
+<div class="viewcode-block" id="AgentArea">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea">[docs]</a>
+<span class="k">class</span> <span class="nc">AgentArea</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">agent_title</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span> <span class="o">=</span> <span class="n">agent_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">title_text</span> <span class="o">=</span> <span class="n">agent_title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_title_var</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_agent_title</span><span class="p">(</span><span class="n">score</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">fsize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent_title</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">20</span> <span class="k">else</span> <span class="nb">int</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_title</span> <span class="o">=</span> <span class="n">make_label</span><span class="p">(</span>
+            <span class="n">root</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_title_var</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">NAME_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">y</span><span class="o">=</span><span class="n">NAME_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">PLYR_SEP</span> <span class="o">*</span> <span class="n">agent_id</span><span class="p">,</span>
+            <span class="n">h</span><span class="o">=</span><span class="mi">30</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span>
+            <span class="n">w</span><span class="o">=</span><span class="mi">300</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;times&quot;</span><span class="p">,</span> <span class="n">fsize</span><span class="p">),</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">fg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Initialise gem, card, and noble stacks.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gems</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cards</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">7</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sleeves</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>  <span class="c1"># Max. 3 reserved cards.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nobles</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Set agent title labels.</span>
+<div class="viewcode-block" id="AgentArea.set_agent_title">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea.set_agent_title">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_agent_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_text</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent_title_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                <span class="s2">&quot;Agent #</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">. Score: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_text</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent_title_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">. Score: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_text</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span></div>
+
+
+    <span class="c1"># Place images of gems, cards, and nobles in this agent&#39;s area, colour by colour.</span>
+<div class="viewcode-block" id="AgentArea.update">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_agent_title</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">score</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">colour</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="c1"># Load and display image of gem counter (of this colour), with correct number.</span>
+            <span class="n">xpos</span> <span class="o">=</span> <span class="n">PGEM_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">PCRD_SEP</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span>
+            <span class="n">ypos</span> <span class="o">=</span> <span class="n">PGEM_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">PLYR_SEP</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span>
+            <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span>
+                <span class="n">colour</span>
+            <span class="p">]:</span>  <span class="c1"># Draw gem counter only if there are gems in the stack.</span>
+                <span class="n">gem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                    <span class="n">xpos</span><span class="p">,</span>
+                    <span class="n">ypos</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;gems_small&quot;</span><span class="p">][</span><span class="n">colour</span><span class="p">][</span><span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]],</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;gem_small&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">=</span> <span class="n">gem</span>
+
+            <span class="c1"># Load and display images of cards (in this colour stack).</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">colour</span><span class="p">]:</span>
+                <span class="n">xpos</span> <span class="o">=</span> <span class="n">PCRD_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">PCRD_SEP</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span>
+                <span class="n">ypos</span> <span class="o">=</span> <span class="n">PCRD_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">PLYR_SEP</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span> <span class="o">+</span> <span class="n">PCRD_SEP</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">j</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">colour</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                    <span class="n">xpos</span><span class="p">,</span>
+                    <span class="n">ypos</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;cards_small&quot;</span><span class="p">][</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">][</span><span class="n">card</span><span class="o">.</span><span class="n">code</span><span class="p">],</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;card_small&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">colour</span> <span class="o">==</span> <span class="s2">&quot;yellow&quot;</span>
+                <span class="p">):</span>  <span class="c1"># If these cards are yellow, that means they are unpaid. Display with card sleeve.</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sleeves</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                        <span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;card_sleeve&quot;</span><span class="p">],</span> <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;card_small&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Load and display images of obtained nobles.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">nobles</span><span class="p">)):</span>
+            <span class="n">xpos</span> <span class="o">=</span> <span class="n">PNBL_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">ypos</span> <span class="o">=</span> <span class="n">PNBL_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">PLYR_SEP</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span> <span class="o">+</span> <span class="n">PNBL_SEP</span> <span class="o">*</span> <span class="n">i</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nobles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                    <span class="n">xpos</span><span class="p">,</span>
+                    <span class="n">ypos</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;nobles_small&quot;</span><span class="p">][</span><span class="n">agent</span><span class="o">.</span><span class="n">nobles</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;noble_small&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="can_buy">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.can_buy">[docs]</a>
+<span class="k">def</span> <span class="nf">can_buy</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">card</span><span class="p">):</span>
+    <span class="n">wild</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">cost</span> <span class="ow">in</span> <span class="n">card</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">wild</span> <span class="o">-=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cost</span> <span class="o">-</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">colour</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">wild</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="BoardArea">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.BoardArea">[docs]</a>
+<span class="k">class</span> <span class="nc">BoardArea</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dealt</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dealt_transparencies</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gems</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nobles</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cntrs</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cntrs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_text</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">D_COUNTR</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">D_COUNTR</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">CARD_SEP</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="p">),</span>
+                <span class="n">text</span><span class="o">=</span><span class="nb">str</span><span class="p">([</span><span class="mi">40</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">20</span><span class="p">][</span><span class="n">i</span><span class="p">]),</span>
+                <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;times&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">s</span><span class="p">)),</span>
+                <span class="n">fill</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;#bf7c1d&quot;</span><span class="p">,</span> <span class="s2">&quot;blue&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">],</span>
+            <span class="p">)</span>
+
+    <span class="c1"># Update text and images on the gameboard.</span>
+<div class="viewcode-block" id="BoardArea.update">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.BoardArea.update">[docs]</a>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">no_highlighting</span><span class="p">):</span>
+        <span class="n">agent</span><span class="p">,</span> <span class="n">board</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">agent_to_move</span><span class="p">],</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span>
+        <span class="c1"># If first update (start of the game), stagger image placements to make a simple animation.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>
+            <span class="n">animation_sequence</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span>
+                <span class="p">[[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]],</span>
+            <span class="p">]</span>
+            <span class="n">deck_counts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">40</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">20</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">animation_sequence</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">step</span><span class="p">:</span>
+                    <span class="n">deck_id</span><span class="p">,</span> <span class="n">loc</span> <span class="o">=</span> <span class="n">card</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">card</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">deck_counts</span><span class="p">[</span><span class="n">deck_id</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">itemconfigure</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cntrs</span><span class="p">[</span><span class="n">deck_id</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">deck_counts</span><span class="p">[</span><span class="n">deck_id</span><span class="p">])</span>
+                    <span class="p">)</span>
+                    <span class="n">card</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">deck_id</span><span class="p">][</span><span class="n">loc</span><span class="p">]</span>
+                    <span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">CARD_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">CARD_SEP</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">loc</span><span class="p">,</span>
+                        <span class="n">CARD_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">CARD_SEP</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">deck_id</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">deck_id</span><span class="p">][</span><span class="n">loc</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                        <span class="n">xpos</span><span class="p">,</span>
+                        <span class="n">ypos</span><span class="p">,</span>
+                        <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;cards_large&quot;</span><span class="p">][</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">][</span><span class="n">card</span><span class="o">.</span><span class="n">code</span><span class="p">],</span>
+                        <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;card_large&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="n">colour</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="n">i</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                    <span class="n">GEMS_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">GEMS_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">GEMS_SEP</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;gems_large&quot;</span><span class="p">][</span><span class="n">colour</span><span class="p">][</span><span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]],</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;gem_large&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">nobles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                            <span class="n">NOBL_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">NOBL_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">NOBL_SEP</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span>
+                            <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;nobles_large&quot;</span><span class="p">][</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span>
+                            <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;noble_large&quot;</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Else, iterate over decks like normal.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="c1"># Update deck counter labels.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">itemconfigure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cntrs</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">decks</span><span class="p">[</span><span class="n">i</span><span class="p">])))</span>
+                <span class="c1"># Update the dealt cards for this deck.</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                    <span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">CARD_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">CARD_SEP</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">j</span><span class="p">,</span>
+                        <span class="n">CARD_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">CARD_SEP</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">i</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span>
+                        <span class="n">j</span>
+                    <span class="p">]:</span>  <span class="c1"># Generate image only if there is a card present at this position.</span>
+                        <span class="n">card</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                            <span class="n">xpos</span><span class="p">,</span>
+                            <span class="n">ypos</span><span class="p">,</span>
+                            <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;cards_large&quot;</span><span class="p">][</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">][</span><span class="n">card</span><span class="o">.</span><span class="n">code</span><span class="p">],</span>
+                            <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;card_large&quot;</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">no_highlighting</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">can_buy</span><span class="p">(</span>
+                            <span class="n">agent</span><span class="p">,</span> <span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                        <span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">dealt_transparencies</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                                <span class="n">xpos</span><span class="p">,</span>
+                                <span class="n">ypos</span><span class="p">,</span>
+                                <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;card_dull&quot;</span><span class="p">],</span>
+                                <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;card_large&quot;</span><span class="p">,</span>
+                            <span class="p">)</span>
+
+        <span class="c1"># Shared gem stacks.</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">colour</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span> <span class="o">=</span> <span class="n">GEMS_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">GEMS_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">GEMS_SEP</span> <span class="o">*</span> <span class="n">i</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">board</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">count</span><span class="p">:</span>  <span class="c1"># Draw gem counter only if there are gems in this stack.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                    <span class="n">xpos</span><span class="p">,</span>
+                    <span class="n">ypos</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;gems_large&quot;</span><span class="p">][</span><span class="n">colour</span><span class="p">][</span><span class="n">count</span><span class="p">],</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;gem_large&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Nobles.</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">)):</span>
+            <span class="n">xpos</span><span class="p">,</span> <span class="n">ypos</span> <span class="o">=</span> <span class="n">NOBL_POS</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">NOBL_POS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">NOBL_SEP</span> <span class="o">*</span> <span class="n">i</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nobles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+                    <span class="n">xpos</span><span class="p">,</span>
+                    <span class="n">ypos</span><span class="p">,</span>
+                    <span class="n">image</span><span class="o">=</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;nobles_large&quot;</span><span class="p">][</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]],</span>
+                    <span class="n">tags</span><span class="o">=</span><span class="s2">&quot;noble_large&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GUIDisplayer">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer">[docs]</a>
+<span class="k">class</span> <span class="nc">GUIDisplayer</span><span class="p">(</span><span class="n">Displayer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">half_scale</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">no_highlighting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">delay</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_highlighting</span> <span class="o">=</span> <span class="n">no_highlighting</span>
+        <span class="c1"># Absolute positions for resources (cards, gems, nobles). All positions align with top-left of assets.</span>
+        <span class="k">global</span> <span class="n">s</span><span class="p">,</span> <span class="n">PLYR_POS</span><span class="p">,</span> <span class="n">NAME_POS</span><span class="p">,</span> <span class="n">PGEM_POS</span><span class="p">,</span> <span class="n">PCRD_POS</span><span class="p">,</span> <span class="n">PNBL_POS</span><span class="p">,</span> <span class="n">PCRD_SEP</span><span class="p">,</span> <span class="n">PLYR_SEP</span><span class="p">,</span> <span class="n">D_COUNTR</span><span class="p">,</span> <span class="n">RUNNING</span><span class="p">,</span> <span class="n">CARD_POS</span><span class="p">,</span> <span class="n">CARD_SEP</span><span class="p">,</span> <span class="n">GEMS_POS</span><span class="p">,</span> <span class="n">GEMS_SEP</span><span class="p">,</span> <span class="n">NOBL_POS</span><span class="p">,</span> <span class="n">PNBL_SEP</span><span class="p">,</span> <span class="n">NOBL_SEP</span><span class="p">,</span> <span class="n">CNVS_DIM</span><span class="p">,</span> <span class="n">ACTN_BOX</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">half_scale</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="c1">#   x      y   #</span>
+        <span class="n">CNVS_DIM</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1920</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">1080</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># Canvas dimensions.</span>
+        <span class="n">PLYR_POS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">19</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">30</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># First player area.</span>
+        <span class="n">NAME_POS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">26</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">37</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># First player name.</span>
+        <span class="n">PGEM_POS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">54</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">106</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># First player&#39;s first gem stack.</span>
+        <span class="n">PCRD_POS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">54</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">165</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># First player&#39;s first card stack.</span>
+        <span class="n">PNBL_POS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">366</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">56</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># First player&#39;s first noble.</span>
+        <span class="n">PCRD_SEP</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">49</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span>
+            <span class="mi">15</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># Horizontal and vertical separation between player cards.</span>
+        <span class="n">CARD_SEP</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">220</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span>
+            <span class="mi">298</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># Horizontal and vertical separation between available cards.</span>
+        <span class="n">CARD_POS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">783</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">242</span> <span class="o">*</span> <span class="n">s</span><span class="p">]</span>  <span class="c1"># Top left available card.</span>
+        <span class="n">D_COUNTR</span> <span class="o">=</span> <span class="p">[</span><span class="mi">598</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">210</span> <span class="o">*</span> <span class="n">s</span><span class="p">]</span>  <span class="c1"># Top deck counter.</span>
+        <span class="n">NOBL_POS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1825</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">327</span> <span class="o">*</span> <span class="n">s</span><span class="p">]</span>  <span class="c1"># Top available noble.</span>
+        <span class="n">GEMS_POS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1665</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">171</span> <span class="o">*</span> <span class="n">s</span><span class="p">]</span>  <span class="c1"># Top shared gem stack.</span>
+        <span class="n">PLYR_SEP</span> <span class="o">=</span> <span class="mi">257</span> <span class="o">*</span> <span class="n">s</span>  <span class="c1"># Vertical separation between player areas.</span>
+        <span class="n">GEMS_SEP</span> <span class="o">=</span> <span class="mi">149</span> <span class="o">*</span> <span class="n">s</span>  <span class="c1"># Vertical separation between gem stacks.</span>
+        <span class="n">PNBL_SEP</span> <span class="o">=</span> <span class="mi">25</span> <span class="o">*</span> <span class="n">s</span>  <span class="c1"># Vertical separation between player nobles (small).</span>
+        <span class="n">NOBL_SEP</span> <span class="o">=</span> <span class="mi">110</span> <span class="o">*</span> <span class="n">s</span>  <span class="c1"># Vertical separation between board nobles (large).</span>
+        <span class="n">ACTN_BOX</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="mi">543</span> <span class="o">*</span> <span class="n">s</span><span class="p">)</span>  <span class="c1"># Action box position.</span>
+        <span class="n">RUNNING</span> <span class="o">=</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="GUIDisplayer.InitDisplayer">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.InitDisplayer">[docs]</a>
+    <span class="k">def</span> <span class="nf">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
+        <span class="c1"># Initialise root frame.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">protocol</span><span class="p">(</span><span class="s2">&quot;WM_DELETE_WINDOW&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Splendor ------ COMP90054 AI Planning for Autonomy&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="s2">&quot;bg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;black&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">tk</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">&quot;wm&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;iconphoto&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">_w</span><span class="p">,</span>
+            <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/icon.png&quot;</span><span class="p">))),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">x</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">CNVS_DIM</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">CNVS_DIM</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># Fullscreen mode only if running full resolution.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">&quot;-fullscreen&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;F11&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toggle_fullscreen</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Escape&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_fullscreen</span><span class="p">)</span>
+
+        <span class="c1"># Load image resources.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;background&quot;</span><span class="p">:</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/background.png&quot;</span><span class="p">))</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">)),</span>
+            <span class="s2">&quot;cards_large&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()},</span>
+            <span class="s2">&quot;cards_small&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()},</span>
+            <span class="s2">&quot;gems_large&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()},</span>
+            <span class="s2">&quot;gems_small&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="p">{}</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">()},</span>
+            <span class="s2">&quot;nobles_large&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="s2">&quot;nobles_small&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/cards_large&quot;</span><span class="p">))):</span>
+            <span class="n">colour</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">convert_filename</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;cards_large&quot;</span><span class="p">][</span><span class="n">colour</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/cards_large/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">card</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/cards_small&quot;</span><span class="p">))):</span>
+            <span class="n">colour</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">convert_filename</span><span class="p">(</span><span class="n">card</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;cards_small&quot;</span><span class="p">][</span><span class="n">colour</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/cards_small/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">card</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">gem</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/gems_large&quot;</span><span class="p">))):</span>
+            <span class="n">colour</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="n">convert_filename</span><span class="p">(</span><span class="n">gem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;gems_large&quot;</span><span class="p">][</span><span class="n">colour</span><span class="p">][</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/gems_large/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gem</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">gem</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/gems_small&quot;</span><span class="p">))):</span>
+            <span class="n">colour</span><span class="p">,</span> <span class="n">num</span> <span class="o">=</span> <span class="n">convert_filename</span><span class="p">(</span><span class="n">gem</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;gems_small&quot;</span><span class="p">][</span><span class="n">colour</span><span class="p">][</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/gems_small/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">gem</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">nobl</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/nobles_large&quot;</span><span class="p">))):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">convert_filename</span><span class="p">(</span><span class="n">nobl</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;nobles_large&quot;</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/nobles_large/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nobl</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">nobl</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/nobles_small&quot;</span><span class="p">))):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">convert_filename</span><span class="p">(</span><span class="n">nobl</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;nobles_small&quot;</span><span class="p">][</span><span class="n">code</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span>
+                    <span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/nobles_small/&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">nobl</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;card_sleeve&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+            <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/card_sleeve.png&quot;</span><span class="p">))</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;card_dull&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+            <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/card_dull.png&quot;</span><span class="p">))</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">subsample</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">s</span><span class="p">))</span>
+
+        <span class="c1"># Initialise canvas and place background table image.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Canvas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">CNVS_DIM</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="n">CNVS_DIM</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">create_image</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;background&quot;</span><span class="p">],</span> <span class="n">anchor</span><span class="o">=</span><span class="s2">&quot;nw&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate agent areas.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_areas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">runner</span><span class="o">.</span><span class="n">agents_namelist</span><span class="p">)):</span>
+            <span class="n">area</span> <span class="o">=</span> <span class="n">AgentArea</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">runner</span><span class="o">.</span><span class="n">agents_namelist</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">agent_areas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+
+        <span class="c1"># Generate board area.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board_area</span> <span class="o">=</span> <span class="n">BoardArea</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span>
+
+        <span class="c1"># Generate action selection area.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_frame</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_frame</span><span class="o">.</span><span class="n">place</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="n">ACTN_BOX</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">ACTN_BOX</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">height</span><span class="o">=</span><span class="mi">510</span> <span class="o">*</span> <span class="n">s</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">314</span> <span class="o">*</span> <span class="n">s</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_instruct</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">StringVar</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_label</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_frame</span><span class="p">,</span>
+            <span class="n">textvariable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_instruct</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;times&quot;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="mi">14</span> <span class="o">*</span> <span class="n">s</span><span class="p">)),</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">fg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_label</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar1</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Scrollbar</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_frame</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">HORIZONTAL</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar1</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Scrollbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_frame</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Listbox</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_frame</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;actions:&quot;</span><span class="p">,</span>
+            <span class="n">selectmode</span><span class="o">=</span><span class="s2">&quot;single&quot;</span><span class="p">,</span>
+            <span class="n">borderwidth</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">s</span><span class="p">),</span>
+            <span class="n">xscrollcommand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar1</span><span class="o">.</span><span class="n">set</span><span class="p">,</span>
+            <span class="n">yscrollcommand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar1</span><span class="o">.</span><span class="n">set</span><span class="p">,</span>
+            <span class="n">font</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;times&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span>
+            <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">selectbackground</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span>
+            <span class="n">fg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar1</span><span class="o">.</span><span class="n">config</span><span class="p">(</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">xview</span><span class="p">,</span> <span class="n">troughcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar1</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">BOTTOM</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar1</span><span class="o">.</span><span class="n">config</span><span class="p">(</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">yview</span><span class="p">,</span> <span class="n">troughcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar1</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">RIGHT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">fill</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;&lt;ListboxSelect&gt;&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_selection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">IntVar</span><span class="p">()</span>
+
+        <span class="c1"># Generate scoreboard in separate window.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_window</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Toplevel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_window</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Splendor ------ Activity Log&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_window</span><span class="o">.</span><span class="n">tk</span><span class="o">.</span><span class="n">call</span><span class="p">(</span>
+            <span class="s2">&quot;wm&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;iconphoto&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sb_window</span><span class="o">.</span><span class="n">_w</span><span class="p">,</span>
+            <span class="n">tkinter</span><span class="o">.</span><span class="n">PhotoImage</span><span class="p">(</span>
+                <span class="n">file</span><span class="o">=</span><span class="n">abspath</span><span class="p">(</span><span class="n">join</span><span class="p">(</span><span class="n">SPLENDOR_DIR</span><span class="p">,</span> <span class="s2">&quot;resources/icon_log.png&quot;</span><span class="p">))</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_window</span><span class="o">.</span><span class="n">geometry</span><span class="p">(</span><span class="s2">&quot;640x455&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_frame</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_frame</span><span class="o">.</span><span class="n">pack</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar2</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Scrollbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_frame</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar2</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Scrollbar</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sb_frame</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">VERTICAL</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Listbox</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sb_frame</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;actions:&quot;</span><span class="p">,</span>
+            <span class="n">height</span><span class="o">=</span><span class="mi">37</span><span class="p">,</span>
+            <span class="n">width</span><span class="o">=</span><span class="mi">88</span><span class="p">,</span>
+            <span class="n">selectmode</span><span class="o">=</span><span class="s2">&quot;single&quot;</span><span class="p">,</span>
+            <span class="n">borderwidth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">xscrollcommand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar2</span><span class="o">.</span><span class="n">set</span><span class="p">,</span>
+            <span class="n">yscrollcommand</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar2</span><span class="o">.</span><span class="n">set</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar2</span><span class="o">.</span><span class="n">config</span><span class="p">(</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">xview</span><span class="p">,</span> <span class="n">troughcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">xscrollbar2</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">BOTTOM</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar2</span><span class="o">.</span><span class="n">config</span><span class="p">(</span>
+            <span class="n">command</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">yview</span><span class="p">,</span> <span class="n">troughcolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">bg</span><span class="o">=</span><span class="s2">&quot;white&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yscrollbar2</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">RIGHT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">Y</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="n">side</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">LEFT</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="n">tkinter</span><span class="o">.</span><span class="n">BOTH</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">round_num</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sb_window</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">&quot;-topmost&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.toggle_fullscreen">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.toggle_fullscreen">[docs]</a>
+    <span class="k">def</span> <span class="nf">toggle_fullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">&quot;-fullscreen&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.end_fullscreen">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.end_fullscreen">[docs]</a>
+    <span class="k">def</span> <span class="nf">end_fullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">&quot;-fullscreen&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.close_window">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.close_window">[docs]</a>
+    <span class="k">def</span> <span class="nf">close_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Unblock user_input() from waiting on selection.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.get_selection">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.get_selection">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">widget</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">curselection</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.prime_action_box">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.prime_action_box">[docs]</a>
+    <span class="k">def</span> <span class="nf">prime_action_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">wait_variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">size</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.user_input">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.user_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">user_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">combo_to_str</span><span class="p">(</span><span class="n">combo</span><span class="p">):</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">combo</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">colour</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">string</span>
+
+        <span class="k">def</span> <span class="nf">str_to_combo</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+            <span class="n">combo</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)</span>
+                <span class="n">combo</span><span class="p">[</span><span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">combo</span>
+
+        <span class="c1"># Organise actions by type.</span>
+        <span class="n">actions_organised</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+            <span class="n">actions_organised</span><span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="c1"># User selects an available action type:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_instruct</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;Select action type:&quot;</span><span class="p">)</span>
+        <span class="n">types</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">actions_organised</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">types</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;Collect up to 3 different gemstones&quot;</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;collect_diff&quot;</span>
+                <span class="k">else</span> <span class="p">(</span>
+                    <span class="s2">&quot;Collect 2 identical gemstones&quot;</span>
+                    <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;collect_same&quot;</span>
+                    <span class="k">else</span> <span class="p">(</span>
+                        <span class="s2">&quot;Reserve a card from the table&quot;</span>
+                        <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;reserve&quot;</span>
+                        <span class="k">else</span> <span class="p">(</span>
+                            <span class="s2">&quot;Buy a card from the table&quot;</span>
+                            <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="s2">&quot;buy_available&quot;</span>
+                            <span class="k">else</span> <span class="s2">&quot;Buy a previously reserved card&quot;</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prime_action_box</span><span class="p">()</span>
+        <span class="n">selected_type</span> <span class="o">=</span> <span class="n">types</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">()]</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">actions_organised</span><span class="p">[</span><span class="n">selected_type</span><span class="p">]</span>
+
+        <span class="c1"># If type is buy or reserve, simply print actions, as they will be sparse enough.</span>
+        <span class="k">if</span> <span class="n">selected_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;buy_available&quot;</span><span class="p">,</span> <span class="s2">&quot;buy_reserve&quot;</span><span class="p">,</span> <span class="s2">&quot;reserve&quot;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_instruct</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;Select card to </span><span class="si">{</span><span class="s2">&quot;buy&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;buy&quot;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">selected_type</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;reserve&quot;</span><span class="si">}</span><span class="s1">:&#39;</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+                <span class="n">action</span> <span class="o">=</span> <span class="n">a</span>
+                <span class="k">if</span> <span class="s2">&quot;buy&quot;</span> <span class="ow">in</span> <span class="n">selected_type</span><span class="p">:</span>
+                    <span class="n">a</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;card&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">]:</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;card&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">, receiving a wild&#39;</span>
+                        <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">]:</span>
+                            <span class="n">a</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; and returning a </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">action</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1"> gemstone&#39;</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">a</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;card&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">a</span> <span class="o">+=</span> <span class="s2">&quot;, inviting a noble&quot;</span> <span class="k">if</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;noble&quot;</span><span class="p">]</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prime_action_box</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">actions</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">()]</span>
+
+        <span class="c1"># If type is collection, ask for collect and return combos separately.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_instruct</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Select gems to collect:&quot;</span><span class="p">)</span>
+        <span class="n">collect_combos</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">combo_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">]))</span>
+        <span class="p">)</span>
+        <span class="n">collect_combos</span> <span class="o">=</span> <span class="p">[</span><span class="n">str_to_combo</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collect_combos</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">collect_combos</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">GemsToString</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prime_action_box</span><span class="p">()</span>
+        <span class="n">collected_str</span> <span class="o">=</span> <span class="n">combo_to_str</span><span class="p">(</span><span class="n">collect_combos</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">()])</span>
+
+        <span class="n">any_returned</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">combo_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">collected_str</span>
+                <span class="ow">and</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">]</span>
+            <span class="p">):</span>
+                <span class="n">any_returned</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">any_returned</span><span class="p">:</span>
+            <span class="n">return_combos</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span>
+                    <span class="nb">set</span><span class="p">(</span>
+                        <span class="n">combo_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">])</span>
+                        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span>
+                        <span class="k">if</span> <span class="n">combo_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">collected_str</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">return_combos</span> <span class="o">=</span> <span class="p">[</span><span class="n">str_to_combo</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">return_combos</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_instruct</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Select gems to return:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">return_combos</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">GemsToString</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prime_action_box</span><span class="p">()</span>
+            <span class="n">returned_str</span> <span class="o">=</span> <span class="n">combo_to_str</span><span class="p">(</span><span class="n">return_combos</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">get</span><span class="p">()])</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">combo_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">collected_str</span>
+                    <span class="ow">and</span> <span class="n">combo_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;returned_gems&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">returned_str</span>
+                <span class="p">):</span>
+                    <span class="k">return</span> <span class="n">a</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">combo_to_str</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="s2">&quot;collected_gems&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">collected_str</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">a</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_InsertState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">game_state</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">see</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">selection_clear</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+    <span class="c1"># Rebuild canvas images.</span>
+    <span class="k">def</span> <span class="nf">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+        <span class="c1"># Destroy select canvas text and images.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;card_small&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;gem_small&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;counter&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;card_large&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;gem_large&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;noble_large&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;noble_small&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update displayed areas (agents and board contents).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">board_area</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_highlighting</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">agent</span><span class="p">,</span> <span class="n">area</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_areas</span><span class="p">):</span>
+            <span class="n">area</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resources</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GUIDisplayer.ExcuteAction">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.ExcuteAction">[docs]</a>
+    <span class="k">def</span> <span class="nf">ExcuteAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span><span class="n">ActionToString</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">action</span><span class="p">),</span> <span class="n">game_state</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.TimeOutWarning">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.TimeOutWarning">[docs]</a>
+    <span class="k">def</span> <span class="nf">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span>
+            <span class="s2">&quot;Agent </span><span class="si">{}</span><span class="s2"> time out, </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">. Choosing random action instead.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">id</span><span class="p">,</span> <span class="n">runner</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span> <span class="n">runner</span><span class="o">.</span><span class="n">warning_limit</span>
+            <span class="p">),</span>
+            <span class="n">runner</span><span class="o">.</span><span class="n">game_rule</span><span class="o">.</span><span class="n">current_game_state</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">id</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">itemconfig</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;bg&quot;</span><span class="p">:</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;fg&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">itemconfig</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;bg&quot;</span><span class="p">:</span> <span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;fg&quot;</span><span class="p">:</span> <span class="s2">&quot;yellow&quot;</span><span class="p">})</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="GUIDisplayer.EndGame">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.EndGame">[docs]</a>
+    <span class="k">def</span> <span class="nf">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span><span class="s2">&quot;--------------End of game-------------&quot;</span><span class="p">,</span> <span class="n">game_state</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">plr_state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span>
+                <span class="s2">&quot;Final score for Agent </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">plr_state</span><span class="o">.</span><span class="n">score</span><span class="p">),</span> <span class="n">game_state</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span> <span class="nf">OnHistorySelect</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">widget</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">curselection</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">])</span>
+
+        <span class="k">def</span> <span class="nf">OnHistoryAction</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">keysym</span> <span class="o">==</span> <span class="s2">&quot;Up&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">select_clear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">-=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">select_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">keysym</span> <span class="o">==</span> <span class="s2">&quot;Down&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">select_clear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">select_set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;&lt;ListboxSelect&gt;&gt;&quot;</span><span class="p">,</span> <span class="n">OnHistorySelect</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Up&gt;&quot;</span><span class="p">,</span> <span class="n">OnHistoryAction</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="s2">&quot;&lt;Down&gt;&quot;</span><span class="p">,</span> <span class="n">OnHistoryAction</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TextDisplayer">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer">[docs]</a>
+<span class="k">class</span> <span class="nc">TextDisplayer</span><span class="p">(</span><span class="n">Displayer</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="TextDisplayer.InitDisplayer">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.InitDisplayer">[docs]</a>
+    <span class="k">def</span> <span class="nf">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;------------------------GAME STARTED--------------------------------&quot;</span><span class="p">)</span>
+        <span class="c1"># self._DisplayState(runner.)</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="TextDisplayer.user_input">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.user_input">[docs]</a>
+    <span class="k">def</span> <span class="nf">user_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+        <span class="n">action_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+            <span class="n">action_dict</span><span class="p">[</span><span class="n">counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">action</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">counter</span><span class="p">,</span> <span class="n">action</span><span class="p">))</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Prompt the user for input</span>
+            <span class="n">user_input</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
+                <span class="s2">&quot;please input your choose between 0 and </span><span class="si">%d</span><span class="s2">: &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">counter</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="c1"># Attempt to convert the input to an integer</span>
+            <span class="n">user_int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">user_input</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="c1"># Handle the error if the input is not a valid integer</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;That&#39;s not an integer. Please try again.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">action_dict</span><span class="p">[</span><span class="n">user_int</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TextDisplayer.StartRound">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.StartRound">[docs]</a>
+    <span class="k">def</span> <span class="nf">StartRound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;------------------------GAME STATE----------------------------------&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="TextDisplayer.ExcuteAction">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.ExcuteAction">[docs]</a>
+    <span class="k">def</span> <span class="nf">ExcuteAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">move</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+        <span class="n">player_state</span> <span class="o">=</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Agent </span><span class="si">{}</span><span class="s2"> has chosen the following move:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ActionToString</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">move</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># print(&quot;The new agent state is:&quot;)</span>
+        <span class="c1"># print(AgentToString(i, player_state))</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;------------------------State After Action----------------------------------&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TextDisplayer.TimeOutWarning">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.TimeOutWarning">[docs]</a>
+    <span class="k">def</span> <span class="nf">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Agent </span><span class="si">{}</span><span class="s2"> Time Out, </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">id</span><span class="p">,</span> <span class="n">runner</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span> <span class="n">runner</span><span class="o">.</span><span class="n">warning_limit</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TextDisplayer.EndGame">
+<a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.EndGame">[docs]</a>
+    <span class="k">def</span> <span class="nf">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GAME HAS ENDED&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">plr_state</span> <span class="ow">in</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Score for Agent </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">plr_state</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">plr_state</span><span class="o">.</span><span class="n">score</span><span class="p">))</span></div>
+</div>
+
+
+
+<span class="c1"># END FILE -----------------------------------------------------------------------------------------------------------#</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Eyal Royee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

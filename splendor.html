@@ -7,6 +7,7 @@
   <title>splendor package &mdash; Splendor-AI 0.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
   
   <!--[if lt IE 9]>
@@ -18,10 +19,12 @@
         <script src="_static/documentation_options.js?v=e3a6060d"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="splendor.Splendor package" href="splendor.Splendor.html" />
+    <link rel="next" title="splendor.agents package" href="splendor.agents.html" />
     <link rel="prev" title="splendor" href="modules.html" /> 
 </head>
 
@@ -54,8 +57,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">splendor</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">splendor package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html">splendor.splendor package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
@@ -131,141 +134,6 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.gym.html">splendor.Splendor.gym package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.gym.html#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.gym.html#module-splendor.Splendor.gym">Module contents</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.constants">splendor.Splendor.constants module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.features">splendor.Splendor.features module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.agent_buying_power"><code class="docutils literal notranslate"><span class="pre">agent_buying_power()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.agent_won"><code class="docutils literal notranslate"><span class="pre">agent_won()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.build_array"><code class="docutils literal notranslate"><span class="pre">build_array()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.diminish_return"><code class="docutils literal notranslate"><span class="pre">diminish_return()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_cards"><code class="docutils literal notranslate"><span class="pre">extract_cards()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_metrics"><code class="docutils literal notranslate"><span class="pre">extract_metrics()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_metrics_with_cards"><code class="docutils literal notranslate"><span class="pre">extract_metrics_with_cards()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.extract_reserved_cards"><code class="docutils literal notranslate"><span class="pre">extract_reserved_cards()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_agent"><code class="docutils literal notranslate"><span class="pre">get_agent()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_color_encoder"><code class="docutils literal notranslate"><span class="pre">get_color_encoder()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_indices_access_by_color"><code class="docutils literal notranslate"><span class="pre">get_indices_access_by_color()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.get_yellow_gem_index"><code class="docutils literal notranslate"><span class="pre">get_yellow_gem_index()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.missing_gems_to_card"><code class="docutils literal notranslate"><span class="pre">missing_gems_to_card()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.normalize_metrics"><code class="docutils literal notranslate"><span class="pre">normalize_metrics()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.turns_made_by_agent"><code class="docutils literal notranslate"><span class="pre">turns_made_by_agent()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.turns_to_buy_card"><code class="docutils literal notranslate"><span class="pre">turns_to_buy_card()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.features.vectorize_card"><code class="docutils literal notranslate"><span class="pre">vectorize_card()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.splendor_displayer">splendor.Splendor.splendor_displayer module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.AgentArea"><code class="docutils literal notranslate"><span class="pre">AgentArea</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.AgentArea.set_agent_title"><code class="docutils literal notranslate"><span class="pre">AgentArea.set_agent_title()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.AgentArea.update"><code class="docutils literal notranslate"><span class="pre">AgentArea.update()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.BoardArea"><code class="docutils literal notranslate"><span class="pre">BoardArea</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.BoardArea.update"><code class="docutils literal notranslate"><span class="pre">BoardArea.update()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.EndGame"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.EndGame()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.ExcuteAction"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.ExcuteAction()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.InitDisplayer"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.InitDisplayer()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.TimeOutWarning"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.TimeOutWarning()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.close_window"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.close_window()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.end_fullscreen"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.end_fullscreen()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.get_selection"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.get_selection()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.prime_action_box"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.prime_action_box()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.toggle_fullscreen"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.toggle_fullscreen()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.GUIDisplayer.user_input"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.user_input()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer"><code class="docutils literal notranslate"><span class="pre">TextDisplayer</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.EndGame"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.EndGame()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.ExcuteAction"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.ExcuteAction()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.InitDisplayer"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.InitDisplayer()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.StartRound"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.StartRound()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.TimeOutWarning"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.TimeOutWarning()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.TextDisplayer.user_input"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.user_input()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.can_buy"><code class="docutils literal notranslate"><span class="pre">can_buy()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_displayer.make_label"><code class="docutils literal notranslate"><span class="pre">make_label()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.splendor_model">splendor.Splendor.splendor_model module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.Card"><code class="docutils literal notranslate"><span class="pre">Card</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.calScore"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.calScore()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.gameEnds"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.gameEnds()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generatePredecessor"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generatePredecessor()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generateSuccessor"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generateSuccessor()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.generate_return_combos"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generate_return_combos()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.getLegalActions"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.getLegalActions()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.initialGameState"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.initialGameState()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.noble_visit"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.noble_visit()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorGameRule.resources_sufficient"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.resources_sufficient()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState"><code class="docutils literal notranslate"><span class="pre">SplendorState</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.AgentState"><code class="docutils literal notranslate"><span class="pre">SplendorState.AgentState</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_model.SplendorState.BoardState"><code class="docutils literal notranslate"><span class="pre">SplendorState.BoardState</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.splendor_utils">splendor.Splendor.splendor_utils module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.ActionToString"><code class="docutils literal notranslate"><span class="pre">ActionToString()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.AgentToString"><code class="docutils literal notranslate"><span class="pre">AgentToString()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.AgentTrace"><code class="docutils literal notranslate"><span class="pre">AgentTrace</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.BoardToString"><code class="docutils literal notranslate"><span class="pre">BoardToString()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.GemsToString"><code class="docutils literal notranslate"><span class="pre">GemsToString()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.splendor_utils.convert_filename"><code class="docutils literal notranslate"><span class="pre">convert_filename()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.types">splendor.Splendor.types module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction"><code class="docutils literal notranslate"><span class="pre">BuyAction</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.card"><code class="docutils literal notranslate"><span class="pre">BuyAction.card</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.noble"><code class="docutils literal notranslate"><span class="pre">BuyAction.noble</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">BuyAction.returned_gems</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.BuyAction.type"><code class="docutils literal notranslate"><span class="pre">BuyAction.type</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction"><code class="docutils literal notranslate"><span class="pre">CollectAction</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.collected_gems"><code class="docutils literal notranslate"><span class="pre">CollectAction.collected_gems</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.noble"><code class="docutils literal notranslate"><span class="pre">CollectAction.noble</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">CollectAction.returned_gems</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.CollectAction.type"><code class="docutils literal notranslate"><span class="pre">CollectAction.type</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction"><code class="docutils literal notranslate"><span class="pre">ReserveAction</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.collected_gems"><code class="docutils literal notranslate"><span class="pre">ReserveAction.collected_gems</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.noble"><code class="docutils literal notranslate"><span class="pre">ReserveAction.noble</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">ReserveAction.returned_gems</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.ReserveAction.type"><code class="docutils literal notranslate"><span class="pre">ReserveAction.type</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.YellowGemCount"><code class="docutils literal notranslate"><span class="pre">YellowGemCount</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.types.YellowGemCount.yellow"><code class="docutils literal notranslate"><span class="pre">YellowGemCount.yellow</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor.utils">splendor.Splendor.utils module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.utils.LimitRoundsGameRule"><code class="docutils literal notranslate"><span class="pre">LimitRoundsGameRule</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html#splendor.Splendor.utils.LimitRoundsGameRule.gameEnds"><code class="docutils literal notranslate"><span class="pre">LimitRoundsGameRule.gameEnds()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="splendor.Splendor.html#module-splendor.Splendor">Module contents</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="splendor.agents.generic.html">splendor.agents.generic package</a><ul>
@@ -286,6 +154,141 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.html#module-splendor.agents">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="splendor.splendor.html">splendor.splendor package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.gym.html">splendor.splendor.gym package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.gym.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.gym.html#module-splendor.splendor.gym">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor.constants">splendor.splendor.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor.features">splendor.splendor.features module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.agent_buying_power"><code class="docutils literal notranslate"><span class="pre">agent_buying_power()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.agent_won"><code class="docutils literal notranslate"><span class="pre">agent_won()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.build_array"><code class="docutils literal notranslate"><span class="pre">build_array()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.diminish_return"><code class="docutils literal notranslate"><span class="pre">diminish_return()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.extract_cards"><code class="docutils literal notranslate"><span class="pre">extract_cards()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.extract_metrics"><code class="docutils literal notranslate"><span class="pre">extract_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.extract_metrics_with_cards"><code class="docutils literal notranslate"><span class="pre">extract_metrics_with_cards()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.extract_reserved_cards"><code class="docutils literal notranslate"><span class="pre">extract_reserved_cards()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.get_agent"><code class="docutils literal notranslate"><span class="pre">get_agent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.get_color_encoder"><code class="docutils literal notranslate"><span class="pre">get_color_encoder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.get_indices_access_by_color"><code class="docutils literal notranslate"><span class="pre">get_indices_access_by_color()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.get_yellow_gem_index"><code class="docutils literal notranslate"><span class="pre">get_yellow_gem_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.missing_gems_to_card"><code class="docutils literal notranslate"><span class="pre">missing_gems_to_card()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.normalize_metrics"><code class="docutils literal notranslate"><span class="pre">normalize_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.turns_made_by_agent"><code class="docutils literal notranslate"><span class="pre">turns_made_by_agent()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.turns_to_buy_card"><code class="docutils literal notranslate"><span class="pre">turns_to_buy_card()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.features.vectorize_card"><code class="docutils literal notranslate"><span class="pre">vectorize_card()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor.splendor_displayer">splendor.splendor.splendor_displayer module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea"><code class="docutils literal notranslate"><span class="pre">AgentArea</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea.set_agent_title"><code class="docutils literal notranslate"><span class="pre">AgentArea.set_agent_title()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea.update"><code class="docutils literal notranslate"><span class="pre">AgentArea.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.BoardArea"><code class="docutils literal notranslate"><span class="pre">BoardArea</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.BoardArea.update"><code class="docutils literal notranslate"><span class="pre">BoardArea.update()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.EndGame"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.EndGame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.ExcuteAction"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.ExcuteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.InitDisplayer"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.InitDisplayer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.TimeOutWarning"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.TimeOutWarning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.close_window"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.close_window()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.end_fullscreen"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.end_fullscreen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.get_selection"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.get_selection()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.prime_action_box"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.prime_action_box()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.toggle_fullscreen"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.toggle_fullscreen()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.user_input"><code class="docutils literal notranslate"><span class="pre">GUIDisplayer.user_input()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer"><code class="docutils literal notranslate"><span class="pre">TextDisplayer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.EndGame"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.EndGame()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.ExcuteAction"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.ExcuteAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.InitDisplayer"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.InitDisplayer()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.StartRound"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.StartRound()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.TimeOutWarning"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.TimeOutWarning()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.user_input"><code class="docutils literal notranslate"><span class="pre">TextDisplayer.user_input()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.can_buy"><code class="docutils literal notranslate"><span class="pre">can_buy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_displayer.make_label"><code class="docutils literal notranslate"><span class="pre">make_label()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor.splendor_model">splendor.splendor.splendor_model module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.Card"><code class="docutils literal notranslate"><span class="pre">Card</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.calScore"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.calScore()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.gameEnds"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.gameEnds()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.generatePredecessor"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generatePredecessor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.generateSuccessor"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generateSuccessor()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.generate_return_combos"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.generate_return_combos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.getLegalActions"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.getLegalActions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.initialGameState"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.initialGameState()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.noble_visit"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.noble_visit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorGameRule.resources_sufficient"><code class="docutils literal notranslate"><span class="pre">SplendorGameRule.resources_sufficient()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorState"><code class="docutils literal notranslate"><span class="pre">SplendorState</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorState.AgentState"><code class="docutils literal notranslate"><span class="pre">SplendorState.AgentState</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_model.SplendorState.BoardState"><code class="docutils literal notranslate"><span class="pre">SplendorState.BoardState</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor.splendor_utils">splendor.splendor.splendor_utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_utils.ActionToString"><code class="docutils literal notranslate"><span class="pre">ActionToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_utils.AgentToString"><code class="docutils literal notranslate"><span class="pre">AgentToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_utils.AgentTrace"><code class="docutils literal notranslate"><span class="pre">AgentTrace</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_utils.BoardToString"><code class="docutils literal notranslate"><span class="pre">BoardToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_utils.GemsToString"><code class="docutils literal notranslate"><span class="pre">GemsToString()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.splendor_utils.convert_filename"><code class="docutils literal notranslate"><span class="pre">convert_filename()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor.types">splendor.splendor.types module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.BuyAction"><code class="docutils literal notranslate"><span class="pre">BuyAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.BuyAction.card"><code class="docutils literal notranslate"><span class="pre">BuyAction.card</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.BuyAction.noble"><code class="docutils literal notranslate"><span class="pre">BuyAction.noble</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.BuyAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">BuyAction.returned_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.BuyAction.type"><code class="docutils literal notranslate"><span class="pre">BuyAction.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.CollectAction"><code class="docutils literal notranslate"><span class="pre">CollectAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.CollectAction.collected_gems"><code class="docutils literal notranslate"><span class="pre">CollectAction.collected_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.CollectAction.noble"><code class="docutils literal notranslate"><span class="pre">CollectAction.noble</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.CollectAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">CollectAction.returned_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.CollectAction.type"><code class="docutils literal notranslate"><span class="pre">CollectAction.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.ReserveAction"><code class="docutils literal notranslate"><span class="pre">ReserveAction</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.ReserveAction.collected_gems"><code class="docutils literal notranslate"><span class="pre">ReserveAction.collected_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.ReserveAction.noble"><code class="docutils literal notranslate"><span class="pre">ReserveAction.noble</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.ReserveAction.returned_gems"><code class="docutils literal notranslate"><span class="pre">ReserveAction.returned_gems</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.ReserveAction.type"><code class="docutils literal notranslate"><span class="pre">ReserveAction.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.YellowGemCount"><code class="docutils literal notranslate"><span class="pre">YellowGemCount</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.types.YellowGemCount.yellow"><code class="docutils literal notranslate"><span class="pre">YellowGemCount.yellow</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor.utils">splendor.splendor.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.utils.LimitRoundsGameRule"><code class="docutils literal notranslate"><span class="pre">LimitRoundsGameRule</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html#splendor.splendor.utils.LimitRoundsGameRule.gameEnds"><code class="docutils literal notranslate"><span class="pre">LimitRoundsGameRule.gameEnds()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.splendor.html#module-splendor.splendor">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -491,6 +494,7 @@ from the command line:</p>
 </section>
 <section id="module-splendor.version">
 <span id="splendor-version-module"></span><h2>splendor.version module<a class="headerlink" href="#module-splendor.version" title="Link to this heading"></a></h2>
+<p>Version retrieval utility.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="splendor.version.get_version">
 <span class="sig-prename descclassname"><span class="pre">splendor.version.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/splendor/version.html#get_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.version.get_version" title="Link to this definition"></a></dt>
@@ -508,7 +512,7 @@ from the command line:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="modules.html" class="btn btn-neutral float-left" title="splendor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="splendor.Splendor.html" class="btn btn-neutral float-right" title="splendor.Splendor package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="splendor.agents.html" class="btn btn-neutral float-right" title="splendor.agents package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

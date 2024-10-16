@@ -7,8 +7,8 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   splendor.Splendor
    splendor.agents
+   splendor.splendor
 
 Submodules
 ----------

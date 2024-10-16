@@ -7,6 +7,7 @@
   <title>splendor.agents.generic package &mdash; Splendor-AI 0.0.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
 
   
   <!--[if lt IE 9]>
@@ -18,6 +19,8 @@
         <script src="_static/documentation_options.js?v=e3a6060d"></script>
         <script src="_static/doctools.js?v=9a2dae69"></script>
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="_static/copybutton.js?v=f281be69"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -54,8 +57,8 @@
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">splendor</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="splendor.html">splendor package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="splendor.html#subpackages">Subpackages</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="splendor.Splendor.html">splendor.Splendor package</a></li>
 <li class="toctree-l4 current"><a class="reference internal" href="splendor.agents.html">splendor.agents package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.splendor.html">splendor.splendor package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="splendor.html#submodules">Submodules</a></li>
@@ -106,43 +109,67 @@
 </section>
 <section id="module-splendor.agents.generic.first_move">
 <span id="splendor-agents-generic-first-move-module"></span><h2>splendor.agents.generic.first_move module<a class="headerlink" href="#module-splendor.agents.generic.first_move" title="Link to this heading"></a></h2>
+<p>Implementation of an agent that selects the first legal action.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="splendor.agents.generic.first_move.myAgent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.first_move.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/first_move.html#myAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.first_move.myAgent" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.generic.first_move.FirstActionAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.first_move.</span></span><span class="sig-name descname"><span class="pre">FirstActionAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/first_move.html#FirstActionAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.first_move.FirstActionAgent" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="splendor.html#splendor.template.Agent" title="splendor.template.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a></p>
+<p>An agent that selects the first legal action.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="splendor.agents.generic.first_move.myAgent.SelectAction">
-<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/first_move.html#myAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.first_move.myAgent.SelectAction" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.generic.first_move.FirstActionAgent.SelectAction">
+<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/first_move.html#FirstActionAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.first_move.FirstActionAgent.SelectAction" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.generic.first_move.myAgent">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.first_move.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><a class="headerlink" href="#splendor.agents.generic.first_move.myAgent" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#splendor.agents.generic.first_move.FirstActionAgent" title="splendor.agents.generic.first_move.FirstActionAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">FirstActionAgent</span></code></a></p>
 </dd></dl>
 
 </section>
 <section id="module-splendor.agents.generic.random">
 <span id="splendor-agents-generic-random-module"></span><h2>splendor.agents.generic.random module<a class="headerlink" href="#module-splendor.agents.generic.random" title="Link to this heading"></a></h2>
+<p>Implementation of an agent that selects the first legal action.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="splendor.agents.generic.random.myAgent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.random.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/random.html#myAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.random.myAgent" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.generic.random.RandomAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.random.</span></span><span class="sig-name descname"><span class="pre">RandomAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/random.html#RandomAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.random.RandomAgent" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="splendor.html#splendor.template.Agent" title="splendor.template.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a></p>
+<p>An agent that selects a random legal action.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="splendor.agents.generic.random.myAgent.SelectAction">
-<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/random.html#myAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.random.myAgent.SelectAction" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.generic.random.RandomAgent.SelectAction">
+<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/random.html#RandomAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.random.RandomAgent.SelectAction" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.generic.random.myAgent">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.random.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><a class="headerlink" href="#splendor.agents.generic.random.myAgent" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#splendor.agents.generic.random.RandomAgent" title="splendor.agents.generic.random.RandomAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomAgent</span></code></a></p>
 </dd></dl>
 
 </section>
 <section id="module-splendor.agents.generic.timeout">
 <span id="splendor-agents-generic-timeout-module"></span><h2>splendor.agents.generic.timeout module<a class="headerlink" href="#module-splendor.agents.generic.timeout" title="Link to this heading"></a></h2>
+<p>Implementation of an agent that selects the first legal action after 2 seconds sleep.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="splendor.agents.generic.timeout.myAgent">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.timeout.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/timeout.html#myAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.timeout.myAgent" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.generic.timeout.TimeoutAgent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.timeout.</span></span><span class="sig-name descname"><span class="pre">TimeoutAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/timeout.html#TimeoutAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.timeout.TimeoutAgent" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="splendor.html#splendor.template.Agent" title="splendor.template.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">Agent</span></code></a></p>
+<p>An agent that selects the first legal action, only after a 2 seconds sleep.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="splendor.agents.generic.timeout.myAgent.SelectAction">
-<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/timeout.html#myAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.timeout.myAgent.SelectAction" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="splendor.agents.generic.timeout.TimeoutAgent.SelectAction">
+<span class="sig-name descname"><span class="pre">SelectAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">game_rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/generic/timeout.html#TimeoutAgent.SelectAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.generic.timeout.TimeoutAgent.SelectAction" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="splendor.agents.generic.timeout.myAgent">
+<span class="sig-prename descclassname"><span class="pre">splendor.agents.generic.timeout.</span></span><span class="sig-name descname"><span class="pre">myAgent</span></span><a class="headerlink" href="#splendor.agents.generic.timeout.myAgent" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#splendor.agents.generic.timeout.TimeoutAgent" title="splendor.agents.generic.timeout.TimeoutAgent"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeoutAgent</span></code></a></p>
 </dd></dl>
 
 </section>
