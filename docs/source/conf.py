@@ -6,6 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+# pylint: skip-file
+
 project = "Splendor-AI"
 copyright = "2024, Eyal Royee"
 author = "Eyal Royee"
