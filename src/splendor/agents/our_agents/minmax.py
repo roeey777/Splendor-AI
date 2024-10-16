@@ -1,4 +1,9 @@
+"""
+Implementation of an agent that selects the first legal action.
+"""
+
 import random
+from typing import override
 
 import numpy as np
 
@@ -9,12 +14,21 @@ from splendor.template import Agent
 DEPTH = 2
 
 
-class myAgent(Agent):
+class MiniMaxAgent(Agent):
+    """
+    A Minimax agent, utilizing the zero-sum property of the game,
+    there is only a single winner in each game, for determining which
+    action to play.
+    """
+
+    # pylint: disable=too-few-public-methods
+
+    @override
     def SelectAction(self, actions, game_state, game_rule):
         assert len(game_state.agents) == 2
-        return self.select_action_recursion(game_state, game_rule, DEPTH)[0]
+        return self._select_action_recursion(game_state, game_rule, DEPTH)[0]
 
-    def select_action_recursion(
+    def _select_action_recursion(
         self,
         game_state,
         game_rule,
@@ -24,7 +38,7 @@ class myAgent(Agent):
         beta=np.inf,
     ):
         if depth == 0:
-            return None, self.evaluation_function(game_state)
+            return None, self._evaluation_function(game_state)
         agent_id = self.id if is_maximizing else 1 - self.id
         actions = game_rule.getLegalActions(game_state, agent_id)
         random.shuffle(actions)
@@ -35,13 +49,13 @@ class myAgent(Agent):
         best_value = -np.inf if is_maximizing else np.inf
         for action in actions:
             next_state = game_rule.generateSuccessor(game_state, action, agent_id)
-            _, action_value = self.select_action_recursion(
+            _, action_value = self._select_action_recursion(
                 next_state, game_rule, depth - 1, not is_maximizing, alpha, beta
             )
             # generateSuccessor alternates the game_state inplace,
             # that's why we need to call generatePredecessor to revert
             # it (even though we do not need its output)
-            prev_state = game_rule.generatePredecessor(game_state, action, agent_id)
+            _ = game_rule.generatePredecessor(game_state, action, agent_id)
 
             if is_maximizing:
                 if action_value > best_value:
@@ -60,7 +74,7 @@ class myAgent(Agent):
 
         return best_action, best_value
 
-    def evaluation_function(self, state):
+    def _evaluation_function(self, state):
         agent_state = state.agents[self.id]
         score_factor = 2
         cards_factor = 0.7
@@ -81,7 +95,7 @@ class myAgent(Agent):
 
         for card in state.board.dealt_list() + agent_state.cards["yellow"]:
             relevant_to_nobles = 0
-            for noble_id, noble_cost in state.board.nobles:
+            for _, noble_cost in state.board.nobles:
                 if (
                     card.colour in noble_cost
                     and len(agent_state.cards[card.colour]) < noble_cost[card.colour]
@@ -106,3 +120,6 @@ class myAgent(Agent):
             + sum(agent_state.gems.values()) * gems_factor
             + gems_var * gems_var_factor
         )
+
+
+myAgent = MiniMaxAgent  # pylint: disable=invalid-name
