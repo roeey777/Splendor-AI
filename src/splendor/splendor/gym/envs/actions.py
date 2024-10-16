@@ -8,8 +8,8 @@ from enum import Enum, auto
 from itertools import combinations, combinations_with_replacement
 from typing import Optional, Self, cast
 
-from splendor.Splendor import splendor_utils
-from splendor.Splendor.constants import (
+from splendor.splendor import splendor_utils
+from splendor.splendor.constants import (
     MAX_NOBLES,
     MAX_RESERVED,
     MAX_TIER_CARDS,
@@ -17,8 +17,8 @@ from splendor.Splendor.constants import (
     NUMBER_OF_TIERS,
     RESERVED,
 )
-from splendor.Splendor.splendor_model import SplendorState
-from splendor.Splendor.types import ActionType, BuyAction, GemsCount
+from splendor.splendor.splendor_model import SplendorState
+from splendor.splendor.types import ActionType, BuyAction, GemsCount
 
 ALL_GEMS_COLORS = splendor_utils.COLOURS.values()
 NOBLES_INDICES = list(range(MAX_NOBLES))

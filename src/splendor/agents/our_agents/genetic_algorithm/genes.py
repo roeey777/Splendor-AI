@@ -9,7 +9,7 @@ from typing import Optional, Tuple, Union
 import numpy as np
 from numpy.typing import NDArray
 
-from splendor.Splendor.features import METRICS_SHAPE, build_array
+from splendor.splendor.features import METRICS_SHAPE, build_array
 
 
 class Gene:

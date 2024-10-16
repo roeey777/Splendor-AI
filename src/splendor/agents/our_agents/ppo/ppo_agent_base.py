@@ -1,14 +1,15 @@
+"""
+Definition for a base class for all PPO-based agents.
+"""
+
 from abc import abstractmethod
-from pathlib import Path
 from typing import List, Optional
 
-import gymnasium as gym
-import numpy as np
 import torch
-import torch.nn as nn
+import torch.nn as nn  # pylint: disable=consider-using-from-import
 
-from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
-from splendor.Splendor.types import ActionType
+from splendor.splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.splendor.types import ActionType
 from splendor.template import Agent
 
 from .ppo_base import PPOBase
@@ -46,5 +47,8 @@ class PPOAgentBase(Agent):
         raise NotImplementedError()
 
     def load_policy(self, policy: nn.Module):
+        """
+        Use a given policy as the agent's network policy.
+        """
         self.net = policy.to(self.device)
         self.net.eval()

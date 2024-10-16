@@ -8,9 +8,9 @@ import gymnasium as gym
 import numpy as np
 from numpy.typing import NDArray
 
-from splendor.Splendor import features
-from splendor.Splendor.splendor_model import SplendorState
-from splendor.Splendor.utils import LimitRoundsGameRule
+from splendor.splendor import features
+from splendor.splendor.splendor_model import SplendorState
+from splendor.splendor.utils import LimitRoundsGameRule
 from splendor.template import Agent
 
 from .actions import ALL_ACTIONS

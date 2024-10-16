@@ -1,22 +1,34 @@
-from typing import Tuple
+"""
+Collection of useful calculation functions
+"""
+
+from typing import List, Tuple
 
 import torch
-import torch.distributions as distributions
-import torch.nn as nn
-import torch.nn.functional as F
+import torch.distributions as distributions  # pylint: disable=consider-using-from-import
 
 from .constants import ENTROPY_COEFFICIENT, VALUE_COEFFICIENT, VERY_SMALL_EPSILON
 
 
-def calculate_returns(rewards, discount_factor, normalize=True):
-    returns = []
-    R = 0
+def calculate_returns(
+    rewards: torch.Tensor, discount_factor: float, normalize: bool = True
+) -> torch.Tensor:
+    """
+    calculate episodes returns (cumulative summation of the rewards)
+
+    :param rewards: the rewards obtained throughout each episode.
+    :param discount_factor: by how much rewards decay over time.
+    :param normalize: should the returns be normalized (have 0 mean and variance of 1).
+    :return: the calculated returns.
+    """
+    returns_list: List[float] = []
+    cumulative_reward: float = 0
 
     for r in reversed(rewards):
-        R = r + R * discount_factor
-        returns.insert(0, R)
+        cumulative_reward = r + cumulative_reward * discount_factor
+        returns_list.insert(0, cumulative_reward)
 
-    returns = torch.tensor(returns)
+    returns = torch.tensor(returns_list)
 
     if normalize:
         # avoid possible division by 0
@@ -25,7 +37,18 @@ def calculate_returns(rewards, discount_factor, normalize=True):
     return returns
 
 
-def calculate_advantages(returns, values, normalize=True):
+def calculate_advantages(
+    returns: torch.Tensor, values: torch.Tensor, normalize: bool = True
+) -> torch.Tensor:
+    """
+    Calculate the advantages.
+
+    :param returns: the returns (cumulative summation of rewards).
+    :param values: the value estimates for each state.
+    :param normalize: should the advantages be normalized, i.e. have 0 mean and variance of 1.
+    :return: the calculated advantages.
+    """
+
     advantages = returns - values
 
     if normalize:
@@ -44,6 +67,16 @@ def calculate_policy_loss(
     advantages: torch.Tensor,
     ppo_clip,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """
+    calculate the clipped policy loss.
+
+    :param action_prob:
+    :param actions:
+    :param log_prob_actions:
+    :param advantages:
+    :param ppo_clip:
+    :return: the policy loss, the Kullback–Leibler divergence estimate & the entropy gain.
+    """
     dist = distributions.Categorical(action_prob)
 
     # new log prob using old actions
@@ -73,6 +106,11 @@ def calculate_loss(
     """
     final loss of clipped objective PPO, as seen here:
     https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/ppo2/model.py#L91
+
+    :param policy_loss: the calculated policy loss.
+    :param value_loss: the calculation value loss.
+    :param entropy_bonus: the calculated entropy bonus.
+    :return: the PPO objective, i.e. a linear combination of those losses & entropy bonus.
     """
     loss = (
         policy_loss

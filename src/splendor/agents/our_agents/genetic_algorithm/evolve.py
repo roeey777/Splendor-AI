@@ -21,8 +21,8 @@ from splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent import
     GeneAlgoAgent,
 )
 from splendor.game import Game
-from splendor.Splendor import features
-from splendor.Splendor.utils import LimitRoundsGameRule
+from splendor.splendor import features
+from splendor.splendor.utils import LimitRoundsGameRule
 
 from .argument_parsing import parse_args
 from .constants import (

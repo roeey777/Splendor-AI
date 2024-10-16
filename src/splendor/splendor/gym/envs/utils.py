@@ -7,9 +7,9 @@ from typing import Dict, List
 import numpy as np
 from numpy.typing import NDArray
 
-from splendor.Splendor.constants import MAX_TIER_CARDS, NUMBER_OF_TIERS, RESERVED
-from splendor.Splendor.splendor_model import SplendorState
-from splendor.Splendor.types import ActionType
+from splendor.splendor.constants import MAX_TIER_CARDS, NUMBER_OF_TIERS, RESERVED
+from splendor.splendor.splendor_model import SplendorState
+from splendor.splendor.types import ActionType
 
 from .actions import ALL_ACTIONS, Action, ActionEnum, CardPosition
 
