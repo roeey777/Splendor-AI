@@ -1,18 +1,21 @@
-from pathlib import Path
-from typing import List, Optional, override
+"""
+Implementation of a PPO agent with MLP neural network
+"""
 
-import gymnasium as gym
+from pathlib import Path
+from typing import List, override
+
 import numpy as np
 import torch
 from numpy.typing import NDArray
 
-from splendor.Splendor.features import extract_metrics_with_cards
-from splendor.Splendor.gym.envs.utils import (
+from splendor.splendor.features import extract_metrics_with_cards
+from splendor.splendor.gym.envs.utils import (
     create_action_mapping,
     create_legal_actions_mask,
 )
-from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
-from splendor.Splendor.types import ActionType
+from splendor.splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.splendor.types import ActionType
 
 from .ppo_agent_base import PPOAgentBase, PPOBase
 from .utils import load_saved_ppo
@@ -21,6 +24,10 @@ DEFAULT_SAVED_PPO_PATH = Path(__file__).parent / "ppo_model.pth"
 
 
 class PPOAgent(PPOAgentBase):
+    """
+    PPO agent with MLP neural network.
+    """
+
     @override
     def SelectAction(
         self,
@@ -61,4 +68,4 @@ class PPOAgent(PPOAgentBase):
         return load_saved_ppo()
 
 
-myAgent = PPOAgent
+myAgent = PPOAgent  # pylint: disable=invalid-name

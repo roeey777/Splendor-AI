@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 # INFORMATION ------------------------------------------------------------------------------------------------------- #
 
 # Author:  Steven Spratley, extending code by Guang Ho and Michelle Blom
@@ -15,7 +17,6 @@ from os.path import abspath, join, realpath
 
 from splendor.template import Displayer
 
-# from splendor.Splendor.splendor_utils import *
 from .splendor_utils import *
 
 SPLENDOR_DIR = os.path.dirname(realpath(__file__))

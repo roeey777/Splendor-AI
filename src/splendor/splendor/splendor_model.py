@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 # INFORMATION ------------------------------------------------------------------------------------------------------- #
 
 # Author:  Steven Spratley, extending code by Guang Ho and Michelle Blom

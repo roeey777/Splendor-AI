@@ -1,3 +1,7 @@
+"""
+Constants related to PPO with Self-Attention.
+"""
+
 from typing import List
 
 DROPOUT = 0.2

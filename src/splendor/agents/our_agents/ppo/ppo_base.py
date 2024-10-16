@@ -1,12 +1,20 @@
+"""
+Base class for all neural network that should be used by a PPO agent.
+"""
+
 from abc import ABC, abstractmethod
 from typing import Any, Protocol, Tuple, Union
 
 import torch
-import torch.nn as nn
+import torch.nn as nn  # pylint: disable=consider-using-from-import
 from jaxtyping import Float
 
 
 class PPOBase(nn.Module, ABC):
+    """
+    Base class for all neural network that should be used by a PPO agent.
+    """
+
     def __init__(
         self,
         input_dim: int,
@@ -54,5 +62,10 @@ class PPOBase(nn.Module, ABC):
 
 
 class PPOBaseFactory(Protocol):
+    """
+    factory for PPO models
+    """
+
+    # pylint: disable=too-few-public-methods
     def __call__(self, input_dim: int, output_dim: int, *args, **kwargs) -> PPOBase:
         pass

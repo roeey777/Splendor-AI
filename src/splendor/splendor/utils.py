@@ -1,3 +1,7 @@
+"""
+Usefule utilities.
+"""
+
 from . import features
 from .splendor_model import SplendorGameRule
 

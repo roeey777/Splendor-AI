@@ -1,14 +1,23 @@
+"""
+Base class for all PPO which incorporates a recurrent unit in their neural network
+architecture.
+"""
+
 from abc import abstractmethod
 from typing import Any, Tuple, Union
 
 import torch
-import torch.nn as nn
+import torch.nn as nn  # pylint: disable=consider-using-from-import
 from jaxtyping import Float
 
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 
 
 class RecurrentPPO(PPOBase):
+    """
+    Base class for all PPO models with recurrent unit.
+    """
+
     def __init__(
         self,
         input_dim: int,
@@ -19,7 +28,7 @@ class RecurrentPPO(PPOBase):
         self.recurrent_unit = recurrent_unit
 
     @abstractmethod
-    def forward(
+    def forward(  # pylint: disable=arguments-differ
         self,
         x: Union[
             Float[torch.Tensor, "batch sequence features"],
@@ -29,6 +38,7 @@ class RecurrentPPO(PPOBase):
         action_mask: Union[
             Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
         ],
+        hidden_state: Any,
         *args,
         **kwargs,
     ) -> Tuple[

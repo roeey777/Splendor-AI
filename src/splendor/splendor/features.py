@@ -2,7 +2,6 @@
 Features extraction from SplendorState
 """
 
-from dataclasses import dataclass
 from functools import cache
 from itertools import chain, repeat
 from typing import Dict, List, Optional, Tuple, Union, ValuesView
@@ -64,12 +63,24 @@ def get_agent(game_state: SplendorState, agent_index: int) -> SplendorState.Agen
 
 
 def agent_buying_power(agent: SplendorState.AgentState) -> Dict[Color, int]:
+    """
+    Find the buying power of a specific agent.
+
+    :param agent: an agent.
+    :return: the agent buying power.
+    """
     return {
         color: agent.gems[color] + len(agent.cards[color]) for color in NORMAL_COLORS
     }
 
 
 def diminish_return(value: Union[int, float]) -> float:
+    """
+    calculate the diminished return of a value.
+
+    :param value: a value.
+    :return: the calculated diminished value of the given value.
+    """
     if value <= -1:
         raise ValueError(f"log(1 + value) isn't defined for the value {value}")
 
@@ -77,6 +88,12 @@ def diminish_return(value: Union[int, float]) -> float:
 
 
 def agent_won(agent: SplendorState.AgentState) -> bool:
+    """
+    Check if a given agent has won.
+
+    :param agent: an agent.
+    :return: whether or not the agent has won.
+    """
     return agent.score >= WINNING_SCORE_TRESHOLD
 
 
@@ -90,6 +107,13 @@ def turns_made_by_agent(agent: SplendorState.AgentState) -> int:
 def missing_gems_to_card(
     card: Card, buying_power: Dict[Color, int]
 ) -> Dict[Color, int]:
+    """
+    find how many gems are required in order to buy a specific card.
+
+    :param card: a card up for purchase.
+    :param buying_power: the current buying power.
+    :return: the required gems for purchasing that card.
+    """
     return {
         color: cost - buying_power[color]
         for color, cost in card.cost.items()
@@ -98,12 +122,23 @@ def missing_gems_to_card(
 
 
 def turns_to_buy_card(missing_gems: ValuesView[int]) -> int:
+    """
+    calculate an optimistic estimate for the amount of turns required
+    in order to buy a card by collecting all the missing gems without any
+    interference from the opponents.
+
+    :param missing_gems: the missing gems required to buy a card.
+    :return: an estimate on how many turns are required in order to collect all those gems.
+    """
     if not missing_gems:
         return 0
     return max(np.ceil(sum(missing_gems) / 3), *missing_gems)
 
 
 def build_array(base_array: NDArray, instruction: Tuple[int, ...]) -> NDArray:
+    """
+    construct an ``np.array`` from given instructions.
+    """
     building_blocks = zip(base_array, instruction, strict=True)
     iters = (repeat(value, times) for value, times in building_blocks)
     match len(base_array.shape):
@@ -177,17 +212,25 @@ METRIC_NORMALIZATION: NDArray = np.array(
 
 
 def extract_metrics(game_state: SplendorState, agent_index: int) -> NDArray:
+    # pylint: disable=too-many-locals
+    """
+    Extract metrics/features from a given state.
+
+    :param game_state: a game state.
+    :param agent_index: the index an agent.
+    :return: the extracted feature vector of that state.
+    """
     agent = get_agent(game_state, agent_index)
     buying_power = agent_buying_power(agent)
     owned_cards = sum(len(agent.cards[color]) for color in NORMAL_COLORS)
 
     card_distance_per_color: Dict[Color, List[float]] = {
-        color: list() for color in NORMAL_COLORS
+        color: [] for color in NORMAL_COLORS
     }
     distance_in_gems: float = 0
 
-    cards_distances_in_gems: list[int] = list()
-    cards_distances_in_turns: list[int] = list()
+    cards_distances_in_gems: list[int] = []
+    cards_distances_in_turns: list[int] = []
     for card in chain(*game_state.board.dealt):
         if card is None:
             cards_distances_in_gems.append(MISSING_CARD_GEMS_DEFAULT)
@@ -268,6 +311,12 @@ def extract_metrics(game_state: SplendorState, agent_index: int) -> NDArray:
 
 
 def normalize_metrics(metrics: NDArray) -> NDArray:
+    """
+    normalize the feature vector.
+
+    :param metrics: un-normalized features vector.
+    :return: normalized features vector.
+    """
     normalizer = build_array(METRIC_NORMALIZATION, METRICS_SHAPE)
     normalized = metrics / normalizer
     return normalized.clip(-1, 1)
@@ -312,7 +361,9 @@ def get_yellow_gem_index() -> int:
 
 @cache
 def get_indices_access_by_color(color_name: str) -> NDArray:
-    """ """
+    """
+    convert gem's color name to an indexing array.
+    """
     encoder: OneHotEncoder = get_color_encoder()
     yellow_index = get_yellow_gem_index()
 
@@ -383,7 +434,7 @@ def extract_reserved_cards(
     for card in agent.cards[RESERVED]:
         reserved.append(vectorize_card(card))
 
-    for i in range(MAX_RESERVED - len(reserved)):
+    for _ in range(MAX_RESERVED - len(reserved)):
         reserved.append(vectorize_card(None))
 
     return reserved

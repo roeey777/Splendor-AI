@@ -1,9 +1,13 @@
+"""
+Genetic Algorithm based agent.
+"""
+
 from pathlib import Path
 
 import numpy as np
 
 from splendor.agents.our_agents.genetic_algorithm.genes import ManagerGene, StrategyGene
-from splendor.Splendor.features import extract_metrics, normalize_metrics
+from splendor.splendor.features import extract_metrics, normalize_metrics
 from splendor.template import Agent
 
 
@@ -30,29 +34,29 @@ class GeneAlgoAgent(Agent):
         super().__init__(_id)
 
         if manager is None:
-            self._manager_gene = ManagerGene.load(self.MANAGER_PATH)
+            self.manager_gene = ManagerGene.load(self.MANAGER_PATH)
         else:
-            self._manager_gene = manager
+            self.manager_gene = manager
 
         if strategy1 is None:
-            self._strategy_gene_1 = StrategyGene.load(self.STRATEGY_1_PATH)
+            self.stategy_gene_1 = StrategyGene.load(self.STRATEGY_1_PATH)
         else:
-            self._strategy_gene_1 = strategy1
+            self.stategy_gene_1 = strategy1
 
         if strategy2 is None:
-            self._strategy_gene_2 = StrategyGene.load(self.STRATEGY_2_PATH)
+            self.stategy_gene_2 = StrategyGene.load(self.STRATEGY_2_PATH)
         else:
-            self._strategy_gene_2 = strategy2
+            self.stategy_gene_2 = strategy2
 
         if strategy3 is None:
-            self._strategy_gene_3 = StrategyGene.load(self.STRATEGY_3_PATH)
+            self.stategy_gene_3 = StrategyGene.load(self.STRATEGY_3_PATH)
         else:
-            self._strategy_gene_3 = strategy3
+            self.stategy_gene_3 = strategy3
 
         self._strategies = (
-            self._strategy_gene_1,
-            self._strategy_gene_2,
-            self._strategy_gene_3,
+            self.stategy_gene_1,
+            self.stategy_gene_2,
+            self.stategy_gene_3,
         )
 
         self.population_id = self.INVALID_POPULATION_ID
@@ -62,10 +66,10 @@ class GeneAlgoAgent(Agent):
         Saves the genes of the given agent to the provided folder.
         Used for evolution.
         """
-        self._manager_gene.save(folder / self.MANAGER_PATH.name)
-        self._strategy_gene_1.save(folder / self.STRATEGY_1_PATH.name)
-        self._strategy_gene_2.save(folder / self.STRATEGY_2_PATH.name)
-        self._strategy_gene_3.save(folder / self.STRATEGY_3_PATH.name)
+        self.manager_gene.save(folder / self.MANAGER_PATH.name)
+        self.stategy_gene_1.save(folder / self.STRATEGY_1_PATH.name)
+        self.stategy_gene_2.save(folder / self.STRATEGY_2_PATH.name)
+        self.stategy_gene_3.save(folder / self.STRATEGY_3_PATH.name)
 
     def evaluate_action(self, strategy, action, game_state, game_rule):
         """
@@ -84,10 +88,10 @@ class GeneAlgoAgent(Agent):
         Method used by the game's engine when running a game with this agent.
         """
         if not actions:
-            raise Exception("Cannot play, no actions")
+            raise RuntimeError("Cannot play, no actions")
 
         metrics = normalize_metrics(extract_metrics(game_state, self.id))
-        strategy = self._manager_gene.select_strategy(metrics, self._strategies)
+        strategy = self.manager_gene.select_strategy(metrics, self._strategies)
         best_action = None
         best_action_value = -np.inf
 
@@ -103,4 +107,4 @@ class GeneAlgoAgent(Agent):
 
 
 # Required for the game engine to use this agent
-myAgent = GeneAlgoAgent
+myAgent = GeneAlgoAgent  # pylint: disable=invalid-name

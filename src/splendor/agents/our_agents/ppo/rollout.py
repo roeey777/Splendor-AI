@@ -1,5 +1,10 @@
+"""
+Implementation of a rollout buffer - a tracker of essential
+values for learning purposes, during an episode.
+"""
+
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple
+from typing import Optional, Tuple
 
 import torch
 
@@ -8,6 +13,12 @@ from .common import calculate_advantages, calculate_returns
 
 @dataclass
 class RolloutBuffer:
+    """
+    The rollout buffer.
+    """
+
+    # pylint: disable=too-many-instance-attributes
+
     size: int
     input_dim: int
     action_dim: int
@@ -58,7 +69,7 @@ class RolloutBuffer:
         else:
             self.hidden_states = torch.zeros(self.size, dtype=torch.float64)
 
-    def remember(
+    def remember(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         state: torch.Tensor,
         action: torch.Tensor,
@@ -69,6 +80,19 @@ class RolloutBuffer:
         done: bool,
         hidden_state: Optional[torch.Tensor] = None,
     ):
+        """
+        Store essential values in the rollout buffer.
+
+        :param state: feature vector of a state.
+        :param action: the action taken in that state.
+        :param action_mask: the actions mask in that state.
+        :param log_prob_action: the log of the probabilities for each action in that state.
+        :param value: the value estimation of that state.
+        :param reward: the reward given after taken the action.
+        :param done: is this a terminal state.
+        :param hidden_state: the hidden state used, only relevant for recurrent PPO.
+        """
+
         with torch.no_grad():
             if self.full:
                 return
@@ -93,6 +117,9 @@ class RolloutBuffer:
                 self.full = True
 
     def clear(self):
+        """
+        clean the rollout buffer.
+        """
         self.index = 0
         self.full = False
 
@@ -101,6 +128,9 @@ class RolloutBuffer:
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Compute the Generalized Advantage Estimation (GAE).
+
+        :param discount_factor: by how much a reward decays over time.
+        :return: the calculated advantages & returns.
         """
         with torch.no_grad():
             returns = calculate_returns(self.rewards[: self.index], discount_factor).to(
@@ -123,6 +153,9 @@ class RolloutBuffer:
         torch.Tensor,
         torch.Tensor,
     ]:
+        """
+        unpack all the stored values from the rollout buffer.
+        """
         if self.hidden_states is not None:
             hidden_states = self.hidden_states[: self.index]
         else:
