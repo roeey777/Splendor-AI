@@ -1,10 +1,14 @@
+"""
+Collection of useful utility functions used in the implementation of SplendorEnv.
+"""
+
 from typing import Dict, List
 
 import numpy as np
 from numpy.typing import NDArray
 
 from splendor.Splendor.constants import MAX_TIER_CARDS, NUMBER_OF_TIERS, RESERVED
-from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.Splendor.splendor_model import SplendorState
 from splendor.Splendor.types import ActionType
 
 from .actions import ALL_ACTIONS, Action, ActionEnum, CardPosition
@@ -17,7 +21,7 @@ def _valid_position(state: SplendorState, position: CardPosition) -> bool:
     """
     if position.tier not in range(NUMBER_OF_TIERS):
         return False
-    elif (
+    if (
         position.card_index not in range(MAX_TIER_CARDS)
         or state.board.dealt[position.tier][position.card_index] is None
     ):
@@ -40,7 +44,6 @@ def _valid_reserved_position(
 
 def build_action(
     action_index: int,
-    game_rule: SplendorGameRule,
     state: SplendorState,
     agent_index: int,
 ) -> Dict:
@@ -113,8 +116,7 @@ def build_action(
                 raise ValueError(
                     f"Can't build action {action} since there is not card to buy!"
                 )
-            else:
-                returned_gems = card.cost
+            returned_gems = card.cost
 
             action_to_execute = {
                 "type": "buy_available",
@@ -129,8 +131,7 @@ def build_action(
                 raise ValueError(
                     f"Can't build action {action} since there is not card to buy!"
                 )
-            else:
-                returned_gems = reserved_card.cost
+            returned_gems = reserved_card.cost
 
             action_to_execute = {
                 "type": "buy_reserve",

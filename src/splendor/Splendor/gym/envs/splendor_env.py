@@ -2,22 +2,28 @@
 Implementation of Splendor as a gym.Env
 """
 
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, override
 
 import gymnasium as gym
 import numpy as np
 from numpy.typing import NDArray
 
-from splendor.Splendor import features, splendor_utils
-from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.Splendor import features
+from splendor.Splendor.splendor_model import SplendorState
 from splendor.Splendor.utils import LimitRoundsGameRule
 from splendor.template import Agent
 
-from .actions import ALL_ACTIONS, Action, ActionType, CardPosition
+from .actions import ALL_ACTIONS
 from .utils import create_action_mapping, create_legal_actions_mask
 
 
 class SplendorEnv(gym.Env):
+    """
+    Custom gym.Env for the game Splendor.
+    """
+
+    # pylint: disable=too-many-instance-attributes
+
     def __init__(
         self,
         agents: List[Agent],
@@ -54,6 +60,9 @@ class SplendorEnv(gym.Env):
         """
         super().__init__()
 
+        # unused render_mode
+        _ = render_mode
+
         self.fixed_turn = fixed_turn
         self.shuffle_turns = shuffle_turns
         self.agents = np.array(agents)
@@ -75,8 +84,9 @@ class SplendorEnv(gym.Env):
         # this default value will be overridden by reset().
         self.my_turn: int = -1
 
+    @override
     def reset(
-        self, seed: Optional[int] = None, options: Optional[Dict] = None
+        self, *, seed: Optional[int] = None, options: Optional[Dict] = None
     ) -> Tuple[NDArray, Dict[str, int]]:
         """
         Reset the environment - Create a new game.
@@ -88,6 +98,7 @@ class SplendorEnv(gym.Env):
                  my agent.
         :note: the order of turns in randomly chosen each time reset is called.
         """
+        super().reset(seed=seed)
         self.game_rule = LimitRoundsGameRule(self.number_of_players)
 
         if self.shuffle_turns:
@@ -108,10 +119,11 @@ class SplendorEnv(gym.Env):
         assert self.observation_space.shape is not None
 
         return (
-            self._vectorize(self.state, self.observation_space.shape, self.my_turn),
+            self._vectorize(self.state, self.my_turn),
             {"my_id": self.my_turn},
         )
 
+    @override
     def step(self, action: int) -> Tuple[NDArray, float, bool, bool, Dict]:
         """
         Run one time-step of the environment's dynamics.
@@ -146,20 +158,13 @@ class SplendorEnv(gym.Env):
         # simulate opponents until my next turn
         terminated, next_state = self._simulate_opponents()
 
-        is_leading = (
-            np.array(
-                [self.state.agents[i].score for i in range(self.number_of_players)]
-            ).argmax()
-            == self.my_turn
-        )
-
         reward = current_score - previous_score
 
         # this assertion is for mypy, the shape is never None.
         assert self.observation_space.shape is not None
 
         return (
-            self._vectorize(next_state, self.observation_space.shape, self.my_turn),
+            self._vectorize(next_state, self.my_turn),
             reward,
             terminated,
             False,
@@ -194,7 +199,7 @@ class SplendorEnv(gym.Env):
         raise ValueError(f"Invalid turn ({turn})")
 
     @staticmethod
-    def _vectorize(state: SplendorState, shape: Tuple[int, ...], turn: int) -> NDArray:
+    def _vectorize(state: SplendorState, turn: int) -> NDArray:
         """
         extract the features vector out of the given state.
         """
@@ -227,8 +232,14 @@ class SplendorEnv(gym.Env):
 
     @property
     def turn(self) -> int:
+        """
+        return the turn of the player.
+        """
         return self.game_rule.current_agent_index
 
     @property
     def state(self) -> SplendorState:
+        """
+        return the current game state itself, not the feature vector of that state.
+        """
         return self.game_rule.current_game_state
