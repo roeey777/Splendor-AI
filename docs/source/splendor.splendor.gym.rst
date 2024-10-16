@@ -1,4 +1,4 @@
-splendor.Splendor.gym package
+splendor.splendor.gym package
 =============================
 
 Subpackages
@@ -7,12 +7,12 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   splendor.Splendor.gym.envs
+   splendor.splendor.gym.envs
 
 Module contents
 ---------------
 
-.. automodule:: splendor.Splendor.gym
+.. automodule:: splendor.splendor.gym
    :members:
    :undoc-members:
    :show-inheritance:
