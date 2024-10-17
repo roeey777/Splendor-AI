@@ -82,6 +82,7 @@ class PPOSelfAttention(PPOBase):
     ) -> Tuple[
         Float[torch.Tensor, "batch actions"],
         Float[torch.Tensor, "batch 1"],
+        None,
     ]:
         """
         Pass input through the network to gain predictions.
@@ -105,11 +106,12 @@ class PPOSelfAttention(PPOBase):
         actor_output = self.actor(x1)
         masked_actor_output = torch.where(action_mask == 0, HUGE_NEG, actor_output)
         prob = F.softmax(masked_actor_output, dim=1)
-        return prob, self.critic(x1)
+        return prob, self.critic(x1), None
 
     @override
-    def init_hidden_state(self) -> None:
+    def init_hidden_state(self, device: torch.device) -> None:
         """
         return the initial hidden state to be used.
         """
-        return None
+        # device is unused.
+        _ = device

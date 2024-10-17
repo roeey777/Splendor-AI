@@ -28,7 +28,7 @@ class RecurrentPPO(PPOBase):
         self.recurrent_unit = recurrent_unit
 
     @abstractmethod
-    def forward(  # pylint: disable=arguments-differ
+    def forward(  # type: ignore
         self,
         x: Union[
             Float[torch.Tensor, "batch sequence features"],
@@ -46,6 +46,7 @@ class RecurrentPPO(PPOBase):
         Float[torch.Tensor, "batch 1"],
         Float[torch.Tensor, "batch hidden_dim"],
     ]:
+        # pylint: disable=arguments-differ
         """
         Pass input through the network to gain predictions.
 
@@ -62,7 +63,7 @@ class RecurrentPPO(PPOBase):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_hidden_state(self, device: torch.device) -> Any:
+    def init_hidden_state(self, device: torch.device) -> Tuple[Any, Any]:
         """
         return the initial hidden state to be used.
         """

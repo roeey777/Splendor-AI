@@ -38,7 +38,7 @@ class PPOBase(nn.Module, ABC):
         ],
         *args,
         **kwargs,
-    ) -> Tuple[torch.Tensor, ...]:
+    ) -> Tuple[torch.Tensor, torch.Tensor, Any]:
         """
         Pass input through the network to gain predictions.
 
@@ -50,6 +50,7 @@ class PPOBase(nn.Module, ABC):
                             expected shape: (actions,) or (batch_size, actions).
                             where actions are equal to len(ALL_ACTIONS) which comes
                             from splendor.Splendor.gym.envs.actions
+        :return: the actions probabilities and the value estimate.
         """
         raise NotImplementedError()
 

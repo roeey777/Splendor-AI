@@ -9,7 +9,17 @@ from dataclasses import dataclass
 from functools import partial
 from importlib import import_module
 from pathlib import Path
-from typing import Callable, Dict, List, Literal, Optional, Required, TypedDict, cast
+from typing import (
+    Callable,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Required,
+    Tuple,
+    TypedDict,
+    cast,
+)
 
 from splendor.agents.generic.random import myAgent as RandomAgent
 from splendor.agents.our_agents.minmax import myAgent as MinMaxAgent
@@ -27,10 +37,10 @@ from .ppo_base import PPOBaseFactory
 from .ppo_rnn.gru.constants import HIDDEN_STATE_SHAPE as GRU_HIDDEN_STATE_SHAPE
 from .ppo_rnn.gru.network import PpoGru
 from .ppo_rnn.gru.ppo_agent import DEFAULT_SAVED_PPO_GRU_PATH
+from .ppo_rnn.lstm.constants import HIDDEN_STATE_SHAPE as LSTM_HIDDEN_STATE_SHAPE
 
 # recurrent PPO with LSTM
-from .ppo_rnn.lstm.network import PPO_LSTM
-from .ppo_rnn.lstm.constants import HIDDEN_STATE_SHAPE as LSTM_HIDDEN_STATE_SHAPE
+from .ppo_rnn.lstm.network import PpoLstm
 from .ppo_rnn.lstm.ppo_agent import DEFAULT_SAVED_PPO_LSTM_PATH
 
 # PPO with self-attention
@@ -50,7 +60,7 @@ class NeuralNetArch:
     is_recurrent: bool
     default_saved_weights: Path
     agent_relative_import_path: str
-    hidden_state_dim: Optional[int] = None
+    hidden_state_dim: Optional[Tuple[int, ...]] = None
 
 
 OpponentsFactory = Callable[[int], List[Agent]]
@@ -74,7 +84,12 @@ NN_ARCHITECTURES = {
         ".self_attn.ppo_agent",
     ),
     "lstm": NeuralNetArch(
-        "ppo_lstm", PPO_LSTM, True, DEFAULT_SAVED_PPO_LSTM_PATH, LSTM_HIDDEN_STATE_SHAPE
+        "ppo_lstm",
+        PpoLstm,
+        True,
+        DEFAULT_SAVED_PPO_LSTM_PATH,
+        ".ppo_rnn.lstm.ppo_agent",
+        LSTM_HIDDEN_STATE_SHAPE,
     ),
 }
 NN_ARCHITECTURES_CHOICES = NN_ARCHITECTURES.keys()

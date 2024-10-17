@@ -48,7 +48,7 @@ class LearningParams:
     seed: int
     device: torch.device
     is_recurrent: bool
-    hidden_states_dim: Optional[int] = None
+    hidden_states_shape: Optional[Tuple[int, ...]] = None
 
 
 def train_single_episode(
@@ -78,7 +78,7 @@ def train_single_episode(
         flatdim(custom_env.observation_space),
         flatdim(custom_env.action_space),
         learning_params.is_recurrent,
-        learning_params.hidden_states_dim,
+        learning_params.hidden_states_shape,
     )
 
     done = False
@@ -91,7 +91,7 @@ def train_single_episode(
     )
 
     if learning_params.is_recurrent:
-        hidden = policy.init_hidden_state().to(learning_params.device)
+        hidden, cell_state = policy.init_hidden_state(learning_params.device)
 
     while not done:
         action_mask = (
@@ -102,9 +102,11 @@ def train_single_episode(
         )
 
         if learning_params.is_recurrent:
-            action_prob, value_pred, *next_hidden = policy(state, action_mask, hidden)
+            action_prob, value_pred, next_hidden, next_cell = policy(
+                state, action_mask, (hidden, cell_state)
+            )
         else:
-            action_prob, value_pred = policy(state, action_mask)
+            action_prob, value_pred, *_ = policy(state, action_mask)
 
         dist = distributions.Categorical(action_prob)
         action = dist.sample()
@@ -125,6 +127,7 @@ def train_single_episode(
             reward,
             done,
             hidden if learning_params.is_recurrent else None,
+            cell_state if learning_params.is_recurrent else None,
         )
 
         state = (
@@ -136,6 +139,7 @@ def train_single_episode(
 
         if learning_params.is_recurrent:
             hidden = next_hidden
+            cell_state = next_cell
 
     policy_loss, value_loss = update_policy(policy, rollout_buffer, learning_params)
 
@@ -162,6 +166,7 @@ def update_policy(
 
     (
         hidden_states,
+        cell_states,
         states,
         actions,
         action_masks,
@@ -174,13 +179,12 @@ def update_policy(
     for _ in range(learning_params.ppo_steps):
         # get new log prob of actions for all input states
         if learning_params.is_recurrent:
-            action_prob, value_pred, next_hidden_states = policy(
-                states, action_masks, hidden_states
+            action_prob, value_pred, *_ = policy(
+                states, action_masks, (hidden_states, cell_states)
             )
-            next_hidden_states.detach()
             value_pred = value_pred.squeeze(-1)
         else:
-            action_prob, value_pred = policy(states, action_masks)
+            action_prob, value_pred, *_ = policy(states, action_masks)
             value_pred = value_pred.squeeze(-1)
 
         policy_loss, kl_divergence_estimate, entropy = calculate_policy_loss(
@@ -238,7 +242,7 @@ def evaluate(
     state = torch.from_numpy(state_vector).double().unsqueeze(0).to(device)
 
     if is_recurrent:
-        hidden = policy.init_hidden_state().to(device)
+        hidden = policy.init_hidden_state(device)
 
     with torch.no_grad():
         while not done:
@@ -249,9 +253,9 @@ def evaluate(
             )
 
             if is_recurrent:
-                action_prob, _, hidden = policy(state, action_mask, hidden)
+                action_prob, _, *hidden = policy(state, action_mask, hidden)
             else:
-                action_prob, _ = policy(state, action_mask)
+                action_prob, *_ = policy(state, action_mask)
 
             action = torch.argmax(action_prob, dim=-1)
             next_state, reward, done, _, __ = custom_env.step(int(action.item()))
