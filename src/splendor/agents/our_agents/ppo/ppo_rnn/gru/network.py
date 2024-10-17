@@ -57,17 +57,9 @@ class PpoGru(RecurrentPPO):
         self.recurrent_layers_num = recurrent_layers_num
 
         self.input_norm = InputNormalization(input_dim)
-
-        layers: List[nn.Module] = []
-        prev_dim = hidden_state_dim
-        for next_dim in self.hidden_layers_dims:
-            layers.append(nn.Linear(prev_dim, next_dim))
-            layers.append(nn.LayerNorm(next_dim))
-            layers.append(nn.Dropout(dropout))
-            layers.append(nn.ReLU())
-            prev_dim = next_dim
-        self.net = nn.Sequential(*layers)
-
+        self.net = self.create_hidden_layers(
+            input_dim, self.hidden_layers_dims, dropout
+        )
         self.actor = nn.Linear(self.hidden_layers_dims[-1], output_dim)
         self.critic = nn.Linear(self.hidden_layers_dims[-1], 1)
 

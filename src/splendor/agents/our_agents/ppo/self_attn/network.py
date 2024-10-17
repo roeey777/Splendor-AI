@@ -41,16 +41,9 @@ class PPOSelfAttention(PPOBase):
         # 1 is for using a single-headed attention.
         self.self_attention = nn.MultiheadAttention(input_dim, 1, dropout=dropout)
 
-        layers: List[nn.Module] = []
-        prev_dim = input_dim
-        for next_dim in self.hidden_layers_dims:
-            layers.append(nn.Linear(prev_dim, next_dim))
-            layers.append(nn.LayerNorm(next_dim))
-            layers.append(nn.Dropout(dropout))
-            layers.append(nn.ReLU())
-            prev_dim = next_dim
-        self.net = nn.Sequential(*layers)
-
+        self.net = self.create_hidden_layers(
+            input_dim, self.hidden_layers_dims, dropout
+        )
         self.actor = nn.Linear(self.hidden_layers_dims[-1], output_dim)
         self.critic = nn.Linear(self.hidden_layers_dims[-1], 1)
 
@@ -107,11 +100,3 @@ class PPOSelfAttention(PPOBase):
         masked_actor_output = torch.where(action_mask == 0, HUGE_NEG, actor_output)
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1), None
-
-    @override
-    def init_hidden_state(self, device: torch.device) -> None:
-        """
-        return the initial hidden state to be used.
-        """
-        # device is unused.
-        _ = device

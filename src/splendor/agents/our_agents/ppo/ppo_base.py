@@ -3,7 +3,7 @@ Base class for all neural network that should be used by a PPO agent.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Protocol, Tuple, Union
+from typing import Any, List, Protocol, Tuple, Union
 
 import torch
 import torch.nn as nn  # pylint: disable=consider-using-from-import
@@ -54,12 +54,29 @@ class PPOBase(nn.Module, ABC):
         """
         raise NotImplementedError()
 
-    @abstractmethod
     def init_hidden_state(self, device: torch.device) -> Any:
         """
         return the initial hidden state to be used.
         """
-        raise NotImplementedError()
+        # device is unused.
+        _ = device
+
+    @classmethod
+    def create_hidden_layers(
+        cls, input_dim: int, hidden_layers_dims: List[int], dropout: float
+    ) -> nn.Module:
+        """
+        Create hidden layers based on given dimentions.
+        """
+        layers: List[nn.Module] = []
+        prev_dim = input_dim
+        for next_dim in hidden_layers_dims:
+            layers.append(nn.Linear(prev_dim, next_dim))
+            layers.append(nn.LayerNorm(next_dim))
+            layers.append(nn.Dropout(dropout))
+            layers.append(nn.ReLU())
+            prev_dim = next_dim
+        return nn.Sequential(*layers)
 
 
 class PPOBaseFactory(Protocol):

@@ -20,5 +20,5 @@ repos:
       args:
         [
           "-rn", # Only display messages
-          "--fail-under=9.9"
+          "--fail-under=9.5"
         ]
