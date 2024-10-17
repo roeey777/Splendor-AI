@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 # INFORMATION ------------------------------------------------------------------------------------------------------- #
 
 
@@ -276,11 +278,11 @@ def run(options, msg):
 
     # import GameRule
     try:
-        model_name = f"splendor.{game_name}.{game_name.lower()}_model"
+        model_name = f"splendor.{game_name.lower()}.{game_name.lower()}_model"
         model = importlib.import_module(model_name)
         GameRule = getattr(model, f"{game_name}GameRule")
         displayer = importlib.import_module(
-            f"splendor.{game_name}.{game_name.lower()}_displayer"
+            f"splendor.{game_name.lower()}.{game_name.lower()}_displayer"
         )
         TextDisplayer = getattr(displayer, "TextDisplayer")
         GUIDisplayer = getattr(displayer, "GUIDisplayer")

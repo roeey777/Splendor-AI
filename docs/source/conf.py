@@ -6,6 +6,8 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+# pylint: skip-file
+
 project = "Splendor-AI"
 copyright = "2024, Eyal Royee"
 author = "Eyal Royee"
@@ -19,6 +21,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autodoc",
     "sphinx.ext.githubpages",
+    "sphinx_copybutton",
 ]
 
 templates_path = ["_templates"]

@@ -1,43 +1,44 @@
+"""
+Implementation for a PPO agent which uses GRU in his neural network
+"""
+
 from pathlib import Path
 from typing import List, override
 
-import gymnasium as gym
 import numpy as np
 import torch
-import torch.nn as nn
+import torch.nn as nn  # pylint: disable=consider-using-from-import
 from numpy.typing import NDArray
 
 from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 from splendor.agents.our_agents.ppo.utils import load_saved_model
-from splendor.Splendor.features import extract_metrics_with_cards
-from splendor.Splendor.gym.envs.utils import (
+from splendor.splendor.features import extract_metrics_with_cards
+from splendor.splendor.gym.envs.utils import (
     create_action_mapping,
     create_legal_actions_mask,
 )
-from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
-from splendor.Splendor.types import ActionType
+from splendor.splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.splendor.types import ActionType
 
-from .network import PPO_GRU
+from .network import PpoGru
 
 DEFAULT_SAVED_PPO_GRU_PATH = Path(__file__).parent / "ppo_gru_model.pth"
 
 
 class PpoGruAgent(PPOAgentBase):
-<<<<<<< HEAD
-    def __init__(self, _id):
-        super().__init__(_id)
-        self.hidden_state = self.net.init_hidden_state(self.device)
-=======
+    """
+    PPO agent with GRU.
+    """
+
     @override
     def __init__(self, _id: int, load_net: bool = True):
         super().__init__(_id, load_net)
->>>>>>> master
 
         if load_net:
             # this assertion is only for mypy
             assert self.net is not None
-            self.hidden_state = self.net.init_hidden_state().to(self.device)
+            self.hidden_state = self.net.init_hidden_state(self.device)
 
     @override
     def SelectAction(
@@ -79,7 +80,7 @@ class PpoGruAgent(PPOAgentBase):
         """
         load the weights of the network.
         """
-        return load_saved_model(DEFAULT_SAVED_PPO_GRU_PATH, PPO_GRU)
+        return load_saved_model(DEFAULT_SAVED_PPO_GRU_PATH, PpoGru)
 
     @override
     def load_policy(self, policy: nn.Module):
@@ -90,4 +91,4 @@ class PpoGruAgent(PPOAgentBase):
         self.hidden_state = self.net.init_hidden_state().to(self.device)
 
 
-myAgent = PpoGruAgent
+myAgent = PpoGruAgent  # pylint: disable=invalid-name

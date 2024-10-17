@@ -25,10 +25,18 @@ NobleType = Tuple[str, GemsCount]
 
 
 class YellowGemCount(TypedDict):
+    """
+    TypedDict for the yellow gems count.
+    """
+
     yellow: Required[Optional[Literal[1]]]
 
 
 class CollectAction(TypedDict):
+    """
+    TypedDict for collecting gems action.
+    """
+
     type: Required[CollectActionType]
     collected_gems: Required[GemsCount]
     returned_gems: Required[GemsCount]
@@ -36,6 +44,10 @@ class CollectAction(TypedDict):
 
 
 class ReserveAction(TypedDict):
+    """
+    TypedDict for reserving a card action.
+    """
+
     type: Required[ReserveActionType]
     collected_gems: Required[YellowGemCount]
     returned_gems: Required[GemsCount]
@@ -43,6 +55,10 @@ class ReserveAction(TypedDict):
 
 
 class BuyAction(TypedDict):
+    """
+    TypedDict for buying action.
+    """
+
     type: Required[BuyActionType]
     card: Required[Card]
     returned_gems: Required[GemsCount]

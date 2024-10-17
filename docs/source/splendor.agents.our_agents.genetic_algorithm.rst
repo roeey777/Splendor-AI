@@ -4,6 +4,22 @@ splendor.agents.our\_agents.genetic\_algorithm package
 Submodules
 ----------
 
+splendor.agents.our\_agents.genetic\_algorithm.argument\_parsing module
+-----------------------------------------------------------------------
+
+.. automodule:: splendor.agents.our_agents.genetic_algorithm.argument_parsing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+splendor.agents.our\_agents.genetic\_algorithm.constants module
+---------------------------------------------------------------
+
+.. automodule:: splendor.agents.our_agents.genetic_algorithm.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 splendor.agents.our\_agents.genetic\_algorithm.evolve module
 ------------------------------------------------------------
 

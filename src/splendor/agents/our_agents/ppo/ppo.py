@@ -1,3 +1,7 @@
+"""
+entry-point for PPO training.
+"""
+
 import random
 from csv import writer as csv_writer
 from datetime import datetime
@@ -9,15 +13,14 @@ from typing import List, Optional, cast
 import gymnasium as gym
 import numpy as np
 import torch
-import torch.nn as nn
-import torch.optim as optim
+import torch.nn as nn  # pylint: disable=consider-using-from-import
+import torch.optim as optim  # pylint: disable=consider-using-from-import
 from gymnasium.spaces.utils import flatdim
-from numpy.typing import NDArray
 
 # import this would register splendor as one of gym's environments.
-import splendor.Splendor.gym
-from splendor.Splendor.gym.envs.splendor_env import SplendorEnv
-from splendor.Splendor.splendor_model import SplendorState
+import splendor.splendor.gym  # pylint: disable=unused-import
+from splendor.splendor.gym.envs.splendor_env import SplendorEnv
+from splendor.splendor.splendor_model import SplendorState
 
 from .arguments_parsing import (
     DEFAULT_ARCHITECTURE,
@@ -108,6 +111,7 @@ def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> List[f
     return stats
 
 
+# pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-positional-arguments
 def train(
     working_dir: Path = WORKING_DIR,
     learning_rate: float = LEARNING_RATE,
@@ -146,7 +150,7 @@ def train(
     nn_arch: NeuralNetArch = NN_ARCHITECTURES[architecture]
 
     load_net_later = False
-    if opponent in OPPONENTS_AGENTS_FACTORY.keys():
+    if opponent in OPPONENTS_AGENTS_FACTORY:
         opponents_factory: OpponentsFactory = OPPONENTS_AGENTS_FACTORY[opponent]
         opponents = opponents_factory(0)
     else:
@@ -156,7 +160,7 @@ def train(
         load_net_later = True
 
     load_test_net_later = False
-    if test_opponent in OPPONENTS_AGENTS_FACTORY.keys():
+    if test_opponent in OPPONENTS_AGENTS_FACTORY:
         test_opponents_factory: OpponentsFactory = OPPONENTS_AGENTS_FACTORY[
             test_opponent
         ]
@@ -168,7 +172,8 @@ def train(
         load_test_net_later = True
 
     print(
-        f"Training PPO (arch: {nn_arch.name}) against opponent: {opponent} and test opponent: {test_opponent}"
+        f"Training PPO (arch: {nn_arch.name}) against opponent: {opponent}"
+        f" and evaluating against test opponent: {test_opponent}"
     )
 
     np.random.seed(seed)
@@ -253,10 +258,9 @@ def train(
             if (episode + 1) % N_TRIALS == 0:
                 mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
                 mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
-                # train_rewards_std = np.std(train_rewards[-N_TRIALS:])
-                # test_rewards_std = np.std(test_rewards[-N_TRIALS:])
                 print(
-                    f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.2f} | Mean Test Rewards: {mean_test_rewards:5.2f} |"
+                    f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.2f} |"
+                    f"Mean Test Rewards: {mean_test_rewards:5.2f} |"
                 )
                 save_model(
                     policy,
@@ -271,7 +275,7 @@ def main():
     Entry-point for the ``ppo`` console script.
     """
     options = parse_args()
-    train(**options.__dict__)
+    train(**options)
 
 
 if __name__ == "__main__":

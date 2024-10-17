@@ -1,9 +1,12 @@
-from typing import List, Tuple, Union, override
+"""
+Implementation of neural network for PPO using MLP architecture.
+"""
+
+from typing import List, Optional, Tuple, Union, override
 
 import numpy as np
 import torch
-import torch.distributions as distributions
-import torch.nn as nn
+import torch.nn as nn  # pylint: disable=consider-using-from-import
 import torch.nn.functional as F
 from jaxtyping import Float
 
@@ -13,23 +16,29 @@ from .ppo_base import PPOBase
 
 
 class PPO(PPOBase):
+    """
+    Neural Network, in MLP architecture, for PPO.
+    """
+
     def __init__(
         self,
         input_dim: int,
         output_dim: int,
-        hidden_layers_dims: List[int] = HIDDEN_DIMS,
+        hidden_layers_dims: Optional[List[int]] = None,
         dropout: float = DROPOUT,
     ):
         super().__init__(input_dim, output_dim)
 
-        self.hidden_layers_dims = hidden_layers_dims
+        self.hidden_layers_dims = (
+            hidden_layers_dims if hidden_layers_dims is not None else HIDDEN_DIMS
+        )
         self.dropout = dropout
 
         self.input_norm = InputNormalization(input_dim)
 
         layers: List[nn.Module] = []
         prev_dim = input_dim
-        for next_dim in hidden_layers_dims:
+        for next_dim in self.hidden_layers_dims:
             layers.append(nn.Linear(prev_dim, next_dim))
             layers.append(nn.LayerNorm(next_dim))
             layers.append(nn.Dropout(dropout))
@@ -37,8 +46,8 @@ class PPO(PPOBase):
             prev_dim = next_dim
         self.net = nn.Sequential(*layers)
 
-        self.actor = nn.Linear(hidden_layers_dims[-1], output_dim)
-        self.critic = nn.Linear(hidden_layers_dims[-1], 1)
+        self.actor = nn.Linear(self.hidden_layers_dims[-1], output_dim)
+        self.critic = nn.Linear(self.hidden_layers_dims[-1], 1)
 
         # Initialize weights (recursively)
         self.apply(self._init_weights)
@@ -69,7 +78,8 @@ class PPO(PPOBase):
                 ordered_x = x
             case _:
                 raise ValueError(
-                    f"Got tensor of unexpected shape! shape: {x.shape}. there are just to many dimentions."
+                    f"Got tensor of unexpected shape! shape: {x.shape}. "
+                    "there are just to many dimentions."
                 )
         return ordered_x
 

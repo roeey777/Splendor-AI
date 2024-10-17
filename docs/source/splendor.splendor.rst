@@ -1,4 +1,4 @@
-splendor.Splendor package
+splendor.splendor package
 =========================
 
 Subpackages
@@ -7,63 +7,63 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   splendor.Splendor.gym
+   splendor.splendor.gym
 
 Submodules
 ----------
 
-splendor.Splendor.constants module
+splendor.splendor.constants module
 ----------------------------------
 
-.. automodule:: splendor.Splendor.constants
+.. automodule:: splendor.splendor.constants
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.features module
+splendor.splendor.features module
 ---------------------------------
 
-.. automodule:: splendor.Splendor.features
+.. automodule:: splendor.splendor.features
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.splendor\_displayer module
+splendor.splendor.splendor\_displayer module
 --------------------------------------------
 
-.. automodule:: splendor.Splendor.splendor_displayer
+.. automodule:: splendor.splendor.splendor_displayer
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.splendor\_model module
+splendor.splendor.splendor\_model module
 ----------------------------------------
 
-.. automodule:: splendor.Splendor.splendor_model
+.. automodule:: splendor.splendor.splendor_model
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.splendor\_utils module
+splendor.splendor.splendor\_utils module
 ----------------------------------------
 
-.. automodule:: splendor.Splendor.splendor_utils
+.. automodule:: splendor.splendor.splendor_utils
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.types module
+splendor.splendor.types module
 ------------------------------
 
-.. automodule:: splendor.Splendor.types
+.. automodule:: splendor.splendor.types
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.utils module
+splendor.splendor.utils module
 ------------------------------
 
-.. automodule:: splendor.Splendor.utils
+.. automodule:: splendor.splendor.utils
    :members:
    :undoc-members:
    :show-inheritance:
@@ -71,7 +71,7 @@ splendor.Splendor.utils module
 Module contents
 ---------------
 
-.. automodule:: splendor.Splendor
+.. automodule:: splendor.splendor
    :members:
    :undoc-members:
    :show-inheritance:

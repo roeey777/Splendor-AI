@@ -1,8 +1,15 @@
+"""
+All things related to command-line arguments parsing for PPO training.
+"""
+
+import argparse
+import typing
 from argparse import ArgumentParser
 from dataclasses import dataclass
+from functools import partial
 from importlib import import_module
 from pathlib import Path
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, Literal, Optional, Required, TypedDict, cast
 
 from splendor.agents.generic.random import myAgent as RandomAgent
 from splendor.agents.our_agents.minmax import myAgent as MinMaxAgent
@@ -18,7 +25,7 @@ from .ppo_base import PPOBaseFactory
 
 # recurrent PPO with GRU
 from .ppo_rnn.gru.constants import HIDDEN_STATE_SHAPE as GRU_HIDDEN_STATE_SHAPE
-from .ppo_rnn.gru.network import PPO_GRU
+from .ppo_rnn.gru.network import PpoGru
 from .ppo_rnn.gru.ppo_agent import DEFAULT_SAVED_PPO_GRU_PATH
 
 # recurrent PPO with LSTM
@@ -33,6 +40,11 @@ from .self_attn.ppo_agent import DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH
 
 @dataclass
 class NeuralNetArch:
+    """
+    dataclass for storing all essential information regarding a specific
+    neural network architecture.
+    """
+
     name: str
     ppo_factory: PPOBaseFactory
     is_recurrent: bool
@@ -48,7 +60,7 @@ NN_ARCHITECTURES = {
     "mlp": NeuralNetArch("ppo_mlp", PPO, False, DEFAULT_SAVED_PPO_PATH, ".ppo_agent"),
     "gru": NeuralNetArch(
         "ppo_gru",
-        PPO_GRU,
+        PpoGru,
         True,
         DEFAULT_SAVED_PPO_GRU_PATH,
         ".ppo_rnn.gru.ppo_agent",
@@ -69,11 +81,14 @@ NN_ARCHITECTURES_CHOICES = NN_ARCHITECTURES.keys()
 DEFAULT_ARCHITECTURE = "mlp"
 
 NN_OPPONENTS_AGENTS_FACTORY: Dict[str, OpponentsFactory] = {
-    name: lambda agent_id: [
-        import_module(arch.agent_relative_import_path, package=__package__).myAgent(
-            agent_id
-        )
-    ]
+    name: partial(
+        lambda agent_id, nn_arch: [
+            import_module(
+                nn_arch.agent_relative_import_path, package=__package__
+            ).myAgent(agent_id)
+        ],
+        nn_arch=arch,
+    )
     for name, arch in NN_ARCHITECTURES.items()
 }
 
@@ -89,10 +104,31 @@ OPPONENTS_CHOICES = tuple(OPPONENTS_AGENTS_FACTORY.keys()) + (SELF_OPPONENT,)
 
 WORKING_DIR = Path().absolute()
 
+DeviceName = Literal["cuda", "cpu", "mps"]
+DEVICE_NAME_CHOICES = typing.get_args(DeviceName)
 
-def parse_args():
+
+class Arguments(TypedDict):
+    """
+    TypedDict representing the command-line arguments.
+    """
+
+    learning_rate: Required[float]
+    weight_decay: Required[float]
+    working_dir: Required[Path]
+    seed: Required[int]
+    saved_weights: Required[Optional[Path]]
+    opponent: Required[str]
+    test_opponent: Required[str]
+    device_name: Required[DeviceName]
+    architecture: Required[str]
+
+
+def parse_args() -> Arguments:
     """
     Parse command-line arguments.
+
+    :return: dictionary storing all the required arguments.
     """
     parser = ArgumentParser(
         prog="ppo",
@@ -132,13 +168,15 @@ def parse_args():
         "-t",
         "--transfer-learning",
         action="store_true",
-        help="Learn from previosly learned model, i.e. trasfer learning from previos training sessions",
+        help="Learn from previosly learned model, "
+        "i.e. trasfer learning from previos training sessions",
     )
     parser.add_argument(
         "--saved-weights",
         default=None,
         type=Path,
-        help="Path to the weights to start from a new learning session (ignored if not in transfer-learning mode)",
+        help="Path to the weights to start from a new learning session "
+        "(ignored if not in transfer-learning mode)",
     )
     parser.add_argument(
         "-o",
@@ -159,7 +197,7 @@ def parse_args():
         "--device",
         default="cuda",
         type=str,
-        choices=("cuda", "cpu", "mps"),
+        choices=DEVICE_NAME_CHOICES,
         dest="device_name",
         help="On which device to do heavy mathematical computation",
     )
@@ -173,6 +211,6 @@ def parse_args():
         help="What type of architecture of the neural network should be used",
     )
 
-    options = parser.parse_args()
+    options: argparse.Namespace = parser.parse_args()
 
-    return options
+    return cast(Arguments, vars(options))

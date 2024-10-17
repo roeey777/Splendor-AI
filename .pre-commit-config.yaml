@@ -9,3 +9,16 @@ repos:
     - id: isort
       name: isort
       args: ["--profile", "black"]
+- repo: https://github.com/pycqa/pylint
+  rev: v3.3.1
+  hooks:
+    - id: pylint
+      name: pylint
+      entry: pylint
+      language: system
+      types: [python]
+      args:
+        [
+          "-rn", # Only display messages
+          "--fail-under=9.9"
+        ]

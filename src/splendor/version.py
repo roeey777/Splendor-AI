@@ -1,3 +1,7 @@
+"""
+Version retrieval utility.
+"""
+
 from functools import cache
 from importlib.metadata import version
 

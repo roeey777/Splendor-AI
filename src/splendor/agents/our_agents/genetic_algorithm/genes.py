@@ -1,9 +1,15 @@
-from typing import Optional, Tuple
+"""
+Defining how to represent agents as genes (i.e. vectors) so they
+could be optimized with a genetic algorithm.
+"""
+
+from pathlib import Path
+from typing import Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
 
-from splendor.Splendor.features import METRICS_SHAPE, build_array
+from splendor.splendor.features import METRICS_SHAPE, build_array
 
 
 class Gene:
@@ -25,13 +31,21 @@ class Gene:
         """
         We want some metrics to have the same weight (in places the is no
         meaning to the order). This methods returns a dna which matches in
-        dimentions to the metrics we get in practice by repeting some value
+        dimentions to the metrics we get in practice by repeating some value
         multiple time (according to the instructions of `METRICS_SHAPE`).
         """
         if self._prepared_dna is None:
             self._prepared_dna = build_array(self._dna, METRICS_SHAPE)
 
         return self._prepared_dna
+
+    @property
+    def raw_dna(self):
+        """
+        Return a direct access to the private _dna attribute.
+        This is useful when implementing the crossover functionality.
+        """
+        return self._dna
 
     @classmethod
     def random(cls):
@@ -41,13 +55,13 @@ class Gene:
         return cls(np.random.uniform(cls.LOWER_BOUND, cls.UPPER_BOUND, cls.SHAPE))
 
     @classmethod
-    def load(cls, path_or_file: str):
+    def load(cls, path_or_file: Union[Path, str]):
         """
         Initiate a gene with DNA from a saved file.
         """
         return cls(np.load(path_or_file))
 
-    def save(self, path_or_file: str):
+    def save(self, path_or_file: Union[Path, str]):
         """
         Saves a gene's DNA to a file.
         """
@@ -90,12 +104,18 @@ class ManagerGene(Gene):
     SHAPE = (len(METRICS_SHAPE), 3)
 
     def select_strategy(
-        self, state_metrics, strategies: Tuple[StrategyGene, ...]
+        self, state_metrics: NDArray, strategies: Tuple[StrategyGene, ...]
     ) -> StrategyGene:
+        """
+        Select which strategy should be used based on given state.
+
+        :param state_metrics: the feature vector extracted from the state.
+        :param strategies: all the available strategies.
+        :return: the selected strategy.
+        """
         output = np.matmul(state_metrics, self.dna)
         assert len(output) == len(strategies), f"Mismatching lengths ({output.shape})"
+        # might replace this with output.argmax()
         index = max(range(len(output)), key=lambda i: output[i])
-        # with open("shit.txt", 'a') as f:
-        #     print(index, file=f)
 
         return strategies[index]

@@ -1,3 +1,7 @@
+"""
+Constants regarding PPO with GRU.
+"""
+
 from typing import List
 
 DROPOUT = 0.2

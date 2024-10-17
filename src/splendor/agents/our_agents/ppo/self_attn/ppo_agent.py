@@ -1,7 +1,10 @@
+"""
+An agent which uses PPO with self-attention
+"""
+
 from pathlib import Path
 from typing import List, override
 
-import gymnasium as gym
 import numpy as np
 import torch
 from numpy.typing import NDArray
@@ -9,13 +12,13 @@ from numpy.typing import NDArray
 from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 from splendor.agents.our_agents.ppo.utils import load_saved_model
-from splendor.Splendor.features import extract_metrics_with_cards
-from splendor.Splendor.gym.envs.utils import (
+from splendor.splendor.features import extract_metrics_with_cards
+from splendor.splendor.gym.envs.utils import (
     create_action_mapping,
     create_legal_actions_mask,
 )
-from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
-from splendor.Splendor.types import ActionType
+from splendor.splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.splendor.types import ActionType
 
 from .network import PPOSelfAttention
 
@@ -23,6 +26,10 @@ DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH = Path(__file__).parent / "ppo_model.pth"
 
 
 class PPOSelfAttentionAgent(PPOAgentBase):
+    """
+    PPO agent with self-attention
+    """
+
     @override
     def SelectAction(
         self,
@@ -66,4 +73,4 @@ class PPOSelfAttentionAgent(PPOAgentBase):
         return load_saved_model(DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH, PPOSelfAttention)
 
 
-myAgent = PPOSelfAttentionAgent
+myAgent = PPOSelfAttentionAgent  # pylint: disable=invalid-name

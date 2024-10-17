@@ -1,3 +1,7 @@
+"""
+Collection of utility functions.
+"""
+
 from functools import cache
 from pathlib import Path
 from typing import Optional, cast

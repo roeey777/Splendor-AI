@@ -1,29 +1,29 @@
-splendor.Splendor.gym.envs package
+splendor.splendor.gym.envs package
 ==================================
 
 Submodules
 ----------
 
-splendor.Splendor.gym.envs.actions module
+splendor.splendor.gym.envs.actions module
 -----------------------------------------
 
-.. automodule:: splendor.Splendor.gym.envs.actions
+.. automodule:: splendor.splendor.gym.envs.actions
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.gym.envs.splendor\_env module
+splendor.splendor.gym.envs.splendor\_env module
 -----------------------------------------------
 
-.. automodule:: splendor.Splendor.gym.envs.splendor_env
+.. automodule:: splendor.splendor.gym.envs.splendor_env
    :members:
    :undoc-members:
    :show-inheritance:
 
-splendor.Splendor.gym.envs.utils module
+splendor.splendor.gym.envs.utils module
 ---------------------------------------
 
-.. automodule:: splendor.Splendor.gym.envs.utils
+.. automodule:: splendor.splendor.gym.envs.utils
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,7 +31,7 @@ splendor.Splendor.gym.envs.utils module
 Module contents
 ---------------
 
-.. automodule:: splendor.Splendor.gym.envs
+.. automodule:: splendor.splendor.gym.envs
    :members:
    :undoc-members:
    :show-inheritance:

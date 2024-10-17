@@ -1,3 +1,7 @@
+"""
+Constants relevant for MLP-based PPO and Gradient-Descent based learning.
+"""
+
 from typing import List
 
 DROPOUT = 0.2

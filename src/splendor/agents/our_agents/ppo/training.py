@@ -1,17 +1,20 @@
+"""
+Implementation of the actual training of the PPO.
+"""
+
 from dataclasses import dataclass
 from typing import Optional, Tuple, cast
 
 import gymnasium as gym
 import torch
-import torch.distributions as distributions
-import torch.nn as nn
-import torch.nn.functional as F
+import torch.distributions as distributions  # pylint: disable=consider-using-from-import
+import torch.nn as nn  # pylint: disable=consider-using-from-import
 from gymnasium.spaces.utils import flatdim
 from numpy.typing import NDArray
 from torch.nn.modules.loss import _Loss as Loss_Fn
 from torch.optim.optimizer import Optimizer
 
-from splendor.Splendor.gym.envs.splendor_env import SplendorEnv
+from splendor.splendor.gym.envs.splendor_env import SplendorEnv
 
 from .common import calculate_loss, calculate_policy_loss
 from .constants import MAX_GRADIENT_NORM, ROLLOUT_BUFFER_SIZE
@@ -35,6 +38,8 @@ class LearningParams:
     This parameter is here to tell if the hidden states should be ignored or not.
     """
 
+    # pylint: disable=too-many-instance-attributes
+
     optimizer: Optimizer
     discount_factor: float
     ppo_steps: int
@@ -51,6 +56,7 @@ def train_single_episode(
     policy: nn.Module,
     learning_params: LearningParams,
 ) -> Tuple[float, float, float]:
+    # pylint: disable=too-many-locals
     """
     Execute the training procedure for a single episode (game), i.e. record
     a complete episode trajectory (trace of a full game) and then perform multiple
@@ -141,6 +147,7 @@ def update_policy(
     rollout_buffer: RolloutBuffer,
     learning_params: LearningParams,
 ) -> Tuple[float, float]:
+    # pylint: disable=too-many-locals
     """
     Update the policy using several gradient descent steps (via the given optimizer)
     on the PPO-Clip loss function.
@@ -194,6 +201,9 @@ def update_policy(
         total_policy_loss += policy_loss.detach().cpu().item()
         total_value_loss += value_loss.detach().cpu().item()
 
+        # kl_divergence_estimate is unused.
+        _ = kl_divergence_estimate
+
     return (
         total_policy_loss / learning_params.ppo_steps,
         total_value_loss / learning_params.ppo_steps,
@@ -203,6 +213,7 @@ def update_policy(
 def evaluate(
     env: gym.Env, policy: nn.Module, is_recurrent: bool, seed: int, device: torch.device
 ) -> float:
+    # pylint: disable=too-many-locals
     """
     Evaluate the PPO agent (in training) performence against the test opponent.
 

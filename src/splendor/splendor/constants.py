@@ -1,3 +1,7 @@
+"""
+Useful constants regarding the game.
+"""
+
 from typing import Literal, cast
 
 from .splendor_utils import COLOURS
