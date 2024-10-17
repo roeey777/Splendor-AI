@@ -23,7 +23,7 @@ class RolloutBuffer:
     input_dim: int
     action_dim: int
     is_recurrent: bool = False
-    hidden_states_dim: Optional[int] = None
+    hidden_states_shape: Optional[Tuple[int, ...]] = None
     device: Optional[torch.device] = None
     states: torch.Tensor = field(init=False)
     actions: torch.Tensor = field(init=False)
@@ -33,6 +33,7 @@ class RolloutBuffer:
     rewards: torch.Tensor = field(init=False)
     dones: torch.Tensor = field(init=False)
     hidden_states: Optional[torch.Tensor] = field(init=False)
+    cell_states: Optional[torch.Tensor] = field(init=False)
     index: int = field(default=0, init=False)
     full: bool = field(default=False, init=False)
 
@@ -58,16 +59,20 @@ class RolloutBuffer:
         self.dones = torch.zeros((self.size, 1), dtype=torch.bool).to(self.device)
 
         if self.is_recurrent:
-            if self.hidden_states_dim is None:
+            if self.hidden_states_shape is None:
                 raise ValueError(
-                    "hidden_states_dim must be an int when is_recurrent is set"
+                    "hidden_states_dim must be an valid shape when is_recurrent is set"
                 )
 
             self.hidden_states = torch.zeros(
-                (self.size, 1, self.hidden_states_dim), dtype=torch.float64
+                (self.size, 1, *self.hidden_states_shape), dtype=torch.float64
+            ).to(self.device)
+            self.cell_states = torch.zeros(
+                (self.size, 1, *self.hidden_states_shape), dtype=torch.float64
             ).to(self.device)
         else:
             self.hidden_states = torch.zeros(self.size, dtype=torch.float64)
+            self.cell_states = torch.zeros(self.size, dtype=torch.float64)
 
     def remember(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
@@ -79,6 +84,7 @@ class RolloutBuffer:
         reward: float,
         done: bool,
         hidden_state: Optional[torch.Tensor] = None,
+        cell_state: Optional[torch.Tensor] = None,
     ):
         """
         Store essential values in the rollout buffer.
@@ -91,6 +97,8 @@ class RolloutBuffer:
         :param reward: the reward given after taken the action.
         :param done: is this a terminal state.
         :param hidden_state: the hidden state used, only relevant for recurrent PPO.
+        :param cell_state: the hidden state used, only relevant for
+                           recurrent PPO, specificly for LSTM.
         """
 
         with torch.no_grad():
@@ -110,6 +118,10 @@ class RolloutBuffer:
                 assert self.hidden_states is not None
                 assert hidden_state is not None
                 self.hidden_states[self.index] = hidden_state
+
+                assert self.cell_states is not None
+                if cell_state is not None:
+                    self.cell_states[self.index] = cell_state
 
             self.index += 1
 
@@ -144,22 +156,25 @@ class RolloutBuffer:
         return advantages, returns
 
     def unpack(self, discount_factor: float) -> Tuple[
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
-        torch.Tensor,
+        torch.Tensor,  # hidden_states
+        torch.Tensor,  # cell_states
+        torch.Tensor,  # states
+        torch.Tensor,  # actions
+        torch.Tensor,  # action_masks
+        torch.Tensor,  # log_prob_actions
+        torch.Tensor,  # advantages
+        torch.Tensor,  # returns
+        torch.Tensor,  # dones
     ]:
         """
         unpack all the stored values from the rollout buffer.
         """
-        if self.hidden_states is not None:
+        if self.hidden_states is not None and self.cell_states is not None:
             hidden_states = self.hidden_states[: self.index]
+            cell_states = self.cell_states[: self.index]
         else:
             hidden_states = torch.empty(1)
+            cell_states = torch.empty(1)
 
         states = self.states[: self.index]
         actions = self.actions[: self.index]
@@ -171,6 +186,7 @@ class RolloutBuffer:
 
         return (
             hidden_states,
+            cell_states,
             states,
             actions,
             action_masks,

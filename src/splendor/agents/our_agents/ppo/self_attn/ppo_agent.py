@@ -59,7 +59,7 @@ class PPOSelfAttentionAgent(PPOAgentBase):
             # this assertion is only for mypy.
             assert self.net is not None
 
-            action_pred, _ = self.net(state_tesnor, action_mask)
+            action_pred, *_ = self.net(state_tesnor, action_mask)
             chosen_action = action_pred.argmax()
             mapping = create_action_mapping(actions, game_state, self.id)
 

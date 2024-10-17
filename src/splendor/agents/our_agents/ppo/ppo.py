@@ -259,7 +259,7 @@ def train(
                 mean_train_rewards = np.mean(train_rewards[-N_TRIALS:])
                 mean_test_rewards = np.mean(test_rewards[-N_TRIALS:])
                 print(
-                    f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.2f} |"
+                    f"| Episode: {episode + 1:3} | Mean Train Rewards: {mean_train_rewards:5.2f} | "
                     f"Mean Test Rewards: {mean_test_rewards:5.2f} |"
                 )
                 save_model(

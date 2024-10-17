@@ -38,7 +38,7 @@ class PpoGruAgent(PPOAgentBase):
         if load_net:
             # this assertion is only for mypy
             assert self.net is not None
-            self.hidden_state = self.net.init_hidden_state().to(self.device)
+            self.hidden_state = self.net.init_hidden_state(self.device)
 
     @override
     def SelectAction(
@@ -66,7 +66,7 @@ class PpoGruAgent(PPOAgentBase):
             # this assertion is only for mypy.
             assert self.net is not None
 
-            action_pred, _, next_hidden_state = self.net(
+            action_pred, _, next_hidden_state, __ = self.net(
                 state_tesnor, action_mask, self.hidden_state
             )
             chosen_action = action_pred.argmax()
