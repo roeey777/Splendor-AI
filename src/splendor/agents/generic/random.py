@@ -1,5 +1,6 @@
-from splendor.template import Agent
 import random
+
+from splendor.template import Agent
 
 
 class myAgent(Agent):

@@ -1,16 +1,24 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
+from importlib import import_module
 from pathlib import Path
-from typing import Optional
-
-from splendor.version import get_version
+from typing import Callable, Dict, List, Optional
 
 from splendor.agents.generic.random import myAgent as RandomAgent
 from splendor.agents.our_agents.minmax import myAgent as MinMaxAgent
+from splendor.template import Agent
+from splendor.version import get_version
+
+from .constants import LEARNING_RATE, SEED, WEIGHT_DECAY
+
+# vanilla PPO
+from .network import PPO
+from .ppo_agent import DEFAULT_SAVED_PPO_PATH
+from .ppo_base import PPOBaseFactory
 
 # recurrent PPO with GRU
-from .ppo_rnn.gru.network import PPO_GRU
 from .ppo_rnn.gru.constants import HIDDEN_STATE_SHAPE as GRU_HIDDEN_STATE_SHAPE
+from .ppo_rnn.gru.network import PPO_GRU
 from .ppo_rnn.gru.ppo_agent import DEFAULT_SAVED_PPO_GRU_PATH
 
 # recurrent PPO with LSTM
@@ -22,17 +30,6 @@ from .ppo_rnn.lstm.ppo_agent import DEFAULT_SAVED_PPO_LSTM_PATH
 from .self_attn.network import PPOSelfAttention
 from .self_attn.ppo_agent import DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH
 
-# vanilla PPO
-from .network import PPO
-from .ppo_agent import DEFAULT_SAVED_PPO_PATH
-
-from .ppo_base import PPOBaseFactory
-from .constants import (
-    SEED,
-    LEARNING_RATE,
-    WEIGHT_DECAY,
-)
-
 
 @dataclass
 class NeuralNetArch:
@@ -40,24 +37,29 @@ class NeuralNetArch:
     ppo_factory: PPOBaseFactory
     is_recurrent: bool
     default_saved_weights: Path
+    agent_relative_import_path: str
     hidden_state_dim: Optional[int] = None
 
 
-OPPONENTS_AGENTS = {
-    "random": [RandomAgent(0)],
-    "minimax": [MinMaxAgent(0)],
-}
-DEFAULT_OPPONENT = "random"
-DEFAULT_TEST_OPPONENT = "minimax"
-OPPONENTS_CHOICES = OPPONENTS_AGENTS.keys()
+OpponentsFactory = Callable[[int], List[Agent]]
+
 
 NN_ARCHITECTURES = {
-    "mlp": NeuralNetArch("ppo_mlp", PPO, False, DEFAULT_SAVED_PPO_PATH),
+    "mlp": NeuralNetArch("ppo_mlp", PPO, False, DEFAULT_SAVED_PPO_PATH, ".ppo_agent"),
     "gru": NeuralNetArch(
-        "ppo_gru", PPO_GRU, True, DEFAULT_SAVED_PPO_GRU_PATH, GRU_HIDDEN_STATE_SHAPE
+        "ppo_gru",
+        PPO_GRU,
+        True,
+        DEFAULT_SAVED_PPO_GRU_PATH,
+        ".ppo_rnn.gru.ppo_agent",
+        GRU_HIDDEN_STATE_SHAPE,
     ),
     "self_attn": NeuralNetArch(
-        "ppo_self_attn", PPOSelfAttention, False, DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH
+        "ppo_self_attn",
+        PPOSelfAttention,
+        False,
+        DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH,
+        ".self_attn.ppo_agent",
     ),
     "lstm": NeuralNetArch(
         "ppo_lstm", PPO_LSTM, True, DEFAULT_SAVED_PPO_LSTM_PATH, LSTM_HIDDEN_STATE_SHAPE
@@ -65,6 +67,25 @@ NN_ARCHITECTURES = {
 }
 NN_ARCHITECTURES_CHOICES = NN_ARCHITECTURES.keys()
 DEFAULT_ARCHITECTURE = "mlp"
+
+NN_OPPONENTS_AGENTS_FACTORY: Dict[str, OpponentsFactory] = {
+    name: lambda agent_id: [
+        import_module(arch.agent_relative_import_path, package=__package__).myAgent(
+            agent_id
+        )
+    ]
+    for name, arch in NN_ARCHITECTURES.items()
+}
+
+OPPONENTS_AGENTS_FACTORY: Dict[str, OpponentsFactory] = {
+    "random": lambda agent_id: [RandomAgent(agent_id)],
+    "minimax": lambda agent_id: [MinMaxAgent(agent_id)],
+}
+OPPONENTS_AGENTS_FACTORY.update(NN_OPPONENTS_AGENTS_FACTORY)
+DEFAULT_OPPONENT = "random"
+DEFAULT_TEST_OPPONENT = "minimax"
+SELF_OPPONENT = "itself"
+OPPONENTS_CHOICES = tuple(OPPONENTS_AGENTS_FACTORY.keys()) + (SELF_OPPONENT,)
 
 WORKING_DIR = Path().absolute()
 
@@ -139,11 +160,13 @@ def parse_args():
         default="cuda",
         type=str,
         choices=("cuda", "cpu", "mps"),
+        dest="device_name",
         help="On which device to do heavy mathematical computation",
     )
     parser.add_argument(
         "-a",
         "--architecture",
+        "--arch",
         type=str,
         default=DEFAULT_ARCHITECTURE,
         choices=NN_ARCHITECTURES_CHOICES,

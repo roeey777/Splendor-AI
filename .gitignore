@@ -1,3 +1,4 @@
+*.swp
 *__pycache__
 *.pyc
 *.idea
@@ -5,7 +6,7 @@
 build
 *.pth
 docs/_build/
-*.swp
+.mypy_cache/
 
 # define exceptions for pre-trained models.
 !src/splendor/agents/our_agents/ppo/ppo_model.pth

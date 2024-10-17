@@ -1,20 +1,17 @@
-from typing import Optional
-from pathlib import Path
 from functools import cache
+from pathlib import Path
+from typing import Optional, cast
 
-import torch
 import gymnasium as gym
-
+import torch
 from gymnasium.spaces.utils import flatdim
 
+from .network import DROPOUT, PPO
 from .ppo_base import PPOBase, PPOBaseFactory
-from .network import PPO, DROPOUT
-
 
 DEFAULT_SAVED_PPO_PATH = Path(__file__).parent / "ppo_model.pth"
 
 
-@cache
 def load_saved_model(
     path: Path,
     ppo_factory: PPOBaseFactory,
@@ -59,4 +56,4 @@ def load_saved_ppo(path: Optional[Path] = None) -> PPO:
     if path is None:
         path = DEFAULT_SAVED_PPO_PATH
 
-    return load_saved_model(path, PPO, dropout=DROPOUT)
+    return cast(PPO, load_saved_model(path, PPO, dropout=DROPOUT))

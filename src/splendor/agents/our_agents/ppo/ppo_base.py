@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Union, Tuple, Callable
+from typing import Any, Protocol, Tuple, Union
 
 import torch
 import torch.nn as nn
-
 from jaxtyping import Float
 
 
@@ -47,11 +46,13 @@ class PPOBase(nn.Module, ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_hidden_state(self) -> Any:
+    def init_hidden_state(self, device: torch.device) -> Any:
         """
         return the initial hidden state to be used.
         """
         raise NotImplementedError()
 
 
-PPOBaseFactory = Callable[[int, int, ...], PPOBase]
+class PPOBaseFactory(Protocol):
+    def __call__(self, input_dim: int, output_dim: int, *args, **kwargs) -> PPOBase:
+        pass

@@ -2,8 +2,12 @@ import shutil
 from argparse import ArgumentParser
 from csv import writer as csv_writer
 from datetime import datetime
-from multiprocessing import cpu_count, Pool
+from multiprocessing import Pool, cpu_count
 from pathlib import Path
+from typing import List, Optional, Tuple, Union, cast
+
+import numpy as np
+from numpy.typing import NDArray
 
 from splendor.agents.our_agents.genetic_algorithm.genes import (
     Gene,
@@ -17,9 +21,6 @@ from splendor.game import Game
 from splendor.Splendor import features
 from splendor.Splendor.utils import LimitRoundsGameRule
 from splendor.version import get_version
-
-import numpy as np
-
 
 POPULATION_SIZE = 24  # 60
 GENERATIONS = 100
@@ -80,7 +81,7 @@ def mutate_population(
         mutate(agent._strategy_gene_3, progress, mutation_rate)
 
 
-def _crossover(dna1: np.array, dna2: np.array) -> tuple[np.array, np.array]:
+def _crossover(dna1: NDArray, dna2: NDArray) -> Tuple[NDArray, NDArray]:
     """
     Crossover method is based on the following article (page 9)
     https://www.cs.us.es/~fsancho/ficheros/IA2019/TheContinuousGeneticAlgorithm.pdf
@@ -103,16 +104,25 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
     if not isinstance(dad, cls):
         raise TypeError("Crossover works only between genes of the same type")
 
-    if len(cls.SHAPE) == 1:
-        child_dna_1, child_dna_2 = _crossover(mom._dna, dad._dna)
-        return cls(child_dna_1), cls(child_dna_2)
+    # this assertion is only for mypy.
+    assert cls.SHAPE is not None
 
-    elif len(cls.SHAPE) == 2:
-        children_dna = (
-            _crossover(dna1, dna2) for dna1, dna2 in zip(mom._dna.T, dad._dna.T)
-        )
-        child_dna_1, child_dna_2 = zip(*children_dna)
-        return cls(np.vstack(child_dna_1).T), cls(np.vstack(child_dna_2).T)
+    child_dna_1: Union[NDArray, Tuple[NDArray, ...]]
+    child_dna_2: Union[NDArray, Tuple[NDArray, ...]]
+
+    match len(cls.SHAPE):
+        case 1:
+            child_dna_1, child_dna_2 = _crossover(mom._dna, dad._dna)
+            return cls(child_dna_1), cls(child_dna_2)
+        case 2:
+            children_dna = (
+                _crossover(dna1, dna2) for dna1, dna2 in zip(mom._dna.T, dad._dna.T)
+            )
+            child_dna_1, child_dna_2 = zip(*children_dna)
+            return (
+                cls(np.vstack(cast(Tuple[NDArray, ...], child_dna_1)).T),
+                cls(np.vstack(cast(Tuple[NDArray, ...], child_dna_2)).T),
+            )
 
     raise ValueError(f"Unsupported DNA shape for crossover {cls.SHAPE}")
 
@@ -125,10 +135,11 @@ def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAge
     CHILDREN_PER_MATING = 2
     PARENTS_PER_MATING = 2
 
+    parents_array = np.array(parents)
     children = list()
     matings = (population_size - len(parents)) // CHILDREN_PER_MATING
     for _ in range(matings):
-        mom, dad = np.random.choice(parents, PARENTS_PER_MATING, False)
+        mom, dad = np.random.choice(parents_array, PARENTS_PER_MATING, False)
         managers = crossover(mom._manager_gene, dad._manager_gene)
         strategies_1 = crossover(mom._strategy_gene_1, dad._strategy_gene_1)
         strategies_2 = crossover(mom._strategy_gene_2, dad._strategy_gene_2)
@@ -157,7 +168,7 @@ def single_game(agents) -> tuple[Game, dict]:
         LimitRoundsGameRule,
         agents,
         len(agents),
-        seed=np.random.randint(1e8, dtype=int),
+        seed=np.random.randint(int(1e8), dtype=int),
         agents_namelist=names,
     )
     return game, game.Run()
@@ -210,14 +221,13 @@ def evaluate(
     population: list[GeneAlgoAgent],
     quiet: bool,
     multiprocess: bool,
-) -> dict[GeneAlgoAgent, int]:
+) -> Tuple[List[float], List[List[float]]]:
     """
     Measures the fitness of each individual by having them play against each
     other. Each individual plays in 3 games with 1,2 and 3 rivals.
     """
-    pool = list()
-    games_stats = list()
-    evaluation = [0] * len(population)
+    games_stats: List[List[float]] = list()
+    evaluation: List[float] = [0] * len(population)
 
     for players_count in PLAYERS_OPTIONS:
         if not quiet:
@@ -302,7 +312,7 @@ def evolve(
     generations: int = GENERATIONS,
     mutation_rate: float = MUTATION_RATE,
     working_dir: Path = WORKING_DIR,
-    seed: int = None,
+    seed: Optional[int] = None,
     quiet: bool = False,
     multiprocess: bool = False,
 ):

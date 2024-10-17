@@ -1,12 +1,10 @@
 from pathlib import Path
 
-from splendor.agents.our_agents.genetic_algorithm.genes import (
-    ManagerGene,
-    StrategyGene,
-)
+import numpy as np
+
+from splendor.agents.our_agents.genetic_algorithm.genes import ManagerGene, StrategyGene
 from splendor.Splendor.features import extract_metrics, normalize_metrics
 from splendor.template import Agent
-import numpy as np
 
 
 class GeneAlgoAgent(Agent):
@@ -24,6 +22,7 @@ class GeneAlgoAgent(Agent):
     STRATEGY_1_PATH = Path(__file__).parent / "strategy1.npy"
     STRATEGY_2_PATH = Path(__file__).parent / "strategy2.npy"
     STRATEGY_3_PATH = Path(__file__).parent / "strategy3.npy"
+    INVALID_POPULATION_ID = -1
 
     def __init__(
         self, _id, manager=None, strategy1=None, strategy2=None, strategy3=None
@@ -55,6 +54,8 @@ class GeneAlgoAgent(Agent):
             self._strategy_gene_2,
             self._strategy_gene_3,
         )
+
+        self.population_id = self.INVALID_POPULATION_ID
 
     def save(self, folder: Path):
         """

@@ -6,10 +6,14 @@
 
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
-import random, copy, time
-from .template import GameState
-from func_timeout import func_timeout, FunctionTimedOut
+import copy
+import random
+import time
+
+from func_timeout import FunctionTimedOut, func_timeout
+
 from .template import Agent as DummyAgent
+from .template import GameState
 
 # CONSTANTS ----------------------------------------------------------------------------------------------------------#
 

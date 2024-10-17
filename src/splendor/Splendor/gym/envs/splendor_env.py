@@ -2,19 +2,19 @@
 Implementation of Splendor as a gym.Env
 """
 
-from typing import Dict, Literal, List, Tuple, Optional, Any
+from typing import Any, Dict, List, Literal, Optional, Tuple
 
-import numpy as np
 import gymnasium as gym
+import numpy as np
+from numpy.typing import NDArray
 
-from splendor.template import Agent
-from splendor.Splendor.splendor_model import SplendorState, SplendorGameRule
+from splendor.Splendor import features, splendor_utils
+from splendor.Splendor.splendor_model import SplendorGameRule, SplendorState
 from splendor.Splendor.utils import LimitRoundsGameRule
-from splendor.Splendor import splendor_utils
-from splendor.Splendor import features
+from splendor.template import Agent
 
-from .actions import ALL_ACTIONS, ActionType, Action, CardPosition
-from .utils import create_legal_actions_mask, create_action_mapping
+from .actions import ALL_ACTIONS, Action, ActionType, CardPosition
+from .utils import create_action_mapping, create_legal_actions_mask
 
 
 class SplendorEnv(gym.Env):
@@ -56,7 +56,7 @@ class SplendorEnv(gym.Env):
 
         self.fixed_turn = fixed_turn
         self.shuffle_turns = shuffle_turns
-        self.agents = agents
+        self.agents = np.array(agents)
         self.number_of_players = len(self.agents) + 1
         self.game_rule = LimitRoundsGameRule(self.number_of_players)
 
@@ -77,7 +77,7 @@ class SplendorEnv(gym.Env):
 
     def reset(
         self, seed: Optional[int] = None, options: Optional[Dict] = None
-    ) -> Tuple[SplendorState, Dict[str, int]]:
+    ) -> Tuple[NDArray, Dict[str, int]]:
         """
         Reset the environment - Create a new game.
 
@@ -104,12 +104,15 @@ class SplendorEnv(gym.Env):
 
         self._simulate_opponents()
 
+        # this assertion is for mypy, the shape is never None.
+        assert self.observation_space.shape is not None
+
         return (
             self._vectorize(self.state, self.observation_space.shape, self.my_turn),
             {"my_id": self.my_turn},
         )
 
-    def step(self, action: int) -> Tuple[np.array, float, bool, bool, Dict]:
+    def step(self, action: int) -> Tuple[NDArray, float, bool, bool, Dict]:
         """
         Run one time-step of the environment's dynamics.
 
@@ -132,7 +135,7 @@ class SplendorEnv(gym.Env):
 
         action_to_take = mapping[action]
 
-        legal_actions_mask: np.array = self.get_legal_actions_mask()
+        legal_actions_mask: NDArray = self.get_legal_actions_mask()
 
         if legal_actions_mask[action] == 0:
             raise ValueError(f"the action {action} ({action_to_take}) is illegal!")
@@ -152,6 +155,9 @@ class SplendorEnv(gym.Env):
 
         reward = current_score - previous_score
 
+        # this assertion is for mypy, the shape is never None.
+        assert self.observation_space.shape is not None
+
         return (
             self._vectorize(next_state, self.observation_space.shape, self.my_turn),
             reward,
@@ -164,14 +170,14 @@ class SplendorEnv(gym.Env):
         # Don't render anything.
         pass
 
-    def get_legal_actions_mask(self) -> np.array:
+    def get_legal_actions_mask(self) -> NDArray:
         """
         Create an array of shape (len(ALL_ACTIONS),) whose values are 0's or 1's.
         If the at the i'th index the mask[i] == 1 then the i'th action is legal,
         otherwise it's illegal (The legal actions are based on SplendorGameRule).
         """
         legal_actions = self.game_rule.getLegalActions(self.state, self.my_turn)
-        legal_actions_mask: np.array = create_legal_actions_mask(
+        legal_actions_mask: NDArray = create_legal_actions_mask(
             legal_actions, self.state, self.my_turn
         )
 
@@ -188,7 +194,7 @@ class SplendorEnv(gym.Env):
         raise ValueError(f"Invalid turn ({turn})")
 
     @staticmethod
-    def _vectorize(state: SplendorState, shape: Tuple[int, ...], turn: int) -> np.array:
+    def _vectorize(state: SplendorState, shape: Tuple[int, ...], turn: int) -> NDArray:
         """
         extract the features vector out of the given state.
         """
@@ -220,9 +226,9 @@ class SplendorEnv(gym.Env):
         return self.game_rule.gameEnds(), self.state
 
     @property
-    def turn(self):
+    def turn(self) -> int:
         return self.game_rule.current_agent_index
 
     @property
-    def state(self):
+    def state(self) -> SplendorState:
         return self.game_rule.current_game_state

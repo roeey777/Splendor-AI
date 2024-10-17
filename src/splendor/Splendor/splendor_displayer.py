@@ -6,16 +6,17 @@
 
 # IMPORTS ------------------------------------------------------------------------------------------------------------#
 
+import copy
 import os
-from os.path import realpath, abspath, join
-
-import tkinter, copy, time, os, time
+import time
+import tkinter
 from collections import defaultdict
+from os.path import abspath, join, realpath
+
+from splendor.template import Displayer
 
 # from splendor.Splendor.splendor_utils import *
 from .splendor_utils import *
-from splendor.template import Displayer
-
 
 SPLENDOR_DIR = os.path.dirname(realpath(__file__))
 
