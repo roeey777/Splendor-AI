@@ -51,6 +51,7 @@ There are multiple available architectures for the neural network to be used by 
 #. MLP - Multi-Layered Perceptron, also known as Fully-Connected Feed-Forward network.
 #. Self-Attention and then MLP.
 #. GRU (Gated Recurrent Unit) and then MLP.
+#. LSTM (Long Short-Term Memory) and then MLP.
 
 By default the MLP architecture will be used, however you can decide to train the PPO with a different architecture via the ``--architecture`` or via it's shortcuts ``-a`` and ``--arch``, here is an example:
 
@@ -66,6 +67,7 @@ There are also multiple opponents available to be trained or evaluated agaisnt, 
 #. PPO (with MLP)
 #. PPO (with Self-Attention)
 #. PPO (with GRU)
+#. PPO (with LSTM)
 
 ``SplendorEnv`` - an OpenAI ``gym`` compatible simulator for the game Splendor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

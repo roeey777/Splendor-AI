@@ -134,6 +134,30 @@
 <li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#module-splendor.agents.our_agents.ppo.ppo_rnn.gru">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html">splendor.agents.our_agents.ppo.ppo_rnn.lstm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.constants">splendor.agents.our_agents.ppo.ppo_rnn.lstm.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.network">splendor.agents.our_agents.ppo.ppo_rnn.lstm.network module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm"><code class="docutils literal notranslate"><span class="pre">PpoLstm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm.forward"><code class="docutils literal notranslate"><span class="pre">PpoLstm.forward()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm.init_hidden_state"><code class="docutils literal notranslate"><span class="pre">PpoLstm.init_hidden_state()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent">splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent"><code class="docutils literal notranslate"><span class="pre">PpoLstmAgent</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent.SelectAction"><code class="docutils literal notranslate"><span class="pre">PpoLstmAgent.SelectAction()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent.load"><code class="docutils literal notranslate"><span class="pre">PpoLstmAgent.load()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent.load_policy"><code class="docutils literal notranslate"><span class="pre">PpoLstmAgent.load_policy()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.myAgent"><code class="docutils literal notranslate"><span class="pre">myAgent</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -174,7 +198,7 @@ from splendor.Splendor.gym.envs.actions</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO.init_hidden_state">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_hidden_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Any</span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/ppo_rnn/recurrent_ppo.html#RecurrentPPO.init_hidden_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO.init_hidden_state" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">init_hidden_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/ppo_rnn/recurrent_ppo.html#RecurrentPPO.init_hidden_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO.init_hidden_state" title="Link to this definition"></a></dt>
 <dd><p>return the initial hidden state to be used.</p>
 </dd></dl>
 

@@ -135,6 +135,7 @@ and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files
 <li><p>MLP - Multi-Layered Perceptron, also known as Fully-Connected Feed-Forward network.</p></li>
 <li><p>Self-Attention and then MLP.</p></li>
 <li><p>GRU (Gated Recurrent Unit) and then MLP.</p></li>
+<li><p>LSTM (Long Short-Term Memory) and then MLP.</p></li>
 </ol>
 <p>By default the MLP architecture will be used, however you can decide to train the PPO with a different architecture via the <code class="docutils literal notranslate"><span class="pre">--architecture</span></code> or via it’s shortcuts <code class="docutils literal notranslate"><span class="pre">-a</span></code> and <code class="docutils literal notranslate"><span class="pre">--arch</span></code>, here is an example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ppo<span class="w"> </span>--device<span class="w"> </span>cpu<span class="w"> </span>--opponent<span class="w"> </span>random<span class="w"> </span>--architecture<span class="w"> </span>gru
@@ -148,6 +149,7 @@ and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files
 <li><p>PPO (with MLP)</p></li>
 <li><p>PPO (with Self-Attention)</p></li>
 <li><p>PPO (with GRU)</p></li>
+<li><p>PPO (with LSTM)</p></li>
 </ol>
 </section>
 <section id="splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor">

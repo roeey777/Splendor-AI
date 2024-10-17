@@ -200,6 +200,8 @@
 </li>
       <li><a href="splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.actions.CardPosition">CardPosition (class in splendor.splendor.gym.envs.actions)</a>
 </li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.cell_states">cell_states (splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.clear">clear() (splendor.agents.our_agents.ppo.rollout.RolloutBuffer method)</a>
@@ -223,6 +225,8 @@
       <li><a href="splendor.splendor.html#splendor.splendor.splendor_utils.convert_filename">convert_filename() (in module splendor.splendor.splendor_utils)</a>
 </li>
       <li><a href="splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.utils.create_action_mapping">create_action_mapping() (in module splendor.splendor.gym.envs.utils)</a>
+</li>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_base.PPOBase.create_hidden_layers">create_hidden_layers() (splendor.agents.our_agents.ppo.ppo_base.PPOBase class method)</a>
 </li>
       <li><a href="splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.utils.create_legal_actions_mask">create_legal_actions_mask() (in module splendor.splendor.gym.envs.utils)</a>
 </li>
@@ -325,6 +329,8 @@
 </li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.network.PpoGru.forward">(splendor.agents.our_agents.ppo.ppo_rnn.gru.network.PpoGru method)</a>
 </li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm.forward">(splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm method)</a>
+</li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.html#splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO.forward">(splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO method)</a>
 </li>
         <li><a href="splendor.agents.our_agents.ppo.self_attn.html#splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention.forward">(splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention method)</a>
@@ -418,10 +424,10 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.hidden_states_dim">hidden_states_dim (splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.hidden_states_shape">hidden_states_shape (splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
 
       <ul>
-        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.hidden_states_dim">(splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
+        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.hidden_states_shape">(splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
       </ul></li>
       <li><a href="splendor.html#splendor.general_game_runner.HidePrint">HidePrint (class in splendor.general_game_runner)</a>
@@ -434,16 +440,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.rollout.RolloutBuffer.index">index (splendor.agents.our_agents.ppo.rollout.RolloutBuffer attribute)</a>
 </li>
-      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.network.PPO.init_hidden_state">init_hidden_state() (splendor.agents.our_agents.ppo.network.PPO method)</a>
+      <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_base.PPOBase.init_hidden_state">init_hidden_state() (splendor.agents.our_agents.ppo.ppo_base.PPOBase method)</a>
 
       <ul>
-        <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_base.PPOBase.init_hidden_state">(splendor.agents.our_agents.ppo.ppo_base.PPOBase method)</a>
-</li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.network.PpoGru.init_hidden_state">(splendor.agents.our_agents.ppo.ppo_rnn.gru.network.PpoGru method)</a>
 </li>
-        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.html#splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO.init_hidden_state">(splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO method)</a>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm.init_hidden_state">(splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm method)</a>
 </li>
-        <li><a href="splendor.agents.our_agents.ppo.self_attn.html#splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention.init_hidden_state">(splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention method)</a>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.html#splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO.init_hidden_state">(splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo.RecurrentPPO method)</a>
 </li>
       </ul></li>
       <li><a href="splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.InitDisplayer">InitDisplayer() (splendor.splendor.splendor_displayer.GUIDisplayer method)</a>
@@ -499,6 +503,8 @@
 </li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent.load">(splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent method)</a>
 </li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent.load">(splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent method)</a>
+</li>
         <li><a href="splendor.agents.our_agents.ppo.self_attn.html#splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent.load">(splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent method)</a>
 </li>
       </ul></li>
@@ -508,6 +514,8 @@
 
       <ul>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent.load_policy">(splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent method)</a>
+</li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent.load_policy">(splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent method)</a>
 </li>
       </ul></li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.utils.load_saved_model">load_saved_model() (in module splendor.agents.our_agents.ppo.utils)</a>
@@ -612,6 +620,14 @@
 </li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#module-splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent">splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent</a>
 </li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm">splendor.agents.our_agents.ppo.ppo_rnn.lstm</a>
+</li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.constants">splendor.agents.our_agents.ppo.ppo_rnn.lstm.constants</a>
+</li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.network">splendor.agents.our_agents.ppo.ppo_rnn.lstm.network</a>
+</li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent">splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent</a>
+</li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.html#module-splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo">splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo</a>
 </li>
         <li><a href="splendor.agents.our_agents.ppo.html#module-splendor.agents.our_agents.ppo.rollout">splendor.agents.our_agents.ppo.rollout</a>
@@ -690,6 +706,8 @@
 </li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.myAgent">(in module splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent)</a>
 </li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.myAgent">(in module splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent)</a>
+</li>
         <li><a href="splendor.agents.our_agents.ppo.self_attn.html#splendor.agents.our_agents.ppo.self_attn.ppo_agent.myAgent">(in module splendor.agents.our_agents.ppo.self_attn.ppo_agent)</a>
 </li>
       </ul></li>
@@ -755,10 +773,10 @@
 </li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.training.LearningParams.ppo_steps">ppo_steps (splendor.agents.our_agents.ppo.training.LearningParams attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent.PPOAgent">PPOAgent (class in splendor.agents.our_agents.ppo.ppo_agent)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase">PPOAgentBase (class in splendor.agents.our_agents.ppo.ppo_agent_base)</a>
 </li>
       <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_base.PPOBase">PPOBase (class in splendor.agents.our_agents.ppo.ppo_base)</a>
@@ -768,6 +786,10 @@
       <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.network.PpoGru">PpoGru (class in splendor.agents.our_agents.ppo.ppo_rnn.gru.network)</a>
 </li>
       <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent">PpoGruAgent (class in splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent)</a>
+</li>
+      <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.network.PpoLstm">PpoLstm (class in splendor.agents.our_agents.ppo.ppo_rnn.lstm.network)</a>
+</li>
+      <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent">PpoLstmAgent (class in splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent)</a>
 </li>
       <li><a href="splendor.agents.our_agents.ppo.self_attn.html#splendor.agents.our_agents.ppo.self_attn.network.PPOSelfAttention">PPOSelfAttention (class in splendor.agents.our_agents.ppo.self_attn.network)</a>
 </li>
@@ -869,6 +891,8 @@
         <li><a href="splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase.SelectAction">(splendor.agents.our_agents.ppo.ppo_agent_base.PPOAgentBase method)</a>
 </li>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent.SelectAction">(splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent.PpoGruAgent method)</a>
+</li>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent.SelectAction">(splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent.PpoLstmAgent method)</a>
 </li>
         <li><a href="splendor.agents.our_agents.ppo.self_attn.html#splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent.SelectAction">(splendor.agents.our_agents.ppo.self_attn.ppo_agent.PPOSelfAttentionAgent method)</a>
 </li>
@@ -1066,8 +1090,6 @@
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.html#module-splendor.agents.our_agents.ppo.ppo_rnn">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     splendor.agents.our_agents.ppo.ppo_rnn.gru
 
@@ -1082,6 +1104,8 @@
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#module-splendor.agents.our_agents.ppo.ppo_rnn.gru.constants">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     splendor.agents.our_agents.ppo.ppo_rnn.gru.network
 
@@ -1094,6 +1118,34 @@
 
       <ul>
         <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.gru.html#module-splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent">module</a>
+</li>
+      </ul></li>
+      <li>
+    splendor.agents.our_agents.ppo.ppo_rnn.lstm
+
+      <ul>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm">module</a>
+</li>
+      </ul></li>
+      <li>
+    splendor.agents.our_agents.ppo.ppo_rnn.lstm.constants
+
+      <ul>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.constants">module</a>
+</li>
+      </ul></li>
+      <li>
+    splendor.agents.our_agents.ppo.ppo_rnn.lstm.network
+
+      <ul>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.network">module</a>
+</li>
+      </ul></li>
+      <li>
+    splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent
+
+      <ul>
+        <li><a href="splendor.agents.our_agents.ppo.ppo_rnn.lstm.html#module-splendor.agents.our_agents.ppo.ppo_rnn.lstm.ppo_agent">module</a>
 </li>
       </ul></li>
       <li>

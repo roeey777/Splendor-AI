@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    splendor.agents.our_agents.ppo.ppo_rnn.gru
+   splendor.agents.our_agents.ppo.ppo_rnn.lstm
 
 Submodules
 ----------
