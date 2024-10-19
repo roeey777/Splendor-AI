@@ -1,3 +1,3 @@
-graft src/splendor/Splendor/resources
+graft src/splendor/splendor/resources
 graft src/splendor/agents/our_agents/genetic_algorithm
 graft src/splendor/agents/our_agents/ppo
