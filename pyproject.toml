@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "splendor"
+version = "0.0.3"
+description = "Splendor Game Engine & automatic agents"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [
+  { name = "roeey777" }
+]
+maintainers = [
+  { name = "roeey777" }
+]
+keywords = [
+  "Reinforcement Learning",
+  "game",
+  "RL",
+  "AI",
+  "gymnasium",
+  "torch",
+  "Genetic Algorithm",
+  "PPO",
+  "Recurrent-PPO",
+]
+classifiers=[
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3 :: Only",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Games/Entertainment :: Board Games",
+]
+requires-python=">=3.11"
+dynamic = ["dependencies", "optional-dependencies"]
+
+[project.urls]
+Homepage = "https://roeey777.github.io/Splendor-AI/"
+Documentation = "https://roeey777.github.io/Splendor-AI/"
+Repository = "https://github.com/roeey777/Splendor-AI"
+Issues = "https://github.com/roeey777/Splendor-AI/issues"
+
+[project.scripts]
+evolve = "splendor.agents.our_agents.genetic_algorithm.evolve:main"
+ppo = "splendor.agents.our_agents.ppo.ppo:main"
+
+[project.gui-scripts]
+splendor = "splendor.general_game_runner:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements/runtime.txt"]}
+optional-dependencies = {dev = { file = ["requirements/development.txt"] }}
