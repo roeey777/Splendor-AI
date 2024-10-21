@@ -154,7 +154,9 @@ class RolloutBuffer:
 
         return advantages, returns
 
-    def unpack(self, discount_factor: float) -> tuple[
+    def unpack(
+        self, discount_factor: float
+    ) -> tuple[
         torch.Tensor,  # hidden_states
         torch.Tensor,  # cell_states
         torch.Tensor,  # states

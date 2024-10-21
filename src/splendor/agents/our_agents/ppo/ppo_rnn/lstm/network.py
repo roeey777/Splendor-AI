@@ -174,7 +174,9 @@ class PpoLstm(RecurrentPPO):
         prob = F.softmax(masked_actor_output, dim=1)
         return prob, self.critic(x1), next_hidden_state, next_cell_state
 
-    def init_hidden_state(self, device: torch.device) -> tuple[
+    def init_hidden_state(
+        self, device: torch.device
+    ) -> tuple[
         Float[torch.Tensor, "num_layers hidden_dim"],
         Float[torch.Tensor, "num_layers hidden_dim"],
     ]:

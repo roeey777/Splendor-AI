@@ -67,7 +67,10 @@ class Action:
 
     @classmethod
     def to_action_element(
-        cls: type[ActionTypeVar], action: ActionType, state: SplendorState, agent_index: int
+        cls: type[ActionTypeVar],
+        action: ActionType,
+        state: SplendorState,
+        agent_index: int,
     ) -> ActionTypeVar:
         """
         Convert an action in SplendorGameRule format to Action.
@@ -152,9 +155,7 @@ def _generate_all_collect_same_actions() -> Generator[Action, None, None]:
             # return 2 gems of different colors.
             c1: Color
             c2: Color
-            for c1, c2 in combinations(
-                (x for x in ALL_GEMS_COLORS if x != c), 2
-            ):
+            for c1, c2 in combinations((x for x in ALL_GEMS_COLORS if x != c), 2):
                 yield Action(
                     type_enum=ActionEnum.COLLECT_SAME,
                     noble_index=noble_index,

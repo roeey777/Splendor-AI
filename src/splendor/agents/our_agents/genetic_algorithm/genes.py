@@ -12,7 +12,7 @@ from numpy.typing import NDArray
 
 from splendor.splendor.features import METRICS_SHAPE, build_array
 
-GeneType = TypeVar("GeneType", bound="Gene")
+GeneTypeVar = TypeVar("GeneTypeVar", bound="Gene")
 Mutator = Callable[[float], float]
 
 
@@ -52,14 +52,14 @@ class Gene:
         return self._dna
 
     @classmethod
-    def random(cls: type[GeneType]) -> GeneType:
+    def random(cls: type[GeneTypeVar]) -> GeneTypeVar:
         """
         Initiate a gene with random DNA.
         """
         return cls(np.random.uniform(cls.LOWER_BOUND, cls.UPPER_BOUND, cls.SHAPE))
 
     @classmethod
-    def load(cls: type[GeneType], path_or_file: Path | str) -> GeneType:
+    def load(cls: type[GeneTypeVar], path_or_file: Path | str) -> GeneTypeVar:
         """
         Initiate a gene with DNA from a saved file.
         """
