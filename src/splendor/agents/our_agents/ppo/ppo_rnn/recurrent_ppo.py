@@ -4,11 +4,11 @@ architecture.
 """
 
 from abc import abstractmethod
-from typing import Any, Tuple, Union
+from typing import Any
 
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 from jaxtyping import Float
+from torch import nn
 
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 
@@ -22,7 +22,7 @@ class RecurrentPPO(PPOBase):
         self,
         input_dim: int,
         output_dim: int,
-        recurrent_unit: Union[nn.GRU, nn.LSTM, nn.RNN],
+        recurrent_unit: nn.GRU | nn.LSTM | nn.RNN,
     ):
         super().__init__(input_dim, output_dim)
         self.recurrent_unit = recurrent_unit
@@ -30,18 +30,18 @@ class RecurrentPPO(PPOBase):
     @abstractmethod
     def forward(  # type: ignore
         self,
-        x: Union[
-            Float[torch.Tensor, "batch sequence features"],
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
-        action_mask: Union[
-            Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
-        ],
+        x: (
+            Float[torch.Tensor, "batch sequence features"]
+            | Float[torch.Tensor, "batch features"]
+            | Float[torch.Tensor, " features"]
+        ),
+        action_mask: (
+            Float[torch.Tensor, "batch actions"] | Float[torch.Tensor, " actions"]
+        ),
         hidden_state: Any,
         *args,
         **kwargs,
-    ) -> Tuple[
+    ) -> tuple[
         Float[torch.Tensor, "batch actions"],
         Float[torch.Tensor, "batch 1"],
         Float[torch.Tensor, "batch hidden_dim"],
@@ -63,7 +63,7 @@ class RecurrentPPO(PPOBase):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_hidden_state(self, device: torch.device) -> Tuple[Any, Any]:
+    def init_hidden_state(self, device: torch.device) -> tuple[Any, Any]:
         """
         return the initial hidden state to be used.
         """

@@ -3,7 +3,7 @@ Implementation of an input normalization layer.
 """
 
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
+from torch import nn
 
 from .constants import VERY_SMALL_EPSILON
 

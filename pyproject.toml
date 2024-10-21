@@ -35,6 +35,9 @@ classifiers=[
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Games/Entertainment :: Board Games",
+  "Environment :: Console",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
 ]
 requires-python=">=3.11"
 dynamic = ["dependencies", "optional-dependencies"]
@@ -55,9 +58,55 @@ splendor = "splendor.general_game_runner:main"
 [tool.setuptools]
 include-package-data = true
 
+# Install all the non-code files as well (pictures and trained agents weights).
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements/runtime.txt"]}
 optional-dependencies = {dev = { file = ["requirements/development.txt"] }}
+
+
+# External Tools
+[tool.ruff]
+line-length = 88
+exclude = [
+  "docs",
+  "build",
+  "src/splendor/game.py",
+  "src/splendor/general_game_runner.py",
+  "src/splendor/template.py",
+  "src/splendor/utils.py",
+  "src/splendor/splendor/wiki-template/*",
+  "src/splendor/splendor/splendor.md",
+  "src/splendor/splendor/splendor_utils.py",
+  "src/splendor/splendor/splendor_model.py",
+  "src/splendor/splendor/splendor_displayer.py",
+]
+
+[tool.ruff.lint]
+select = [
+  "C",
+  "F",  # use pyflakes
+  "I",  # use isort
+  "PL",  # use pylint
+  "UP",  # use pyupgrade
+]
+unfixable = ["F401"]
+
+# Globally ignore F722 - Syntax error in forward annotation due to lack
+# of integration between jaxtyping and ruff.
+ignore = ["F722"]
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"

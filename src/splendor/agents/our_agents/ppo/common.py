@@ -2,10 +2,8 @@
 Collection of useful calculation functions
 """
 
-from typing import List, Tuple
-
 import torch
-import torch.distributions as distributions  # pylint: disable=consider-using-from-import
+from torch import distributions
 
 from .constants import ENTROPY_COEFFICIENT, VALUE_COEFFICIENT, VERY_SMALL_EPSILON
 
@@ -21,7 +19,7 @@ def calculate_returns(
     :param normalize: should the returns be normalized (have 0 mean and variance of 1).
     :return: the calculated returns.
     """
-    returns_list: List[float] = []
+    returns_list: list[float] = []
     cumulative_reward: float = 0
 
     for r in reversed(rewards):
@@ -66,7 +64,7 @@ def calculate_policy_loss(
     log_prob_actions: torch.Tensor,
     advantages: torch.Tensor,
     ppo_clip,
-) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     calculate the clipped policy loss.
 

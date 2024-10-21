@@ -6,7 +6,7 @@ from collections import Counter
 from dataclasses import dataclass
 from enum import Enum, auto
 from itertools import combinations, combinations_with_replacement
-from typing import Optional, Self, cast
+from typing import Self, cast
 
 from splendor.splendor import splendor_utils
 from splendor.splendor.constants import (
@@ -55,10 +55,10 @@ class Action:
     """
 
     type: ActionEnum
-    collected_gems: Optional[GemsCount] = None
-    returned_gems: Optional[GemsCount] = None
-    position: Optional[CardPosition] = None
-    noble_index: Optional[int] = None
+    collected_gems: GemsCount | None = None
+    returned_gems: GemsCount | None = None
+    position: CardPosition | None = None
+    noble_index: int | None = None
 
     @classmethod
     def to_action_element(
@@ -68,8 +68,8 @@ class Action:
         Convert an action in SplendorGameRule format to Action.
         """
         action_type = ActionEnum[action["type"].upper()]
-        collected_gems = cast(Optional[GemsCount], action.get("collected_gems"))
-        returned_gems = cast(Optional[GemsCount], action.get("returned_gems"))
+        collected_gems = cast(GemsCount | None, action.get("collected_gems"))
+        returned_gems = cast(GemsCount | None, action.get("returned_gems"))
         noble_index = None
         position = None
 

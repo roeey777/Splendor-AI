@@ -8,17 +8,18 @@ from datetime import datetime
 from importlib import import_module
 from itertools import chain
 from pathlib import Path
-from typing import List, Optional, cast
+from typing import cast
 
 import gymnasium as gym
 import numpy as np
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
-import torch.optim as optim  # pylint: disable=consider-using-from-import
 from gymnasium.spaces.utils import flatdim
+from torch import nn, optim
 
 # import this would register splendor as one of gym's environments.
-import splendor.splendor.gym  # pylint: disable=unused-import
+# pylint: disable=unused-import
+# ruff: noqa: F401
+import splendor.splendor.gym
 from splendor.splendor.gym.envs.splendor_env import SplendorEnv
 from splendor.splendor.splendor_model import SplendorState
 
@@ -35,12 +36,15 @@ from .arguments_parsing import (
 )
 from .constants import (
     DISCOUNT_FACTOR,
+    FIRST_DECK,
     LEARNING_RATE,
     MAX_EPISODES,
     N_TRIALS,
     PPO_CLIP,
     PPO_STEPS,
+    SECOND_DECK,
     SEED,
+    THIRD_DECK,
     WEIGHT_DECAY,
 )
 from .ppo_agent_base import PPOAgentBase
@@ -90,7 +94,7 @@ def save_model(model: nn.Module, path: Path):
     )
 
 
-def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> List[float]:
+def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> list[float]:
     """
     Extract game statistics from the final (terminal) game state.
 
@@ -104,14 +108,36 @@ def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> List[f
         len(agent_state.agent_trace.action_reward),  # "rounds_count",
         agent_state.score,  # "score",
         len(agent_state.nobles),  # "nobles_taken",
-        len(list(filter(lambda c: c.deck_id == 0, chain(*agent_state.cards.values())))),
-        len(list(filter(lambda c: c.deck_id == 1, chain(*agent_state.cards.values())))),
-        len(list(filter(lambda c: c.deck_id == 2, chain(*agent_state.cards.values())))),
+        len(
+            list(
+                filter(
+                    lambda c: c.deck_id == FIRST_DECK,
+                    chain(*agent_state.cards.values()),
+                )
+            )
+        ),
+        len(
+            list(
+                filter(
+                    lambda c: c.deck_id == SECOND_DECK,
+                    chain(*agent_state.cards.values()),
+                )
+            )
+        ),
+        len(
+            list(
+                filter(
+                    lambda c: c.deck_id == THIRD_DECK,
+                    chain(*agent_state.cards.values()),
+                )
+            )
+        ),
     ]
     return stats
 
 
 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-positional-arguments
+# ruff: noqa: C901,PLR0913,PLR0912,PLR0915
 def train(
     working_dir: Path = WORKING_DIR,
     learning_rate: float = LEARNING_RATE,
@@ -119,7 +145,7 @@ def train(
     seed: int = SEED,
     device_name: str = "cpu",
     transfer_learning: bool = False,
-    saved_weights: Optional[Path] = None,
+    saved_weights: Path | None = None,
     opponent: str = DEFAULT_OPPONENT,
     test_opponent: str = DEFAULT_TEST_OPPONENT,
     architecture: str = DEFAULT_ARCHITECTURE,

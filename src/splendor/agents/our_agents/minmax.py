@@ -7,11 +7,13 @@ from typing import override
 
 import numpy as np
 
+from splendor.splendor.constants import WINNING_SCORE_TRESHOLD
 from splendor.template import Agent
 
 # This agent supports only a game of 2 players
-
+EXPECTED_AMOUNT_OF_PLAYERS = 2
 DEPTH = 2
+GEMS_AMOUNT_THRESHOLD = 8
 
 
 class MiniMaxAgent(Agent):
@@ -25,10 +27,10 @@ class MiniMaxAgent(Agent):
 
     @override
     def SelectAction(self, actions, game_state, game_rule):
-        assert len(game_state.agents) == 2
+        assert len(game_state.agents) == EXPECTED_AMOUNT_OF_PLAYERS
         return self._select_action_recursion(game_state, game_rule, DEPTH)[0]
 
-    def _select_action_recursion(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def _select_action_recursion(
         self,
         game_state,
         game_rule,
@@ -37,6 +39,8 @@ class MiniMaxAgent(Agent):
         alpha=-np.inf,
         beta=np.inf,
     ):
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
+        # ruff: noqa: PLR0913
         if depth == 0:
             return None, self._evaluation_function(game_state)
         agent_id = self.id if is_maximizing else 1 - self.id
@@ -84,12 +88,12 @@ class MiniMaxAgent(Agent):
         reward = 0
 
         max_score = max(agent.score for agent in state.agents)
-        if max_score >= 15:
+        if max_score >= WINNING_SCORE_TRESHOLD:
             reward = 99999 + max_score
             if max_score > agent_state.score:
                 reward *= -1
             return reward
-        if sum(agent_state.gems.values()) >= 8:
+        if sum(agent_state.gems.values()) >= GEMS_AMOUNT_THRESHOLD:
             gems_factor = -0.7
         gems_var = np.var(list(agent_state.gems.values()))
 

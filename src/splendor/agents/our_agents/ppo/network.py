@@ -2,13 +2,13 @@
 Implementation of neural network for PPO using MLP architecture.
 """
 
-from typing import List, Optional, Tuple, Union, override
+from typing import override
 
 import numpy as np
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 import torch.nn.functional as F
 from jaxtyping import Float
+from torch import nn
 
 from .constants import DROPOUT, HIDDEN_DIMS, HUGE_NEG
 from .input_norm import InputNormalization
@@ -24,7 +24,7 @@ class PPO(PPOBase):
         self,
         input_dim: int,
         output_dim: int,
-        hidden_layers_dims: Optional[List[int]] = None,
+        hidden_layers_dims: list[int] | None = None,
         dropout: float = DROPOUT,
     ):
         super().__init__(input_dim, output_dim)
@@ -55,10 +55,7 @@ class PPO(PPOBase):
 
     def _order_x_shape(
         self,
-        x: Union[
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
+        x: Float[torch.Tensor, "batch features"] | Float[torch.Tensor, " features"],
     ) -> Float[torch.Tensor, "batch features"]:
         ordered_x: Float[torch.Tensor, "batch features"]
 
@@ -78,17 +75,17 @@ class PPO(PPOBase):
     @override
     def forward(
         self,
-        x: Union[
-            Float[torch.Tensor, "batch sequence features"],
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
-        action_mask: Union[
-            Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
-        ],
+        x: (
+            Float[torch.Tensor, "batch sequence features"]
+            | Float[torch.Tensor, "batch features"]
+            | Float[torch.Tensor, " features"]
+        ),
+        action_mask: (
+            Float[torch.Tensor, "batch actions"] | Float[torch.Tensor, " actions"]
+        ),
         *args,
         **kwargs,
-    ) -> Tuple[
+    ) -> tuple[
         Float[torch.Tensor, "batch actions"],
         Float[torch.Tensor, "batch 1"],
         None,

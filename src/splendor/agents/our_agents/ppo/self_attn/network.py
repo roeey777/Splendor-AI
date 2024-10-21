@@ -2,13 +2,13 @@
 Implementation of the neural network, with self-attention, for the PPO.
 """
 
-from typing import List, Optional, Tuple, Union, override
+from typing import override
 
 import numpy as np
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 import torch.nn.functional as F
 from jaxtyping import Float
+from torch import nn
 
 from splendor.agents.our_agents.ppo.input_norm import InputNormalization
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
@@ -25,7 +25,7 @@ class PPOSelfAttention(PPOBase):
         self,
         input_dim: int,
         output_dim: int,
-        hidden_layers_dims: Optional[List[int]] = None,
+        hidden_layers_dims: list[int] | None = None,
         dropout: float = DROPOUT,
     ):
         super().__init__(input_dim, output_dim)
@@ -62,17 +62,17 @@ class PPOSelfAttention(PPOBase):
     @override
     def forward(
         self,
-        x: Union[
-            Float[torch.Tensor, "batch sequence features"],
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
-        action_mask: Union[
-            Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
-        ],
+        x: (
+            Float[torch.Tensor, "batch sequence features"]
+            | Float[torch.Tensor, "batch features"]
+            | Float[torch.Tensor, " features"]
+        ),
+        action_mask: (
+            Float[torch.Tensor, "batch actions"] | Float[torch.Tensor, " actions"]
+        ),
         *args,
         **kwargs,
-    ) -> Tuple[
+    ) -> tuple[
         Float[torch.Tensor, "batch actions"],
         Float[torch.Tensor, "batch 1"],
         None,

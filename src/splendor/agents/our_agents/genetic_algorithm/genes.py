@@ -4,7 +4,6 @@ could be optimized with a genetic algorithm.
 """
 
 from pathlib import Path
-from typing import Optional, Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -19,7 +18,7 @@ class Gene:
 
     LOWER_BOUND = -20
     UPPER_BOUND = 20
-    SHAPE: Optional[Tuple[int, ...]] = None
+    SHAPE: tuple[int, ...] | None = None
 
     def __init__(self, dna: NDArray):
         assert dna.shape == self.SHAPE, "Given DNA has the wrong shape"
@@ -55,13 +54,13 @@ class Gene:
         return cls(np.random.uniform(cls.LOWER_BOUND, cls.UPPER_BOUND, cls.SHAPE))
 
     @classmethod
-    def load(cls, path_or_file: Union[Path, str]):
+    def load(cls, path_or_file: Path | str):
         """
         Initiate a gene with DNA from a saved file.
         """
         return cls(np.load(path_or_file))
 
-    def save(self, path_or_file: Union[Path, str]):
+    def save(self, path_or_file: Path | str):
         """
         Saves a gene's DNA to a file.
         """
@@ -104,7 +103,7 @@ class ManagerGene(Gene):
     SHAPE = (len(METRICS_SHAPE), 3)
 
     def select_strategy(
-        self, state_metrics: NDArray, strategies: Tuple[StrategyGene, ...]
+        self, state_metrics: NDArray, strategies: tuple[StrategyGene, ...]
     ) -> StrategyGene:
         """
         Select which strategy should be used based on given state.

@@ -7,7 +7,7 @@ from csv import writer as csv_writer
 from datetime import datetime
 from multiprocessing import Pool, cpu_count
 from pathlib import Path
-from typing import List, Optional, Tuple, Union, cast
+from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -41,7 +41,7 @@ from .constants import (
     WORKING_DIR,
 )
 
-GamesStats = List[List[Union[int, float, str]]]
+GamesStats = list[list[int | float | str]]
 
 MAX_PROCESS = cpu_count() // 2
 
@@ -76,7 +76,7 @@ def mutate_population(
         mutate(agent.stategy_gene_3, progress, mutation_rate)
 
 
-def _crossover(dna1: NDArray, dna2: NDArray) -> Tuple[NDArray, NDArray]:
+def _crossover(dna1: NDArray, dna2: NDArray) -> tuple[NDArray, NDArray]:
     """
     Crossover method is based on the following article (page 9)
     https://www.cs.us.es/~fsancho/ficheros/IA2019/TheContinuousGeneticAlgorithm.pdf
@@ -102,8 +102,8 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
     # this assertion is only for mypy.
     assert cls.SHAPE is not None
 
-    child_dna_1: Union[NDArray, Tuple[NDArray, ...]]
-    child_dna_2: Union[NDArray, Tuple[NDArray, ...]]
+    child_dna_1: NDArray | tuple[NDArray, ...]
+    child_dna_2: NDArray | tuple[NDArray, ...]
 
     match len(cls.SHAPE):
         case 1:
@@ -116,8 +116,8 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
             )
             child_dna_1, child_dna_2 = zip(*children_dna)
             return (
-                cls(np.vstack(cast(Tuple[NDArray, ...], child_dna_1)).T),
-                cls(np.vstack(cast(Tuple[NDArray, ...], child_dna_2)).T),
+                cls(np.vstack(cast(tuple[NDArray, ...], child_dna_1)).T),
+                cls(np.vstack(cast(tuple[NDArray, ...], child_dna_2)).T),
             )
 
     raise ValueError(f"Unsupported DNA shape for crossover {cls.SHAPE}")
@@ -212,13 +212,13 @@ def evaluate(
     population: list[GeneAlgoAgent],
     quiet: bool,
     multiprocess: bool,
-) -> Tuple[List[float], GamesStats]:
+) -> tuple[list[float], GamesStats]:
     """
     Measures the fitness of each individual by having them play against each
     other. Each individual plays in 3 games with 1,2 and 3 rivals.
     """
     games_stats: GamesStats = []
-    evaluation: List[float] = [0] * len(population)
+    evaluation: list[float] = [0] * len(population)
 
     for players_count in PLAYERS_OPTIONS:
         if not quiet:
@@ -257,7 +257,7 @@ def evaluate(
 
 
 def sort_by_fitness(
-    population: List[GeneAlgoAgent],
+    population: list[GeneAlgoAgent],
     folder: Path,
     message: str,
     quiet: bool,
@@ -313,11 +313,12 @@ def evolve(
     generations: int = GENERATIONS,
     mutation_rate: float = MUTATION_RATE,
     working_dir: Path = WORKING_DIR,
-    seed: Optional[int] = None,
+    seed: int | None = None,
     quiet: bool = False,
     multiprocess: bool = False,
 ):
     # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
+    # ruff: noqa: PLR0913
     """
     Genetic algorithm evolution process.
     In each generation `selection_size` are kept and used for mating.
@@ -344,9 +345,8 @@ def evolve(
         stats_csv = csv_writer(stats_file)
         stats_csv.writerow(STATS_HEADERS)
 
-        for generation in range(generations):
+        for generation in range(1, generations + 1):
             progress = generation / generations
-            generation += 1
             games_stats = sort_by_fitness(
                 population,
                 folder / str(generation),

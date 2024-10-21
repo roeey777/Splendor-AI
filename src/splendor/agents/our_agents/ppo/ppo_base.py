@@ -3,11 +3,11 @@ Base class for all neural network that should be used by a PPO agent.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Protocol, Tuple, Union
+from typing import Any, Protocol
 
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 from jaxtyping import Float
+from torch import nn
 
 
 class PPOBase(nn.Module, ABC):
@@ -28,17 +28,17 @@ class PPOBase(nn.Module, ABC):
     @abstractmethod
     def forward(
         self,
-        x: Union[
-            Float[torch.Tensor, "batch sequence features"],
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
-        action_mask: Union[
-            Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
-        ],
+        x: (
+            Float[torch.Tensor, "batch sequence features"]
+            | Float[torch.Tensor, "batch features"]
+            | Float[torch.Tensor, " features"]
+        ),
+        action_mask: (
+            Float[torch.Tensor, "batch actions"] | Float[torch.Tensor, " actions"]
+        ),
         *args,
         **kwargs,
-    ) -> Tuple[torch.Tensor, torch.Tensor, Any]:
+    ) -> tuple[torch.Tensor, torch.Tensor, Any]:
         """
         Pass input through the network to gain predictions.
 
@@ -63,12 +63,12 @@ class PPOBase(nn.Module, ABC):
 
     @classmethod
     def create_hidden_layers(
-        cls, input_dim: int, hidden_layers_dims: List[int], dropout: float
+        cls, input_dim: int, hidden_layers_dims: list[int], dropout: float
     ) -> nn.Module:
         """
         Create hidden layers based on given dimentions.
         """
-        layers: List[nn.Module] = []
+        layers: list[nn.Module] = []
         prev_dim = input_dim
         for next_dim in hidden_layers_dims:
             layers.append(nn.Linear(prev_dim, next_dim))

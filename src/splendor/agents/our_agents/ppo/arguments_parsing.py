@@ -5,18 +5,14 @@ All things related to command-line arguments parsing for PPO training.
 import argparse
 import typing
 from argparse import ArgumentParser
+from collections.abc import Callable
 from dataclasses import dataclass
 from functools import partial
 from importlib import import_module
 from pathlib import Path
 from typing import (
-    Callable,
-    Dict,
-    List,
     Literal,
-    Optional,
     Required,
-    Tuple,
     TypedDict,
     cast,
 )
@@ -60,10 +56,10 @@ class NeuralNetArch:
     is_recurrent: bool
     default_saved_weights: Path
     agent_relative_import_path: str
-    hidden_state_dim: Optional[Tuple[int, ...]] = None
+    hidden_state_dim: tuple[int, ...] | None = None
 
 
-OpponentsFactory = Callable[[int], List[Agent]]
+OpponentsFactory = Callable[[int], list[Agent]]
 
 
 NN_ARCHITECTURES = {
@@ -95,7 +91,7 @@ NN_ARCHITECTURES = {
 NN_ARCHITECTURES_CHOICES = NN_ARCHITECTURES.keys()
 DEFAULT_ARCHITECTURE = "mlp"
 
-NN_OPPONENTS_AGENTS_FACTORY: Dict[str, OpponentsFactory] = {
+NN_OPPONENTS_AGENTS_FACTORY: dict[str, OpponentsFactory] = {
     name: partial(
         lambda agent_id, nn_arch: [
             import_module(
@@ -107,7 +103,7 @@ NN_OPPONENTS_AGENTS_FACTORY: Dict[str, OpponentsFactory] = {
     for name, arch in NN_ARCHITECTURES.items()
 }
 
-OPPONENTS_AGENTS_FACTORY: Dict[str, OpponentsFactory] = {
+OPPONENTS_AGENTS_FACTORY: dict[str, OpponentsFactory] = {
     "random": lambda agent_id: [RandomAgent(agent_id)],
     "minimax": lambda agent_id: [MinMaxAgent(agent_id)],
 }
@@ -132,7 +128,7 @@ class Arguments(TypedDict):
     weight_decay: Required[float]
     working_dir: Required[Path]
     seed: Required[int]
-    saved_weights: Required[Optional[Path]]
+    saved_weights: Required[Path | None]
     opponent: Required[str]
     test_opponent: Required[str]
     device_name: Required[DeviceName]

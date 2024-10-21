@@ -3,7 +3,7 @@ An agent which uses PPO with self-attention
 """
 
 from pathlib import Path
-from typing import List, override
+from typing import override
 
 import numpy as np
 import torch
@@ -33,7 +33,7 @@ class PPOSelfAttentionAgent(PPOAgentBase):
     @override
     def SelectAction(
         self,
-        actions: List[ActionType],
+        actions: list[ActionType],
         game_state: SplendorState,
         game_rule: SplendorGameRule,
     ) -> ActionType:
