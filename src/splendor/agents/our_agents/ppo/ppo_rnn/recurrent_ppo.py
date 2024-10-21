@@ -4,11 +4,12 @@ architecture.
 """
 
 from abc import abstractmethod
-from typing import Any, Tuple, Union
+from typing import Any
 
+import numpy as np
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 from jaxtyping import Float
+from torch import nn
 
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
 
@@ -22,26 +23,41 @@ class RecurrentPPO(PPOBase):
         self,
         input_dim: int,
         output_dim: int,
-        recurrent_unit: Union[nn.GRU, nn.LSTM, nn.RNN],
-    ):
+        recurrent_unit: nn.GRU | nn.LSTM | nn.RNN,
+    ) -> None:
         super().__init__(input_dim, output_dim)
         self.recurrent_unit = recurrent_unit
+
+    def _init_weights(self, module: nn.Module) -> None:
+        """
+        Orthogonal initialization of the weights as suggested by (bullet #2):
+        https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+        """
+        if isinstance(module, nn.Linear):
+            nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
+            module.bias.data.zero_()
+        elif isinstance(module, nn.GRU | nn.LSTM):
+            for name, param in module.named_parameters():
+                if "bias" in name:
+                    nn.init.constant_(param, 0)
+                elif "weight" in name:
+                    nn.init.orthogonal_(param, np.sqrt(2))
 
     @abstractmethod
     def forward(  # type: ignore
         self,
-        x: Union[
-            Float[torch.Tensor, "batch sequence features"],
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
-        action_mask: Union[
-            Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
-        ],
-        hidden_state: Any,
+        x: (
+            Float[torch.Tensor, "batch sequence features"]
+            | Float[torch.Tensor, "batch features"]
+            | Float[torch.Tensor, " features"]
+        ),
+        action_mask: (
+            Float[torch.Tensor, "batch actions"] | Float[torch.Tensor, " actions"]
+        ),
+        hidden_state: Any,  # noqa: ANN401
         *args,
         **kwargs,
-    ) -> Tuple[
+    ) -> tuple[
         Float[torch.Tensor, "batch actions"],
         Float[torch.Tensor, "batch 1"],
         Float[torch.Tensor, "batch hidden_dim"],
@@ -63,7 +79,7 @@ class RecurrentPPO(PPOBase):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_hidden_state(self, device: torch.device) -> Tuple[Any, Any]:
+    def init_hidden_state(self, device: torch.device) -> tuple[Any, Any]:  # noqa: ANN401
         """
         return the initial hidden state to be used.
         """

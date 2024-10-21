@@ -1,11 +1,9 @@
 """
-Collection of useful calculation functions
+Collection of useful calculation functions.
 """
 
-from typing import List, Tuple
-
 import torch
-import torch.distributions as distributions  # pylint: disable=consider-using-from-import
+from torch import distributions
 
 from .constants import ENTROPY_COEFFICIENT, VALUE_COEFFICIENT, VERY_SMALL_EPSILON
 
@@ -14,14 +12,14 @@ def calculate_returns(
     rewards: torch.Tensor, discount_factor: float, normalize: bool = True
 ) -> torch.Tensor:
     """
-    calculate episodes returns (cumulative summation of the rewards)
+    calculate episodes returns (cumulative summation of the rewards).
 
     :param rewards: the rewards obtained throughout each episode.
     :param discount_factor: by how much rewards decay over time.
     :param normalize: should the returns be normalized (have 0 mean and variance of 1).
     :return: the calculated returns.
     """
-    returns_list: List[float] = []
+    returns_list: list[float] = []
     cumulative_reward: float = 0
 
     for r in reversed(rewards):
@@ -48,7 +46,6 @@ def calculate_advantages(
     :param normalize: should the advantages be normalized, i.e. have 0 mean and variance of 1.
     :return: the calculated advantages.
     """
-
     advantages = returns - values
 
     if normalize:
@@ -65,16 +62,16 @@ def calculate_policy_loss(
     actions: torch.Tensor,
     log_prob_actions: torch.Tensor,
     advantages: torch.Tensor,
-    ppo_clip,
-) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    ppo_clip: float,
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     calculate the clipped policy loss.
 
-    :param action_prob:
-    :param actions:
-    :param log_prob_actions:
-    :param advantages:
-    :param ppo_clip:
+    :param action_prob: the actions probabilities.
+    :param actions: the actions taken.
+    :param log_prob_actions: the log-probabilities of the actions.
+    :param advantages: the advantages.
+    :param ppo_clip: the PPO clipped objective clipping epsilon.
     :return: the policy loss, the Kullback–Leibler divergence estimate & the entropy gain.
     """
     dist = distributions.Categorical(action_prob)

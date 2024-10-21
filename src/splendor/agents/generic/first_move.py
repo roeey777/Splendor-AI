@@ -4,6 +4,8 @@ Implementation of an agent that selects the first legal action.
 
 from typing import override
 
+from splendor.splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.splendor.types import ActionType
 from splendor.template import Agent
 
 
@@ -15,7 +17,12 @@ class FirstActionAgent(Agent):
     # pylint: disable=too-few-public-methods
 
     @override
-    def SelectAction(self, actions, game_state, game_rule):
+    def SelectAction(
+        self,
+        actions: list[ActionType],
+        game_state: SplendorState,
+        game_rule: SplendorGameRule,
+    ) -> ActionType:
         return actions[0]
 
 

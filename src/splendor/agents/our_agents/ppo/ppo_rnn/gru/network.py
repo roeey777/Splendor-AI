@@ -2,13 +2,12 @@
 PPO with GRU (Gated Recurrent Unit) implementation.
 """
 
-from typing import List, Optional, Tuple, Union, override
+from typing import override
 
-import numpy as np
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 import torch.nn.functional as F
 from jaxtyping import Float
+from torch import nn
 
 from splendor.agents.our_agents.ppo.input_norm import InputNormalization
 from splendor.agents.our_agents.ppo.ppo_rnn.recurrent_ppo import RecurrentPPO
@@ -29,15 +28,16 @@ class PpoGru(RecurrentPPO):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def __init__(  # noqa: PLR0913
         self,
         input_dim: int,
         output_dim: int,
-        hidden_layers_dims: Optional[List[int]] = None,
+        hidden_layers_dims: list[int] | None = None,
         dropout: float = DROPOUT,
         hidden_state_dim: int = HIDDEN_STATE_DIM,
         recurrent_layers_num: int = RECURRENT_LAYERS_AMOUNT,
-    ):
+    ) -> None:
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
         super().__init__(
             input_dim,
             output_dim,
@@ -66,28 +66,13 @@ class PpoGru(RecurrentPPO):
         # Initialize weights (recursively)
         self.apply(self._init_weights)
 
-    def _init_weights(self, module):
-        """
-        Orthogonal initialization of the weights as suggested by (bullet #2):
-        https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
-        """
-        if isinstance(module, nn.Linear):
-            nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
-            module.bias.data.zero_()
-        elif isinstance(module, (nn.GRU, nn.LSTM)):
-            for name, param in module.named_parameters():
-                if "bias" in name:
-                    nn.init.constant_(param, 0)
-                elif "weight" in name:
-                    nn.init.orthogonal_(param, np.sqrt(2))
-
     def _order_x_shape(
         self,
-        x: Union[
-            Float[torch.Tensor, "batch sequence features"],
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
+        x: (
+            Float[torch.Tensor, "batch sequence features"]
+            | Float[torch.Tensor, "batch features"]
+            | Float[torch.Tensor, " features"]
+        ),
     ) -> Float[torch.Tensor, "batch sequence features"]:
         ordered_x: Float[torch.Tensor, "batch sequence features"]
         match len(x.shape):
@@ -108,10 +93,10 @@ class PpoGru(RecurrentPPO):
 
     def _order_hidden_state_shape(
         self,
-        hidden_state: Union[
-            Tuple[Float[torch.Tensor, "batch num_layers hidden_dim"], None],
-            Tuple[Float[torch.Tensor, "num_layers hidden_dim"], None],
-        ],
+        hidden_state: (
+            tuple[Float[torch.Tensor, "batch num_layers hidden_dim"], None]
+            | tuple[Float[torch.Tensor, "num_layers hidden_dim"], None]
+        ),
     ) -> Float[torch.Tensor, "num_layers batch hidden_dim"]:
         hidden, *_ = hidden_state
         match len(hidden.shape):
@@ -130,21 +115,21 @@ class PpoGru(RecurrentPPO):
     @override
     def forward(  # type: ignore
         self,
-        x: Union[
-            Float[torch.Tensor, "batch sequence features"],
-            Float[torch.Tensor, "batch features"],
-            Float[torch.Tensor, "features"],
-        ],
-        action_mask: Union[
-            Float[torch.Tensor, "batch actions"], Float[torch.Tensor, "actions"]
-        ],
-        hidden_state: Union[
-            Tuple[Float[torch.Tensor, "batch num_layers hidden_dim"], None],
-            Tuple[Float[torch.Tensor, "num_layers hidden_dim"], None],
-        ],
+        x: (
+            Float[torch.Tensor, "batch sequence features"]
+            | Float[torch.Tensor, "batch features"]
+            | Float[torch.Tensor, " features"]
+        ),
+        action_mask: (
+            Float[torch.Tensor, "batch actions"] | Float[torch.Tensor, " actions"]
+        ),
+        hidden_state: (
+            tuple[Float[torch.Tensor, "batch num_layers hidden_dim"], None]
+            | tuple[Float[torch.Tensor, "num_layers hidden_dim"], None]
+        ),
         *args,
         **kwargs,
-    ) -> Tuple[
+    ) -> tuple[
         Float[torch.Tensor, "batch actions"],
         Float[torch.Tensor, "batch 1"],
         Float[torch.Tensor, "batch hidden_dim"],
@@ -183,7 +168,7 @@ class PpoGru(RecurrentPPO):
     @override
     def init_hidden_state(
         self, device: torch.device
-    ) -> Tuple[Float[torch.Tensor, "num_layers hidden_dim"], None]:
+    ) -> tuple[Float[torch.Tensor, "num_layers hidden_dim"], None]:
         """
         return the initial hidden state to be used.
         """

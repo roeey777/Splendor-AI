@@ -3,12 +3,12 @@ Implementation of PPO agent with LSTM.
 """
 
 from pathlib import Path
-from typing import List, override
+from typing import override
 
 import numpy as np
 import torch
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 from numpy.typing import NDArray
+from torch import nn
 
 from splendor.agents.our_agents.ppo.ppo_agent_base import PPOAgentBase
 from splendor.agents.our_agents.ppo.ppo_base import PPOBase
@@ -32,7 +32,7 @@ class PpoLstmAgent(PPOAgentBase):
     """
 
     @override
-    def __init__(self, _id: int, load_net: bool = True):
+    def __init__(self, _id: int, load_net: bool = True) -> None:
         super().__init__(_id, load_net)
 
         if load_net:
@@ -43,7 +43,7 @@ class PpoLstmAgent(PPOAgentBase):
     @override
     def SelectAction(
         self,
-        actions: List[ActionType],
+        actions: list[ActionType],
         game_state: SplendorState,
         game_rule: SplendorGameRule,
     ) -> ActionType:
@@ -83,7 +83,7 @@ class PpoLstmAgent(PPOAgentBase):
         return load_saved_model(DEFAULT_SAVED_PPO_LSTM_PATH, PpoLstm)
 
     @override
-    def load_policy(self, policy: nn.Module):
+    def load_policy(self, policy: nn.Module) -> None:
         super().load_policy(policy)
 
         # this assertion is only for mypy

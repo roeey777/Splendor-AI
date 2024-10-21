@@ -35,6 +35,9 @@ classifiers=[
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
   "Topic :: Games/Entertainment :: Board Games",
+  "Environment :: Console",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: Microsoft :: Windows",
 ]
 requires-python=">=3.11"
 dynamic = ["dependencies", "optional-dependencies"]
@@ -55,9 +58,67 @@ splendor = "splendor.general_game_runner:main"
 [tool.setuptools]
 include-package-data = true
 
+# Install all the non-code files as well (pictures and trained agents weights).
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements/runtime.txt"]}
 optional-dependencies = {dev = { file = ["requirements/development.txt"] }}
+
+
+# External Tools
+[tool.ruff]
+line-length = 88
+exclude = [
+  "docs",
+  "build",
+  "src/splendor/game.py",
+  "src/splendor/general_game_runner.py",
+  "src/splendor/template.py",
+  "src/splendor/utils.py",
+  "src/splendor/splendor/wiki-template/*",
+  "src/splendor/splendor/splendor.md",
+  "src/splendor/splendor/splendor_utils.py",
+  "src/splendor/splendor/splendor_model.py",
+  "src/splendor/splendor/splendor_displayer.py",
+]
+
+[tool.ruff.lint]
+select = [
+  "C",
+  "F",   # use pyflakes
+  "I",   # use isort
+  "PL",  # use pylint
+  "UP",  # use pyupgrade
+  "Q",   # use flake8-quotes
+  "B",   # use flake8-bugbear
+  "SLF", # use flake8-self
+  "PTH", # use flake8-use-pathlib
+  "A",   # use flake8-builtins
+  "COM", # use flake8-commas
+  "C4",  # use flake8-comprehensions
+  "ANN", # use flake8-annotations
+]
+unfixable = ["F401"]
+
+ignore = [
+  "F722",    # ignore F722 - Syntax error in forward annotation due to lack of integration between jaxtyping and ruff.
+  "COM812",  # ignore COM812 - Trailing comma missing.
+  "ANN101",  # ignore ANN101 - Missing type annotation for self in method.
+  "ANN002",  # ignore ANN002 - Missing type annotation for *args.
+  "ANN003",  # ignore ANN003 - Missing type annotation for **kwargs.
+]
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"

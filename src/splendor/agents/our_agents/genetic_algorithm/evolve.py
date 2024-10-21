@@ -7,7 +7,7 @@ from csv import writer as csv_writer
 from datetime import datetime
 from multiprocessing import Pool, cpu_count
 from pathlib import Path
-from typing import List, Optional, Tuple, Union, cast
+from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -41,17 +41,17 @@ from .constants import (
     WORKING_DIR,
 )
 
-GamesStats = List[List[Union[int, float, str]]]
+GamesStats = list[list[int | float | str]]
 
 MAX_PROCESS = cpu_count() // 2
 
 
-def mutate(gene: Gene, progress: float, mutate_rate: float):
+def mutate(gene: Gene, progress: float, mutate_rate: float) -> None:
     """
     Mutates a single gene.
     """
 
-    def _mutate(value):
+    def _mutate(value: float) -> float:
         """
         Mutation method is based on the following article (page 112)
         http://web.ist.utl.pt/adriano.simoes/tese/referencias/Michalewicz%20Z.%20Genetic%20Algorithms%20+%20Data%20Structures%20=%20Evolution%20Programs%20%283ed%29.PDF
@@ -65,7 +65,7 @@ def mutate(gene: Gene, progress: float, mutate_rate: float):
 
 def mutate_population(
     population: list[GeneAlgoAgent], progress: float, mutation_rate: float
-):
+) -> None:
     """
     Mutates the genes of the population.
     """
@@ -76,7 +76,7 @@ def mutate_population(
         mutate(agent.stategy_gene_3, progress, mutation_rate)
 
 
-def _crossover(dna1: NDArray, dna2: NDArray) -> Tuple[NDArray, NDArray]:
+def _crossover(dna1: NDArray, dna2: NDArray) -> tuple[NDArray, NDArray]:
     """
     Crossover method is based on the following article (page 9)
     https://www.cs.us.es/~fsancho/ficheros/IA2019/TheContinuousGeneticAlgorithm.pdf
@@ -102,8 +102,8 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
     # this assertion is only for mypy.
     assert cls.SHAPE is not None
 
-    child_dna_1: Union[NDArray, Tuple[NDArray, ...]]
-    child_dna_2: Union[NDArray, Tuple[NDArray, ...]]
+    child_dna_1: NDArray | tuple[NDArray, ...]
+    child_dna_2: NDArray | tuple[NDArray, ...]
 
     match len(cls.SHAPE):
         case 1:
@@ -112,12 +112,12 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
         case 2:
             children_dna = (
                 _crossover(dna1, dna2)
-                for dna1, dna2 in zip(mom.raw_dna.T, dad.raw_dna.T)
+                for dna1, dna2 in zip(mom.raw_dna.T, dad.raw_dna.T, strict=True)
             )
-            child_dna_1, child_dna_2 = zip(*children_dna)
+            child_dna_1, child_dna_2 = zip(*children_dna, strict=True)
             return (
-                cls(np.vstack(cast(Tuple[NDArray, ...], child_dna_1)).T),
-                cls(np.vstack(cast(Tuple[NDArray, ...], child_dna_2)).T),
+                cls(np.vstack(cast(tuple[NDArray, ...], child_dna_1)).T),
+                cls(np.vstack(cast(tuple[NDArray, ...], child_dna_2)).T),
             )
 
     raise ValueError(f"Unsupported DNA shape for crossover {cls.SHAPE}")
@@ -133,10 +133,18 @@ def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAge
     matings = (population_size - len(parents)) // CHILDREN_PER_MATING
     for _ in range(matings):
         mom, dad = np.random.choice(parents_array, PARENTS_PER_MATING, False)
-        managers = crossover(mom.manager_gene, dad.manager_gene)
-        strategies_1 = crossover(mom.stategy_gene_1, dad.stategy_gene_1)
-        strategies_2 = crossover(mom.stategy_gene_2, dad.stategy_gene_2)
-        strategies_3 = crossover(mom.stategy_gene_3, dad.stategy_gene_3)
+        managers = cast(
+            list[ManagerGene], crossover(mom.manager_gene, dad.manager_gene)
+        )
+        strategies_1 = cast(
+            list[StrategyGene], crossover(mom.stategy_gene_1, dad.stategy_gene_1)
+        )
+        strategies_2 = cast(
+            list[StrategyGene], crossover(mom.stategy_gene_2, dad.stategy_gene_2)
+        )
+        strategies_3 = cast(
+            list[StrategyGene], crossover(mom.stategy_gene_3, dad.stategy_gene_3)
+        )
         for i in range(CHILDREN_PER_MATING):
             children.append(
                 GeneAlgoAgent(
@@ -147,11 +155,13 @@ def mate(parents: list[GeneAlgoAgent], population_size: int) -> list[GeneAlgoAge
     return children
 
 
-def single_game(agents) -> tuple[Game, dict]:
+def single_game(agents: list[GeneAlgoAgent]) -> tuple[Game, dict]:
     """
     Runs a single game of Splendor (with the Engine) using the given agents.
     """
-    np.random.shuffle(agents)
+    agents_array = np.array(agents)
+    np.random.shuffle(agents_array)
+    agents = agents_array.tolist()
     names = []
     for i, agent in enumerate(agents):
         agent.id = i
@@ -189,7 +199,7 @@ def _evaluate(
     players_count: int,
     quiet: bool,
 ) -> list[tuple[Game, dict]]:
-    results = []
+    results: list[tuple[Game, dict]] = []
     games = len(population) // players_count
 
     for i in range(games):
@@ -212,13 +222,13 @@ def evaluate(
     population: list[GeneAlgoAgent],
     quiet: bool,
     multiprocess: bool,
-) -> Tuple[List[float], GamesStats]:
+) -> tuple[list[float], GamesStats]:
     """
     Measures the fitness of each individual by having them play against each
     other. Each individual plays in 3 games with 1,2 and 3 rivals.
     """
     games_stats: GamesStats = []
-    evaluation: List[float] = [0] * len(population)
+    evaluation: list[float] = [0] * len(population)
 
     for players_count in PLAYERS_OPTIONS:
         if not quiet:
@@ -246,6 +256,7 @@ def evaluate(
             cards_in_play = zip(
                 game.game_rule.current_game_state.board.decks,
                 game.game_rule.current_game_state.board.dealt,
+                strict=True,
             )
             stats.extend(
                 len(deck) + len(tuple(filter(None, dealt)))
@@ -257,7 +268,7 @@ def evaluate(
 
 
 def sort_by_fitness(
-    population: List[GeneAlgoAgent],
+    population: list[GeneAlgoAgent],
     folder: Path,
     message: str,
     quiet: bool,
@@ -292,7 +303,7 @@ def sort_by_fitness(
     return games_stats
 
 
-def generate_initial_population(population_size: int):
+def generate_initial_population(population_size: int) -> list[GeneAlgoAgent]:
     """
     Creates agents with random genes.
     """
@@ -308,15 +319,15 @@ def generate_initial_population(population_size: int):
     ]
 
 
-def evolve(
+def evolve(  # noqa: PLR0913
     population_size: int = POPULATION_SIZE,
     generations: int = GENERATIONS,
     mutation_rate: float = MUTATION_RATE,
     working_dir: Path = WORKING_DIR,
-    seed: Optional[int] = None,
+    seed: int | None = None,
     quiet: bool = False,
     multiprocess: bool = False,
-):
+) -> list[GeneAlgoAgent]:
     # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
     """
     Genetic algorithm evolution process.
@@ -340,13 +351,14 @@ def evolve(
 
     population = generate_initial_population(population_size)
 
-    with open(folder / STATS_FILE, "w", newline="\n", encoding="ascii") as stats_file:
+    with Path.open(
+        folder / STATS_FILE, "w", newline="\n", encoding="ascii"
+    ) as stats_file:
         stats_csv = csv_writer(stats_file)
         stats_csv.writerow(STATS_HEADERS)
 
-        for generation in range(generations):
+        for generation in range(1, generations + 1):
             progress = generation / generations
-            generation += 1
             games_stats = sort_by_fitness(
                 population,
                 folder / str(generation),
@@ -360,11 +372,14 @@ def evolve(
                 stats_csv.writerow(stats)
 
             parents = population[:selection_size]
-            np.random.shuffle(parents)
-            children = mate(parents, population_size)
+            parents_array = np.array(parents)
+            np.random.shuffle(parents_array)
+            children = mate(parents_array.tolist(), population_size)
             mutate_population(children, progress, mutation_rate)
             population = parents + children
-            np.random.shuffle(population)
+            population_array = np.array(population)
+            np.random.shuffle(population_array)
+            population = population_array.tolist()
 
         games_stats = sort_by_fitness(
             population, folder / "final", "Final", quiet, multiprocess
@@ -378,7 +393,7 @@ def evolve(
     return population[:return_size]
 
 
-def main():
+def main() -> None:
     """
     entry-point for the ``evolve`` console script.
     """

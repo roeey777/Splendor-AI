@@ -3,14 +3,13 @@ Implementation of the actual training of the PPO.
 """
 
 from dataclasses import dataclass
-from typing import Optional, Tuple, cast
+from typing import cast
 
 import gymnasium as gym
 import torch
-import torch.distributions as distributions  # pylint: disable=consider-using-from-import
-import torch.nn as nn  # pylint: disable=consider-using-from-import
 from gymnasium.spaces.utils import flatdim
 from numpy.typing import NDArray
+from torch import distributions, nn
 from torch.nn.modules.loss import _Loss as Loss_Fn
 from torch.optim.optimizer import Optimizer
 
@@ -48,14 +47,14 @@ class LearningParams:
     seed: int
     device: torch.device
     is_recurrent: bool
-    hidden_states_shape: Optional[Tuple[int, ...]] = None
+    hidden_states_shape: tuple[int, ...] | None = None
 
 
 def train_single_episode(
     env: gym.Env,
     policy: nn.Module,
     learning_params: LearningParams,
-) -> Tuple[float, float, float]:
+) -> tuple[float, float, float]:
     # pylint: disable=too-many-locals
     """
     Execute the training procedure for a single episode (game), i.e. record
@@ -150,7 +149,7 @@ def update_policy(
     policy: nn.Module,
     rollout_buffer: RolloutBuffer,
     learning_params: LearningParams,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     # pylint: disable=too-many-locals
     """
     Update the policy using several gradient descent steps (via the given optimizer)

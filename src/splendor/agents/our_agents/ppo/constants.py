@@ -2,11 +2,9 @@
 Constants relevant for MLP-based PPO and Gradient-Descent based learning.
 """
 
-from typing import List
-
 DROPOUT = 0.2
 HUGE_NEG = -1e8
-HIDDEN_DIMS: List[int] = [128, 128, 128, 128]
+HIDDEN_DIMS: list[int] = [128, 128, 128, 128]
 HIDDEN_STATE_DIM = 64
 RECURRENT_LAYERS_AMOUNT = 1
 VERY_SMALL_EPSILON = 1e-8
@@ -30,3 +28,7 @@ VERY_SMALL_EPSILON = 1e-8
 MAX_GRADIENT_NORM = 1.0
 
 ROLLOUT_BUFFER_SIZE = 1000
+
+FIRST_DECK = 0
+SECOND_DECK = 1
+THIRD_DECK = 2

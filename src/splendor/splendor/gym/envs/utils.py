@@ -2,8 +2,6 @@
 Collection of useful utility functions used in the implementation of SplendorEnv.
 """
 
-from typing import Dict, List
-
 import numpy as np
 from numpy.typing import NDArray
 
@@ -46,7 +44,7 @@ def build_action(
     action_index: int,
     state: SplendorState,
     agent_index: int,
-) -> Dict:
+) -> dict:
     """
     Construct the action to be taken from it's action index in the ALL_ACTION list.
 
@@ -81,7 +79,7 @@ def build_action(
         else None
     )
 
-    match action.type:
+    match action.type_enum:
         case ActionEnum.PASS:
             action_to_execute = {
                 "type": "pass",
@@ -141,14 +139,14 @@ def build_action(
             }
         case _:
             raise ValueError(
-                f"Unknown action type: {action.type} of the action {action}"
+                f"Unknown action type: {action.type_enum} of the action {action}"
             )
 
     return action_to_execute
 
 
 def create_legal_actions_mask(
-    legal_actions: List[ActionType],
+    legal_actions: list[ActionType],
     state: SplendorState,
     agent_index: int,
 ) -> NDArray:
@@ -167,8 +165,8 @@ def create_legal_actions_mask(
 
 
 def create_action_mapping(
-    legal_actions: List[ActionType], state: SplendorState, agent_index: int
-) -> Dict[int, ActionType]:
+    legal_actions: list[ActionType], state: SplendorState, agent_index: int
+) -> dict[int, ActionType]:
     """
     Create the mapping between action indices to legal actions.
     This would be in use by both SplendorEnv & by the PPO agent.

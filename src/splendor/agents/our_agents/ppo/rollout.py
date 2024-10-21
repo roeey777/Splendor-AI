@@ -4,7 +4,6 @@ values for learning purposes, during an episode.
 """
 
 from dataclasses import dataclass, field
-from typing import Optional, Tuple
 
 import torch
 
@@ -23,8 +22,8 @@ class RolloutBuffer:
     input_dim: int
     action_dim: int
     is_recurrent: bool = False
-    hidden_states_shape: Optional[Tuple[int, ...]] = None
-    device: Optional[torch.device] = None
+    hidden_states_shape: tuple[int, ...] | None = None
+    device: torch.device | None = None
     states: torch.Tensor = field(init=False)
     actions: torch.Tensor = field(init=False)
     action_mask_history: torch.Tensor = field(init=False)
@@ -32,12 +31,12 @@ class RolloutBuffer:
     values: torch.Tensor = field(init=False)
     rewards: torch.Tensor = field(init=False)
     dones: torch.Tensor = field(init=False)
-    hidden_states: Optional[torch.Tensor] = field(init=False)
-    cell_states: Optional[torch.Tensor] = field(init=False)
+    hidden_states: torch.Tensor | None = field(init=False)
+    cell_states: torch.Tensor | None = field(init=False)
     index: int = field(default=0, init=False)
     full: bool = field(default=False, init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.index = 0
         self.full = False
 
@@ -74,7 +73,7 @@ class RolloutBuffer:
             self.hidden_states = torch.zeros(self.size, dtype=torch.float64)
             self.cell_states = torch.zeros(self.size, dtype=torch.float64)
 
-    def remember(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+    def remember(  # noqa: PLR0913
         self,
         state: torch.Tensor,
         action: torch.Tensor,
@@ -83,9 +82,10 @@ class RolloutBuffer:
         value: float,
         reward: float,
         done: bool,
-        hidden_state: Optional[torch.Tensor] = None,
-        cell_state: Optional[torch.Tensor] = None,
-    ):
+        hidden_state: torch.Tensor | None = None,
+        cell_state: torch.Tensor | None = None,
+    ) -> None:
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
         """
         Store essential values in the rollout buffer.
 
@@ -100,7 +100,6 @@ class RolloutBuffer:
         :param cell_state: the hidden state used, only relevant for
                            recurrent PPO, specificly for LSTM.
         """
-
         with torch.no_grad():
             if self.full:
                 return
@@ -128,7 +127,7 @@ class RolloutBuffer:
             if self.index >= self.size:
                 self.full = True
 
-    def clear(self):
+    def clear(self) -> None:
         """
         clean the rollout buffer.
         """
@@ -137,7 +136,7 @@ class RolloutBuffer:
 
     def calculate_gae(
         self, discount_factor: float
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Compute the Generalized Advantage Estimation (GAE).
 
@@ -155,7 +154,9 @@ class RolloutBuffer:
 
         return advantages, returns
 
-    def unpack(self, discount_factor: float) -> Tuple[
+    def unpack(
+        self, discount_factor: float
+    ) -> tuple[
         torch.Tensor,  # hidden_states
         torch.Tensor,  # cell_states
         torch.Tensor,  # states

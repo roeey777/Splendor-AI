@@ -1,9 +1,9 @@
 """
-An agent which uses PPO with self-attention
+An agent which uses PPO with self-attention.
 """
 
 from pathlib import Path
-from typing import List, override
+from typing import override
 
 import numpy as np
 import torch
@@ -27,13 +27,13 @@ DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH = Path(__file__).parent / "ppo_model.pth"
 
 class PPOSelfAttentionAgent(PPOAgentBase):
     """
-    PPO agent with self-attention
+    PPO agent with self-attention.
     """
 
     @override
     def SelectAction(
         self,
-        actions: List[ActionType],
+        actions: list[ActionType],
         game_state: SplendorState,
         game_rule: SplendorGameRule,
     ) -> ActionType:

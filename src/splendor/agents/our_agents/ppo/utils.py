@@ -4,7 +4,7 @@ Collection of utility functions.
 
 from functools import cache
 from pathlib import Path
-from typing import Optional, cast
+from typing import cast
 
 import gymnasium as gym
 import torch
@@ -52,7 +52,7 @@ def load_saved_model(
 
 
 @cache
-def load_saved_ppo(path: Optional[Path] = None) -> PPO:
+def load_saved_ppo(path: Path | None = None) -> PPO:
     """
     Load saved weights of a PPO model from a given path, if no path was given
     the installed weights of the PPO agent will be loaded.

@@ -11,7 +11,7 @@ class LimitRoundsGameRule(SplendorGameRule):
     Wraps `SplendorGameRule`.
     """
 
-    def gameEnds(self):
+    def gameEnds(self) -> bool:
         """
         Limits the game to `ROUNDS_LIMIT` rounds, so random initial agents
         won't get stuck by accident.
