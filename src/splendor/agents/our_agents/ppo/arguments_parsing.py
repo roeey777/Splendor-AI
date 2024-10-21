@@ -10,12 +10,7 @@ from dataclasses import dataclass
 from functools import partial
 from importlib import import_module
 from pathlib import Path
-from typing import (
-    Literal,
-    Required,
-    TypedDict,
-    cast,
-)
+from typing import Literal, Required, TypedDict, cast
 
 from splendor.agents.generic.random import myAgent as RandomAgent
 from splendor.agents.our_agents.minmax import myAgent as MinMaxAgent

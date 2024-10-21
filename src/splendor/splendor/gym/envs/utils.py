@@ -79,7 +79,7 @@ def build_action(
         else None
     )
 
-    match action.type:
+    match action.type_enum:
         case ActionEnum.PASS:
             action_to_execute = {
                 "type": "pass",
@@ -139,7 +139,7 @@ def build_action(
             }
         case _:
             raise ValueError(
-                f"Unknown action type: {action.type} of the action {action}"
+                f"Unknown action type: {action.type_enum} of the action {action}"
             )
 
     return action_to_execute

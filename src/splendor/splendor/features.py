@@ -1,5 +1,5 @@
 """
-Features extraction from SplendorState
+Features extraction from SplendorState.
 """
 
 from collections.abc import ValuesView
@@ -325,7 +325,7 @@ def normalize_metrics(metrics: NDArray) -> NDArray:
 @cache
 def get_color_encoder() -> OneHotEncoder:
     """
-    Return an encoder of all the colors (including yellow)
+    Return an encoder of all the colors (including yellow).
 
     :note: this function is cached in order to avoid re-creation of this encoder.
            however this means that we uses the same encoder.

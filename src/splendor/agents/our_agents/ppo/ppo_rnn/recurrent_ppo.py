@@ -6,6 +6,7 @@ architecture.
 from abc import abstractmethod
 from typing import Any
 
+import numpy as np
 import torch
 from jaxtyping import Float
 from torch import nn
@@ -23,9 +24,24 @@ class RecurrentPPO(PPOBase):
         input_dim: int,
         output_dim: int,
         recurrent_unit: nn.GRU | nn.LSTM | nn.RNN,
-    ):
+    ) -> None:
         super().__init__(input_dim, output_dim)
         self.recurrent_unit = recurrent_unit
+
+    def _init_weights(self, module: nn.Module) -> None:
+        """
+        Orthogonal initialization of the weights as suggested by (bullet #2):
+        https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
+        """
+        if isinstance(module, nn.Linear):
+            nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
+            module.bias.data.zero_()
+        elif isinstance(module, nn.GRU | nn.LSTM):
+            for name, param in module.named_parameters():
+                if "bias" in name:
+                    nn.init.constant_(param, 0)
+                elif "weight" in name:
+                    nn.init.orthogonal_(param, np.sqrt(2))
 
     @abstractmethod
     def forward(  # type: ignore
@@ -38,7 +54,7 @@ class RecurrentPPO(PPOBase):
         action_mask: (
             Float[torch.Tensor, "batch actions"] | Float[torch.Tensor, " actions"]
         ),
-        hidden_state: Any,
+        hidden_state: Any,  # noqa: ANN401
         *args,
         **kwargs,
     ) -> tuple[
@@ -63,7 +79,7 @@ class RecurrentPPO(PPOBase):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_hidden_state(self, device: torch.device) -> tuple[Any, Any]:
+    def init_hidden_state(self, device: torch.device) -> tuple[Any, Any]:  # noqa: ANN401
         """
         return the initial hidden state to be used.
         """

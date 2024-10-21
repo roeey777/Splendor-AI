@@ -1,8 +1,8 @@
 """
-Implementation of Splendor as a gym.Env
+Implementation of Splendor as a gym.Env.
 """
 
-from typing import Any, override
+from typing import override
 
 import gymnasium as gym
 import numpy as np
@@ -29,8 +29,8 @@ class SplendorEnv(gym.Env):
         agents: list[Agent],
         shuffle_turns: bool = True,
         fixed_turn: int | None = None,
-        render_mode: Any | None = None,
-    ):
+        render_mode: str | None = None,
+    ) -> None:
         """
         Create a new environment, which simulates the game of Splendor by
         using SplendorGameRule.
@@ -171,7 +171,7 @@ class SplendorEnv(gym.Env):
             {},
         )
 
-    def render(self):
+    def render(self) -> None:
         # Don't render anything.
         pass
 
@@ -205,7 +205,7 @@ class SplendorEnv(gym.Env):
         """
         return features.extract_metrics_with_cards(state, turn).astype(np.float32)
 
-    def _set_opponents_ids(self):
+    def _set_opponents_ids(self) -> None:
         """
         assign IDs to all the agents of the opponents according to the turns
         ordering.
@@ -213,12 +213,12 @@ class SplendorEnv(gym.Env):
         ids = list(range(self.number_of_players))
         ids.remove(self.my_turn)
 
-        for agent, agent_id in zip(self.agents, ids):
+        for agent, agent_id in zip(self.agents, ids, strict=True):
             agent.id = agent_id
 
     def _simulate_opponents(self) -> tuple[bool, SplendorState]:
         """
-        Simulate the opponents moves from the current turn until self.my_turn
+        Simulate the opponents moves from the current turn until self.my_turn.
 
         :return: whether or not the game has ended prior to the turn of self.my_turn
         """

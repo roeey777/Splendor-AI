@@ -36,7 +36,7 @@ class RolloutBuffer:
     index: int = field(default=0, init=False)
     full: bool = field(default=False, init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.index = 0
         self.full = False
 
@@ -73,7 +73,7 @@ class RolloutBuffer:
             self.hidden_states = torch.zeros(self.size, dtype=torch.float64)
             self.cell_states = torch.zeros(self.size, dtype=torch.float64)
 
-    def remember(
+    def remember(  # noqa: PLR0913
         self,
         state: torch.Tensor,
         action: torch.Tensor,
@@ -84,9 +84,8 @@ class RolloutBuffer:
         done: bool,
         hidden_state: torch.Tensor | None = None,
         cell_state: torch.Tensor | None = None,
-    ):
+    ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # ruff: noqa: PLR0913
         """
         Store essential values in the rollout buffer.
 
@@ -101,7 +100,6 @@ class RolloutBuffer:
         :param cell_state: the hidden state used, only relevant for
                            recurrent PPO, specificly for LSTM.
         """
-
         with torch.no_grad():
             if self.full:
                 return
@@ -129,7 +127,7 @@ class RolloutBuffer:
             if self.index >= self.size:
                 self.full = True
 
-    def clear(self):
+    def clear(self) -> None:
         """
         clean the rollout buffer.
         """

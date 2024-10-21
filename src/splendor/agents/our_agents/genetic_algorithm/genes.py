@@ -3,12 +3,17 @@ Defining how to represent agents as genes (i.e. vectors) so they
 could be optimized with a genetic algorithm.
 """
 
+from collections.abc import Callable
 from pathlib import Path
+from typing import TypeVar
 
 import numpy as np
 from numpy.typing import NDArray
 
 from splendor.splendor.features import METRICS_SHAPE, build_array
+
+GeneType = TypeVar("GeneType", bound="Gene")
+Mutator = Callable[[float], float]
 
 
 class Gene:
@@ -20,13 +25,13 @@ class Gene:
     UPPER_BOUND = 20
     SHAPE: tuple[int, ...] | None = None
 
-    def __init__(self, dna: NDArray):
+    def __init__(self, dna: NDArray) -> None:
         assert dna.shape == self.SHAPE, "Given DNA has the wrong shape"
         self._dna = dna
-        self._prepared_dna = None
+        self._prepared_dna: NDArray | None = None
 
     @property
-    def dna(self):
+    def dna(self) -> NDArray:
         """
         We want some metrics to have the same weight (in places the is no
         meaning to the order). This methods returns a dna which matches in
@@ -39,7 +44,7 @@ class Gene:
         return self._prepared_dna
 
     @property
-    def raw_dna(self):
+    def raw_dna(self) -> NDArray:
         """
         Return a direct access to the private _dna attribute.
         This is useful when implementing the crossover functionality.
@@ -47,26 +52,26 @@ class Gene:
         return self._dna
 
     @classmethod
-    def random(cls):
+    def random(cls: type[GeneType]) -> GeneType:
         """
         Initiate a gene with random DNA.
         """
         return cls(np.random.uniform(cls.LOWER_BOUND, cls.UPPER_BOUND, cls.SHAPE))
 
     @classmethod
-    def load(cls, path_or_file: Path | str):
+    def load(cls: type[GeneType], path_or_file: Path | str) -> GeneType:
         """
         Initiate a gene with DNA from a saved file.
         """
         return cls(np.load(path_or_file))
 
-    def save(self, path_or_file: Path | str):
+    def save(self, path_or_file: Path | str) -> None:
         """
         Saves a gene's DNA to a file.
         """
         np.save(path_or_file, self._dna)
 
-    def mutate(self, mutate_rate: float, mutator):
+    def mutate(self, mutate_rate: float, mutator: Mutator) -> None:
         """
         Mutates a gene's DNA (in place).
         Should be the only thing that edits the DNA of an existing gene.
@@ -88,16 +93,16 @@ class StrategyGene(Gene):
 
     SHAPE = (len(METRICS_SHAPE),)
 
-    def evaluate_state(self, state_metrics: NDArray):
+    def evaluate_state(self, state_metrics: NDArray) -> float:
         """
-        Evaluates a state's value according to its metrics
+        Evaluates a state's value according to its metrics.
         """
         return np.matmul(state_metrics, self.dna)
 
 
 class ManagerGene(Gene):
     """
-    Represent a gene that helps to choose a strategy to follow (from 3 options)
+    Represent a gene that helps to choose a strategy to follow (from 3 options).
     """
 
     SHAPE = (len(METRICS_SHAPE), 3)

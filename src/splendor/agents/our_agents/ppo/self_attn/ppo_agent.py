@@ -1,5 +1,5 @@
 """
-An agent which uses PPO with self-attention
+An agent which uses PPO with self-attention.
 """
 
 from pathlib import Path
@@ -27,7 +27,7 @@ DEFAULT_SAVED_PPO_SELF_ATTENTION_PATH = Path(__file__).parent / "ppo_model.pth"
 
 class PPOSelfAttentionAgent(PPOAgentBase):
     """
-    PPO agent with self-attention
+    PPO agent with self-attention.
     """
 
     @override

@@ -19,7 +19,7 @@ class PPOBase(nn.Module, ABC):
         self,
         input_dim: int,
         output_dim: int,
-    ):
+    ) -> None:
         super().__init__()
 
         self.input_dim = input_dim
@@ -54,16 +54,15 @@ class PPOBase(nn.Module, ABC):
         """
         raise NotImplementedError()
 
-    def init_hidden_state(self, device: torch.device) -> Any:
+    def init_hidden_state(self, device: torch.device) -> Any:  # noqa: ANN401
         """
         return the initial hidden state to be used.
         """
         # device is unused.
         _ = device
 
-    @classmethod
     def create_hidden_layers(
-        cls, input_dim: int, hidden_layers_dims: list[int], dropout: float
+        self, input_dim: int, hidden_layers_dims: list[int], dropout: float
     ) -> nn.Module:
         """
         Create hidden layers based on given dimentions.
@@ -81,7 +80,7 @@ class PPOBase(nn.Module, ABC):
 
 class PPOBaseFactory(Protocol):
     """
-    factory for PPO models
+    factory for PPO models.
     """
 
     # pylint: disable=too-few-public-methods

@@ -87,16 +87,28 @@ exclude = [
 [tool.ruff.lint]
 select = [
   "C",
-  "F",  # use pyflakes
-  "I",  # use isort
+  "F",   # use pyflakes
+  "I",   # use isort
   "PL",  # use pylint
   "UP",  # use pyupgrade
+  "Q",   # use flake8-quotes
+  "B",   # use flake8-bugbear
+  "SLF", # use flake8-self
+  "PTH", # use flake8-use-pathlib
+  "A",   # use flake8-builtins
+  "COM", # use flake8-commas
+  "C4",  # use flake8-comprehensions
+  "ANN", # use flake8-annotations
 ]
 unfixable = ["F401"]
 
-# Globally ignore F722 - Syntax error in forward annotation due to lack
-# of integration between jaxtyping and ruff.
-ignore = ["F722"]
+ignore = [
+  "F722",    # ignore F722 - Syntax error in forward annotation due to lack of integration between jaxtyping and ruff.
+  "COM812",  # ignore COM812 - Trailing comma missing.
+  "ANN101",  # ignore ANN101 - Missing type annotation for self in method.
+  "ANN002",  # ignore ANN002 - Missing type annotation for *args.
+  "ANN003",  # ignore ANN003 - Missing type annotation for **kwargs.
+]
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.

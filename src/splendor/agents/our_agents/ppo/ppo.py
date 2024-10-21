@@ -18,8 +18,7 @@ from torch import nn, optim
 
 # import this would register splendor as one of gym's environments.
 # pylint: disable=unused-import
-# ruff: noqa: F401
-import splendor.splendor.gym
+import splendor.splendor.gym  # noqa: F401
 from splendor.splendor.gym.envs.splendor_env import SplendorEnv
 from splendor.splendor.splendor_model import SplendorState
 
@@ -69,7 +68,7 @@ STATS_HEADERS = (
 )
 
 
-def save_model(model: nn.Module, path: Path):
+def save_model(model: nn.Module, path: Path) -> None:
     """
     Save given model weights into a file at given path.
 
@@ -137,8 +136,7 @@ def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> list[f
 
 
 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-positional-arguments
-# ruff: noqa: C901,PLR0913,PLR0912,PLR0915
-def train(
+def train(  # noqa: C901,PLR0913,PLR0912,PLR0915
     working_dir: Path = WORKING_DIR,
     learning_rate: float = LEARNING_RATE,
     weight_decay: float = WEIGHT_DECAY,
@@ -247,7 +245,9 @@ def train(
     train_rewards = []
     test_rewards = []
 
-    with open(folder / STATS_FILE, "w", newline="\n", encoding="ascii") as stats_file:
+    with Path.open(
+        folder / STATS_FILE, "w", newline="\n", encoding="ascii"
+    ) as stats_file:
         stats_csv = csv_writer(stats_file)
         stats_csv.writerow(STATS_HEADERS)
 
@@ -296,7 +296,7 @@ def train(
     return policy
 
 
-def main():
+def main() -> None:
     """
     Entry-point for the ``ppo`` console script.
     """

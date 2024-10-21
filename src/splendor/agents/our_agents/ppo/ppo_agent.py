@@ -1,5 +1,5 @@
 """
-Implementation of a PPO agent with MLP neural network
+Implementation of a PPO agent with MLP neural network.
 """
 
 from pathlib import Path

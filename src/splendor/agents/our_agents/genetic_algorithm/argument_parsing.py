@@ -3,15 +3,31 @@ All things related to command-line arguments for evolving
 the genetic algorithm agent.
 """
 
+import argparse
 from argparse import ArgumentParser
 from pathlib import Path
+from typing import Required, TypedDict, cast
 
 from splendor.version import get_version
 
 from .constants import GENERATIONS, MUTATION_RATE, POPULATION_SIZE, WORKING_DIR
 
 
-def parse_args():
+class Arguments(TypedDict):
+    """
+    TypedDict representing the command-line arguments.
+    """
+
+    population_size: Required[int]
+    generations: Required[int]
+    mutation_rate: Required[float]
+    working_dir: Required[Path]
+    seed: Required[int]
+    multiprocess: Required[bool]
+    quiet: Required[bool]
+
+
+def parse_args() -> Arguments:
     """
     parse the command-line arguments.
     """
@@ -62,7 +78,7 @@ def parse_args():
     parser.add_argument("-q", "--quiet", action="store_true")
     parser.add_argument("--version", action="version", version=get_version())
 
-    options = parser.parse_args()
+    options: argparse.Namespace = parser.parse_args()
     if options.population_size <= 0 or (options.population_size % 12):
         raise ValueError(
             "To work properly, population size should be a "
@@ -73,4 +89,4 @@ def parse_args():
     if not 0 <= options.mutation_rate <= 1:
         raise ValueError(f"Invalid mutation rate value {options.mutation_rate}")
 
-    return vars(options)
+    return cast(Arguments, vars(options))

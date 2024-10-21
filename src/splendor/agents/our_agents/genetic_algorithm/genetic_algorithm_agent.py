@@ -3,11 +3,14 @@ Genetic Algorithm based agent.
 """
 
 from pathlib import Path
+from typing import override
 
 import numpy as np
 
 from splendor.agents.our_agents.genetic_algorithm.genes import ManagerGene, StrategyGene
 from splendor.splendor.features import extract_metrics, normalize_metrics
+from splendor.splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.splendor.types import ActionType
 from splendor.template import Agent
 
 
@@ -29,8 +32,13 @@ class GeneAlgoAgent(Agent):
     INVALID_POPULATION_ID = -1
 
     def __init__(
-        self, _id, manager=None, strategy1=None, strategy2=None, strategy3=None
-    ):
+        self,
+        _id: int,
+        manager: ManagerGene | None = None,
+        strategy1: StrategyGene | None = None,
+        strategy2: StrategyGene | None = None,
+        strategy3: StrategyGene | None = None,
+    ) -> None:
         super().__init__(_id)
 
         if manager is None:
@@ -61,7 +69,7 @@ class GeneAlgoAgent(Agent):
 
         self.population_id = self.INVALID_POPULATION_ID
 
-    def save(self, folder: Path):
+    def save(self, folder: Path) -> None:
         """
         Saves the genes of the given agent to the provided folder.
         Used for evolution.
@@ -71,7 +79,13 @@ class GeneAlgoAgent(Agent):
         self.stategy_gene_2.save(folder / self.STRATEGY_2_PATH.name)
         self.stategy_gene_3.save(folder / self.STRATEGY_3_PATH.name)
 
-    def evaluate_action(self, strategy, action, game_state, game_rule):
+    def evaluate_action(
+        self,
+        strategy: StrategyGene,
+        action: ActionType,
+        game_state: SplendorState,
+        game_rule: SplendorGameRule,
+    ) -> float:
         """
         Evaluates an `action` by the metrcis of the game's state after the
         action. The `strategy` is used to evaluate the state.
@@ -83,7 +97,13 @@ class GeneAlgoAgent(Agent):
 
         return evaluation
 
-    def SelectAction(self, actions, game_state, game_rule):
+    @override
+    def SelectAction(
+        self,
+        actions: list[ActionType],
+        game_state: SplendorState,
+        game_rule: SplendorGameRule,
+    ) -> ActionType:
         """
         Method used by the game's engine when running a game with this agent.
         """

@@ -2,7 +2,6 @@
 PPO with LSTM (Long Short-Term Memory)  implementation.
 """
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 from jaxtyping import Float
@@ -27,7 +26,7 @@ class PpoLstm(RecurrentPPO):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(
+    def __init__(  # noqa: PLR0913
         self,
         input_dim: int,
         output_dim: int,
@@ -35,9 +34,8 @@ class PpoLstm(RecurrentPPO):
         dropout: float = DROPOUT,
         hidden_state_dim: int = HIDDEN_STATE_DIM,
         recurrent_layers_num: int = RECURRENT_LAYERS_AMOUNT,
-    ):
+    ) -> None:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # ruff: noqa: PLR0913
         super().__init__(
             input_dim,
             output_dim,
@@ -65,21 +63,6 @@ class PpoLstm(RecurrentPPO):
 
         # Initialize weights (recursively)
         self.apply(self._init_weights)
-
-    def _init_weights(self, module):
-        """
-        Orthogonal initialization of the weights as suggested by (bullet #2):
-        https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
-        """
-        if isinstance(module, nn.Linear):
-            nn.init.orthogonal_(module.weight, gain=np.sqrt(2))
-            module.bias.data.zero_()
-        elif isinstance(module, nn.GRU | nn.LSTM):
-            for name, param in module.named_parameters():
-                if "bias" in name:
-                    nn.init.constant_(param, 0)
-                elif "weight" in name:
-                    nn.init.orthogonal_(param, np.sqrt(2))
 
     def _order_x_shape(
         self,

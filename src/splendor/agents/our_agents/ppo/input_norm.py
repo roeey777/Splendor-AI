@@ -15,7 +15,7 @@ class InputNormalization(nn.Module):
 
     # pylint: disable=too-few-public-methods
 
-    def __init__(self, num_features: int, epsilon: float = VERY_SMALL_EPSILON):
+    def __init__(self, num_features: int, epsilon: float = VERY_SMALL_EPSILON) -> None:
         """
         Create a new input normalization layer.
 
@@ -23,7 +23,6 @@ class InputNormalization(nn.Module):
         :param epsilon: which epsilon value should be add to the denominator during the
                         normalization in order to avoid division by 0.
         """
-
         super().__init__()
         self.num_features = num_features
         self.epsilon = epsilon
@@ -43,7 +42,6 @@ class InputNormalization(nn.Module):
         :param x: the un-normalized input.
         :return: a normalized x.
         """
-
         if self.training:
             mean = x.mean(dim=0)
             var = x.var(dim=0, unbiased=False)

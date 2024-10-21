@@ -1,5 +1,5 @@
 """
-Collection of useful calculation functions
+Collection of useful calculation functions.
 """
 
 import torch
@@ -12,7 +12,7 @@ def calculate_returns(
     rewards: torch.Tensor, discount_factor: float, normalize: bool = True
 ) -> torch.Tensor:
     """
-    calculate episodes returns (cumulative summation of the rewards)
+    calculate episodes returns (cumulative summation of the rewards).
 
     :param rewards: the rewards obtained throughout each episode.
     :param discount_factor: by how much rewards decay over time.
@@ -46,7 +46,6 @@ def calculate_advantages(
     :param normalize: should the advantages be normalized, i.e. have 0 mean and variance of 1.
     :return: the calculated advantages.
     """
-
     advantages = returns - values
 
     if normalize:
@@ -63,16 +62,16 @@ def calculate_policy_loss(
     actions: torch.Tensor,
     log_prob_actions: torch.Tensor,
     advantages: torch.Tensor,
-    ppo_clip,
+    ppo_clip: float,
 ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """
     calculate the clipped policy loss.
 
-    :param action_prob:
-    :param actions:
-    :param log_prob_actions:
-    :param advantages:
-    :param ppo_clip:
+    :param action_prob: the actions probabilities.
+    :param actions: the actions taken.
+    :param log_prob_actions: the log-probabilities of the actions.
+    :param advantages: the advantages.
+    :param ppo_clip: the PPO clipped objective clipping epsilon.
     :return: the policy loss, the Kullback–Leibler divergence estimate & the entropy gain.
     """
     dist = distributions.Categorical(action_prob)

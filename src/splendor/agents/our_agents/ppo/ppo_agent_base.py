@@ -19,7 +19,7 @@ class PPOAgentBase(Agent):
     base class for all PPO-based agents.
     """
 
-    def __init__(self, _id: int, load_net: bool = True):
+    def __init__(self, _id: int, load_net: bool = True) -> None:
         super().__init__(_id)
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.net: nn.Module | None = None
@@ -45,7 +45,7 @@ class PPOAgentBase(Agent):
         """
         raise NotImplementedError()
 
-    def load_policy(self, policy: nn.Module):
+    def load_policy(self, policy: nn.Module) -> None:
         """
         Use a given policy as the agent's network policy.
         """

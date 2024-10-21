@@ -8,6 +8,8 @@ from typing import override
 import numpy as np
 
 from splendor.splendor.constants import WINNING_SCORE_TRESHOLD
+from splendor.splendor.splendor_model import SplendorGameRule, SplendorState
+from splendor.splendor.types import ActionType
 from splendor.template import Agent
 
 # This agent supports only a game of 2 players
@@ -26,21 +28,27 @@ class MiniMaxAgent(Agent):
     # pylint: disable=too-few-public-methods
 
     @override
-    def SelectAction(self, actions, game_state, game_rule):
-        assert len(game_state.agents) == EXPECTED_AMOUNT_OF_PLAYERS
-        return self._select_action_recursion(game_state, game_rule, DEPTH)[0]
-
-    def _select_action_recursion(
+    def SelectAction(
         self,
-        game_state,
-        game_rule,
-        depth,
-        is_maximizing=True,
-        alpha=-np.inf,
-        beta=np.inf,
-    ):
+        actions: list[ActionType],
+        game_state: SplendorState,
+        game_rule: SplendorGameRule,
+    ) -> ActionType:
+        assert len(game_state.agents) == EXPECTED_AMOUNT_OF_PLAYERS
+        selected_action = self._select_action_recursion(game_state, game_rule, DEPTH)[0]
+        assert selected_action is not None
+        return selected_action
+
+    def _select_action_recursion(  # noqa: PLR0913
+        self,
+        game_state: SplendorState,
+        game_rule: SplendorGameRule,
+        depth: int,
+        is_maximizing: bool = True,
+        alpha: float = -np.inf,
+        beta: float = np.inf,
+    ) -> tuple[ActionType | None, float]:
         # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # ruff: noqa: PLR0913
         if depth == 0:
             return None, self._evaluation_function(game_state)
         agent_id = self.id if is_maximizing else 1 - self.id
@@ -78,7 +86,8 @@ class MiniMaxAgent(Agent):
 
         return best_action, best_value
 
-    def _evaluation_function(self, state):  # pylint: disable=too-many-locals
+    def _evaluation_function(self, state: SplendorState) -> float:
+        # pylint: disable=too-many-locals
         agent_state = state.agents[self.id]
         score_factor = 2
         cards_factor = 0.7

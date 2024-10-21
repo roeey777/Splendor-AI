@@ -32,7 +32,7 @@ class PpoLstmAgent(PPOAgentBase):
     """
 
     @override
-    def __init__(self, _id: int, load_net: bool = True):
+    def __init__(self, _id: int, load_net: bool = True) -> None:
         super().__init__(_id, load_net)
 
         if load_net:
@@ -83,7 +83,7 @@ class PpoLstmAgent(PPOAgentBase):
         return load_saved_model(DEFAULT_SAVED_PPO_LSTM_PATH, PpoLstm)
 
     @override
-    def load_policy(self, policy: nn.Module):
+    def load_policy(self, policy: nn.Module) -> None:
         super().load_policy(policy)
 
         # this assertion is only for mypy
