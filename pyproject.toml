@@ -1,46 +1,47 @@
 [build-system]
-requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
+
+requires = [ "setuptools" ]
 
 [project]
 name = "splendor"
 version = "0.0.3"
 description = "Splendor Game Engine & automatic agents"
 readme = "README.md"
-license = {file = "LICENSE"}
-authors = [
-  { name = "roeey777" }
-]
-maintainers = [
-  { name = "roeey777" }
-]
 keywords = [
-  "Reinforcement Learning",
-  "game",
-  "RL",
   "AI",
-  "gymnasium",
-  "torch",
+  "game",
   "Genetic Algorithm",
+  "gymnasium",
   "PPO",
   "Recurrent-PPO",
+  "Reinforcement Learning",
+  "RL",
+  "torch",
 ]
-classifiers=[
+license = { file = "LICENSE" }
+maintainers = [
+  { name = "roeey777" },
+]
+authors = [
+  { name = "roeey777" },
+]
+requires-python = ">=3.11"
+classifiers = [
+  "Environment :: Console",
+  "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
-  "Programming Language :: Python :: 3",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3 :: Only",
-  "Intended Audience :: Science/Research",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Games/Entertainment :: Board Games",
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
-  "Topic :: Games/Entertainment :: Board Games",
-  "Environment :: Console",
-  "Operating System :: POSIX :: Linux",
-  "Operating System :: Microsoft :: Windows",
 ]
-requires-python=">=3.11"
-dynamic = ["dependencies", "optional-dependencies"]
+dynamic = [ "dependencies", "optional-dependencies" ]
 
 [project.urls]
 Homepage = "https://roeey777.github.io/Splendor-AI/"
@@ -60,72 +61,66 @@ include-package-data = true
 
 # Install all the non-code files as well (pictures and trained agents weights).
 [tool.setuptools.packages.find]
-where = ["src"]
+where = [ "src" ]
 
 [tool.setuptools.dynamic]
-dependencies = {file = ["requirements/runtime.txt"]}
-optional-dependencies = {dev = { file = ["requirements/development.txt"] }}
-
+dependencies = { file = [ "requirements/runtime.txt" ] }
+optional-dependencies = { dev = { file = [ "requirements/development.txt" ] } }
 
 # External Tools
-[tool.mypy]
-plugins = ["numpy.typing.mypy_plugin"]
-disable_error_code = ["import-untyped"]
-exclude = [
-  "^.*build.*\\.py$",
-  "^docs.*\\.py$"
-]
 
 [tool.ruff]
 line-length = 88
 exclude = [
-  "docs",
   "build",
+  "docs",
   "src/splendor/game.py",
   "src/splendor/general_game_runner.py",
+  "src/splendor/splendor/splendor.md",
+  "src/splendor/splendor/splendor_displayer.py",
+  "src/splendor/splendor/splendor_model.py",
+  "src/splendor/splendor/splendor_utils.py",
+  "src/splendor/splendor/wiki-template/*",
   "src/splendor/template.py",
   "src/splendor/utils.py",
-  "src/splendor/splendor/wiki-template/*",
-  "src/splendor/splendor/splendor.md",
-  "src/splendor/splendor/splendor_utils.py",
-  "src/splendor/splendor/splendor_model.py",
-  "src/splendor/splendor/splendor_displayer.py",
 ]
 
-[tool.ruff.lint]
-select = [
+# Like Black, indent with spaces, rather than tabs.
+format.indent-style = "space"
+# Like Black, use double quotes for strings.
+format.quote-style = "double"
+# Like Black, automatically detect the appropriate line ending.
+format.line-ending = "auto"
+# Like Black, respect magic trailing commas.
+format.skip-magic-trailing-comma = false
+lint.select = [
+  "A",   # use flake8-builtins
+  "ANN", # use flake8-annotations
+  "B",   # use flake8-bugbear
   "C",
+  "C4",  # use flake8-comprehensions
+  "COM", # use flake8-commas
   "F",   # use pyflakes
   "I",   # use isort
   "PL",  # use pylint
-  "UP",  # use pyupgrade
-  "Q",   # use flake8-quotes
-  "B",   # use flake8-bugbear
-  "SLF", # use flake8-self
   "PTH", # use flake8-use-pathlib
-  "A",   # use flake8-builtins
-  "COM", # use flake8-commas
-  "C4",  # use flake8-comprehensions
-  "ANN", # use flake8-annotations
+  "Q",   # use flake8-quotes
+  "SLF", # use flake8-self
+  "UP",  # use pyupgrade
 ]
-unfixable = ["F401"]
-ignore = [
-  "F722",    # ignore F722 - Syntax error in forward annotation due to lack of integration between jaxtyping and ruff.
-  "COM812",  # ignore COM812 - Trailing comma missing.
-  "ANN101",  # ignore ANN101 - Missing type annotation for self in method.
-  "ANN002",  # ignore ANN002 - Missing type annotation for *args.
-  "ANN003",  # ignore ANN003 - Missing type annotation for **kwargs.
+lint.ignore = [
+  "ANN002", # ignore ANN002 - Missing type annotation for *args.
+  "ANN003", # ignore ANN003 - Missing type annotation for **kwargs.
+  "ANN101", # ignore ANN101 - Missing type annotation for self in method.
+  "COM812", # ignore COM812 - Trailing comma missing.
+  "F722",   # ignore F722 - Syntax error in forward annotation due to lack of integration between jaxtyping and ruff.
 ]
+lint.unfixable = [ "F401" ]
 
-[tool.ruff.format]
-# Like Black, use double quotes for strings.
-quote-style = "double"
-
-# Like Black, indent with spaces, rather than tabs.
-indent-style = "space"
-
-# Like Black, respect magic trailing commas.
-skip-magic-trailing-comma = false
-
-# Like Black, automatically detect the appropriate line ending.
-line-ending = "auto"
+[tool.mypy]
+plugins = [ "numpy.typing.mypy_plugin" ]
+disable_error_code = [ "import-untyped" ]
+exclude = [
+  "^.*build.*\\.py$",
+  "^docs.*\\.py$",
+]
