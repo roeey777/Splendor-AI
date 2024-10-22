@@ -68,6 +68,14 @@ optional-dependencies = {dev = { file = ["requirements/development.txt"] }}
 
 
 # External Tools
+[tool.mypy]
+plugins = ["numpy.typing.mypy_plugin"]
+disable_error_code = ["import-untyped"]
+exclude = [
+  "^.*build.*\\.py$",
+  "^docs.*\\.py$"
+]
+
 [tool.ruff]
 line-length = 88
 exclude = [
@@ -101,7 +109,6 @@ select = [
   "ANN", # use flake8-annotations
 ]
 unfixable = ["F401"]
-
 ignore = [
   "F722",    # ignore F722 - Syntax error in forward annotation due to lack of integration between jaxtyping and ruff.
   "COM812",  # ignore COM812 - Trailing comma missing.
