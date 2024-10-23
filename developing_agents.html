@@ -101,7 +101,7 @@ installed as well. (i.e. when invoking <code class="docutils literal notranslate
 new package and develop your agent there and then install it. 3. create
 a new agent within <code class="docutils literal notranslate"><span class="pre">src/splendor/agents</span></code> and <strong>ONLY DURING
 DEVELOPMENT</strong> install splendor by using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> (instead of
-the <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>) which allowes you to edit and adjust your agent
+the <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>) which allows you to edit and adjust your agent
 as you please without the necessity to re-install the package.</p>
 <section id="training-our-agents">
 <h2>Training Our Agents:<a class="headerlink" href="#training-our-agents" title="Link to this heading"></a></h2>
@@ -129,7 +129,7 @@ hyper-parameters.</p>
 </pre></div>
 </div>
 <p>This command will use GPU during it’s training, it will use the installed weights as initialization of the network
-and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files (weights stored in <code class="docutils literal notranslate"><span class="pre">.pth</span></code> files and <code class="docutils literal notranslate"><span class="pre">stats.csv</span></code>) will be generated within the directory <code class="docutils literal notranslate"><span class="pre">runs/</span></code>.</p>
+and the PPO will be trained against MiniMax. Furthermore all the generated files (weights stored in <code class="docutils literal notranslate"><span class="pre">.pth</span></code> files and <code class="docutils literal notranslate"><span class="pre">stats.csv</span></code>) will be generated within the directory <code class="docutils literal notranslate"><span class="pre">runs/</span></code>.</p>
 <p>There are multiple available architectures for the neural network to be used by the PPO agent, for instance:</p>
 <ol class="arabic simple">
 <li><p>MLP - Multi-Layered Perceptron, also known as Fully-Connected Feed-Forward network.</p></li>
@@ -141,7 +141,7 @@ and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ppo<span class="w"> </span>--device<span class="w"> </span>cpu<span class="w"> </span>--opponent<span class="w"> </span>random<span class="w"> </span>--architecture<span class="w"> </span>gru
 </pre></div>
 </div>
-<p>There are also multiple opponents available to be trained or evaluated agaisnt, such as:</p>
+<p>There are also multiple opponents available to be trained or evaluated against, such as:</p>
 <ol class="arabic simple">
 <li><p>random</p></li>
 <li><p>minimax</p></li>
@@ -154,6 +154,7 @@ and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files
 </section>
 <section id="splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor">
 <h2><code class="docutils literal notranslate"><span class="pre">SplendorEnv</span></code> - an OpenAI <code class="docutils literal notranslate"><span class="pre">gym</span></code> compatible simulator for the game Splendor<a class="headerlink" href="#splendorenv-an-openai-gym-compatible-simulator-for-the-game-splendor" title="Link to this heading"></a></h2>
+<p><a class="reference external" href="https://www.gymlibrary.dev/">gym</a> or currently <a class="reference external" href="https://gymnasium.farama.org/index.html">gymnasium</a> (Previously maintained by <a class="reference external" href="https://openai.com/">OpenAI</a> and now by the <a class="reference external" href="https://farama.org/">Farama Foundation</a>) is a framework providing an API standard for reinforcement learning with a diverse collection of reference environments.</p>
 <p>We’ve made a custom <code class="docutils literal notranslate"><span class="pre">gym.Env</span></code> and registered it as one of <code class="docutils literal notranslate"><span class="pre">gym</span></code>
 environments. This would come in handy when training agent such as DQN
 or PPO.</p>

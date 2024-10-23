@@ -559,7 +559,7 @@ and required if <code class="docutils literal notranslate"><span class="pre">tra
 <dl class="py method">
 <dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.ppo_base.PPOBase.create_hidden_layers">
 <span class="sig-name descname"><span class="pre">create_hidden_layers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Module</span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/ppo_base.html#PPOBase.create_hidden_layers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.ppo_base.PPOBase.create_hidden_layers" title="Link to this definition"></a></dt>
-<dd><p>Create hidden layers based on given dimentions.</p>
+<dd><p>Create hidden layers based on given dimensions.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -711,7 +711,7 @@ values for learning purposes, during an episode.</p>
 <li><p><strong>done</strong> – is this a terminal state.</p></li>
 <li><p><strong>hidden_state</strong> – the hidden state used, only relevant for recurrent PPO.</p></li>
 <li><p><strong>cell_state</strong> – the hidden state used, only relevant for
-recurrent PPO, specificly for LSTM.</p></li>
+recurrent PPO, specifically for LSTM.</p></li>
 </ul>
 </dd>
 </dl>
@@ -753,7 +753,7 @@ recurrent PPO, specificly for LSTM.</p></li>
 <dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.training.LearningParams">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.ppo.training.</span></span><span class="sig-name descname"><span class="pre">LearningParams</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discount_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppo_steps</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ppo_clip</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_fn</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">_Loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_recurrent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_states_shape</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/training.html#LearningParams"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.training.LearningParams" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Placeholder for varius learning parameters.</p>
+<p>Placeholder for various learning parameters.</p>
 <p>discount_factor: by how much the reward decays over environment
 steps (turns in the game).
 optimizer: Which optimizer should be used (Adam, SGD, etc).
@@ -814,7 +814,7 @@ This parameter is here to tell if the hidden states should be ignored or not.</p
 <dl class="py function">
 <dt class="sig sig-object py" id="splendor.agents.our_agents.ppo.training.evaluate">
 <span class="sig-prename descclassname"><span class="pre">splendor.agents.our_agents.ppo.training.</span></span><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Env</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_recurrent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/splendor/agents/our_agents/ppo/training.html#evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#splendor.agents.our_agents.ppo.training.evaluate" title="Link to this definition"></a></dt>
-<dd><p>Evaluate the PPO agent (in training) performence against the test opponent.</p>
+<dd><p>Evaluate the PPO agent (in training) performance against the test opponent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -844,7 +844,7 @@ gradient descent steps on the policy network.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>env</strong> – The environment that would be used to simulate an episode.</p></li>
 <li><p><strong>policy</strong> – The network of the PPO agent.</p></li>
-<li><p><strong>learning_params</strong> – Varios learning parameters required to define
+<li><p><strong>learning_params</strong> – Various learning parameters required to define
 the learning procedure, such as the learning rate.</p></li>
 </ul>
 </dd>

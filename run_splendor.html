@@ -134,8 +134,8 @@ must be specified <strong>regardless of the working directory</strong>.</p>
 <section id="case-2-specifying-opponents-not-from-splendor-installed-via-other-package">
 <h3>Case #2 - Specifying Opponents not from <code class="docutils literal notranslate"><span class="pre">splendor</span></code> (installed via other package)<a class="headerlink" href="#case-2-specifying-opponents-not-from-splendor-installed-via-other-package" title="Link to this heading"></a></h3>
 <p>Let’s assume we’ve installed a package called <code class="docutils literal notranslate"><span class="pre">external</span></code> and there is
-an agent called <code class="docutils literal notranslate"><span class="pre">best</span></code> whithin <code class="docutils literal notranslate"><span class="pre">external.agents</span></code> and we want to
-flesh out this agent againt the random agent we would execute the
+an agent called <code class="docutils literal notranslate"><span class="pre">best</span></code> within <code class="docutils literal notranslate"><span class="pre">external.agents</span></code> and we want to
+flesh out this agent against the random agent we would execute the
 following command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">random</span><span class="p">,</span><span class="n">external</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">best</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">random</span><span class="p">,</span><span class="n">external</span>
 </pre></div>
@@ -164,11 +164,11 @@ other package.</p>
 <h3>Explanation<a class="headerlink" href="#explanation" title="Link to this heading"></a></h3>
 <ol class="arabic simple">
 <li><p>the <code class="docutils literal notranslate"><span class="pre">-a</span></code> flag is used to specify which agents to load, this must be
-comma seperated values, where each value must be an import path of
+comma separated values, where each value must be an import path of
 the agent to be loaded. Moreover each of those agent must inherit
 from <code class="docutils literal notranslate"><span class="pre">splendor.template.Agent</span></code> and must call their agent (or a
 factory) by the following name - <code class="docutils literal notranslate"><span class="pre">myAgent</span></code>.</p></li>
-<li><p>the <code class="docutils literal notranslate"><span class="pre">--agent_names=</span></code> is another comma seperated argument which
+<li><p>the <code class="docutils literal notranslate"><span class="pre">--agent_names=</span></code> is another comma separated argument which
 specifies the names given to each agent. The number of agents to be
 loaded is determined by the amount of names given, when there are
 more names listed than agents listed the game will automatically load
