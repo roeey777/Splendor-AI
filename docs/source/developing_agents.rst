@@ -8,7 +8,7 @@ installed as well. (i.e. when invoking ``pip install .``) 2. create a
 new package and develop your agent there and then install it. 3. create
 a new agent within ``src/splendor/agents`` and **ONLY DURING
 DEVELOPMENT** install splendor by using ``pip install -e .`` (instead of
-the ``pip install .``) which allowes you to edit and adjust your agent
+the ``pip install .``) which allows you to edit and adjust your agent
 as you please without the necessity to re-install the package.
 
 Training Our Agents:
@@ -44,7 +44,7 @@ hyper-parameters.
    ppo --device cuda --working-dir runs --transfer-learning --opponent minimax
 
 This command will use GPU during it's training, it will use the installed weights as initialization of the network
-and the PPO will be trained agaisnt MiniMax. Furthermore all the generated files (weights stored in ``.pth`` files and ``stats.csv``) will be generated within the directory ``runs/``.
+and the PPO will be trained against MiniMax. Furthermore all the generated files (weights stored in ``.pth`` files and ``stats.csv``) will be generated within the directory ``runs/``.
 
 There are multiple available architectures for the neural network to be used by the PPO agent, for instance:
 
@@ -59,7 +59,7 @@ By default the MLP architecture will be used, however you can decide to train th
 
    ppo --device cpu --opponent random --architecture gru
 
-There are also multiple opponents available to be trained or evaluated agaisnt, such as:
+There are also multiple opponents available to be trained or evaluated against, such as:
 
 #. random
 #. minimax
@@ -71,6 +71,15 @@ There are also multiple opponents available to be trained or evaluated agaisnt, 
 
 ``SplendorEnv`` - an OpenAI ``gym`` compatible simulator for the game Splendor
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+`gym`_ or currently `gymnasium`_ (Previously maintained by `OpenAI`_ and now by the `Farama Foundation <https://farama.org/>`_) is a framework providing an API standard for reinforcement learning with a diverse collection of reference environments.
+
+.. _gym: https://www.gymlibrary.dev/
+
+.. _gymnasium: https://gymnasium.farama.org/index.html
+
+.. _OpenAI: https://openai.com/
 
 We’ve made a custom ``gym.Env`` and registered it as one of ``gym``
 environments. This would come in handy when training agent such as DQN

@@ -75,17 +75,17 @@ class PpoLstm(RecurrentPPO):
         ordered_x: Float[torch.Tensor, "batch sequence features"]
         match len(x.shape):
             case 1:
-                # assumes that both the batch & the sequance dimentions are missing.
+                # assumes that both the batch & the sequance dimensions are missing.
                 ordered_x = x.unsqueeze(0).unsqueeze(1)
             case 2:
-                # assumes that the sequance dimention is missing.
+                # assumes that the sequance dimension is missing.
                 ordered_x = x.unsqueeze(1)
             case 3:
                 ordered_x = x
             case _:
                 raise ValueError(
                     f"Got tensor of unexpected shape! shape: {x.shape}. "
-                    "there are just to many dimentions."
+                    "there are just to many dimensions."
                 )
         return ordered_x
 
@@ -109,7 +109,7 @@ class PpoLstm(RecurrentPPO):
         for i, t in enumerate(hidden_state):
             match len(t.shape):
                 case 2:
-                    # assumes that the batch dimention is missing.
+                    # assumes that the batch dimension is missing.
                     ordered_hidden.append(t.unsqueeze(1))
                 case 3:
                     ordered_hidden.append(t.permute(1, 0, 2))

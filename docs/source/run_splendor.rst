@@ -41,8 +41,8 @@ Case #2 - Specifying Opponents not from ``splendor`` (installed via other packag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Let’s assume we’ve installed a package called ``external`` and there is
-an agent called ``best`` whithin ``external.agents`` and we want to
-flesh out this agent againt the random agent we would execute the
+an agent called ``best`` within ``external.agents`` and we want to
+flesh out this agent against the random agent we would execute the
 following command:
 
 ::
@@ -75,11 +75,11 @@ Explanation
 ^^^^^^^^^^^
 
 1. the ``-a`` flag is used to specify which agents to load, this must be
-   comma seperated values, where each value must be an import path of
+   comma separated values, where each value must be an import path of
    the agent to be loaded. Moreover each of those agent must inherit
    from ``splendor.template.Agent`` and must call their agent (or a
    factory) by the following name - ``myAgent``.
-2. the ``--agent_names=`` is another comma seperated argument which
+2. the ``--agent_names=`` is another comma separated argument which
    specifies the names given to each agent. The number of agents to be
    loaded is determined by the amount of names given, when there are
    more names listed than agents listed the game will automatically load

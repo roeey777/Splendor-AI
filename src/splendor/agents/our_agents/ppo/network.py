@@ -61,14 +61,14 @@ class PPO(PPOBase):
 
         match len(x.shape):
             case 1:
-                # assumes that the batch dimention is missing.
+                # assumes that the batch dimension is missing.
                 ordered_x = x.unsqueeze(0)
             case 2:
                 ordered_x = x
             case _:
                 raise ValueError(
                     f"Got tensor of unexpected shape! shape: {x.shape}. "
-                    "there are just to many dimentions."
+                    "there are just to many dimensions."
                 )
         return ordered_x
 

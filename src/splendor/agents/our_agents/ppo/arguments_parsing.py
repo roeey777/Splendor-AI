@@ -174,8 +174,8 @@ def parse_args() -> Arguments:
         "-t",
         "--transfer-learning",
         action="store_true",
-        help="Learn from previosly learned model, "
-        "i.e. trasfer learning from previos training sessions",
+        help="Learn from previously learned model, "
+        "i.e. transfer learning from previous training sessions",
     )
     parser.add_argument(
         "--saved-weights",
