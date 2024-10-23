@@ -23,7 +23,7 @@ from .rollout import RolloutBuffer
 @dataclass
 class LearningParams:
     """
-    Placeholder for varius learning parameters.
+    Placeholder for various learning parameters.
 
     discount_factor: by how much the reward decays over environment
     steps (turns in the game).
@@ -63,7 +63,7 @@ def train_single_episode(
 
     :param env: The environment that would be used to simulate an episode.
     :param policy: The network of the PPO agent.
-    :param learning_params: Varios learning parameters required to define
+    :param learning_params: Various learning parameters required to define
                             the learning procedure, such as the learning rate.
     :return: the average policy & value losses and the episode reward.
     """
@@ -218,7 +218,7 @@ def evaluate(
 ) -> float:
     # pylint: disable=too-many-locals
     """
-    Evaluate the PPO agent (in training) performence against the test opponent.
+    Evaluate the PPO agent (in training) performance against the test opponent.
 
     :param env: The test environment, configured to simulate a game against the test opponent.
     :param policy: The network of the PPO agent.

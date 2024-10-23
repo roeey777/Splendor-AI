@@ -1,5 +1,5 @@
 """
-Usefule utilities.
+Useful utilities.
 """
 
 from . import features

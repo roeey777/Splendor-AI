@@ -65,7 +65,7 @@ class PPOBase(nn.Module, ABC):
         self, input_dim: int, hidden_layers_dims: list[int], dropout: float
     ) -> nn.Module:
         """
-        Create hidden layers based on given dimentions.
+        Create hidden layers based on given dimensions.
         """
         layers: list[nn.Module] = []
         prev_dim = input_dim

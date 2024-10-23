@@ -37,7 +37,7 @@ class PPOSelfAttention(PPOBase):
 
         self.input_norm = InputNormalization(input_dim)
 
-        # In self-attention the embedding dimention is equal to the quary & key dimentions.
+        # In self-attention the embedding dimension is equal to the quary & key dimensions.
         # 1 is for using a single-headed attention.
         self.self_attention = nn.MultiheadAttention(input_dim, 1, dropout=dropout)
 

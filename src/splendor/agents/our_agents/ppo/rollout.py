@@ -98,7 +98,7 @@ class RolloutBuffer:
         :param done: is this a terminal state.
         :param hidden_state: the hidden state used, only relevant for recurrent PPO.
         :param cell_state: the hidden state used, only relevant for
-                           recurrent PPO, specificly for LSTM.
+                           recurrent PPO, specifically for LSTM.
         """
         with torch.no_grad():
             if self.full:

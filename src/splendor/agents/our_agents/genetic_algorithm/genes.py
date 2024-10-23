@@ -35,7 +35,7 @@ class Gene:
         """
         We want some metrics to have the same weight (in places the is no
         meaning to the order). This methods returns a dna which matches in
-        dimentions to the metrics we get in practice by repeating some value
+        dimensions to the metrics we get in practice by repeating some value
         multiple time (according to the instructions of `METRICS_SHAPE`).
         """
         if self._prepared_dna is None:

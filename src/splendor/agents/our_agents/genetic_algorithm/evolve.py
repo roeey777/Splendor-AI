@@ -275,7 +275,7 @@ def sort_by_fitness(
     multiprocess: bool,
 ) -> GamesStats:
     """
-    Sort the individuals of the population based on thier fitness score.
+    Sort the individuals of the population based on their fitness score.
 
     :param population: list of all the individuals comprizing the entire population.
     :param folder: where to store the fittest individual of the population.
