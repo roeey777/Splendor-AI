@@ -2,14 +2,11 @@ Developing an Agent
 -------------------
 
 In order for the game to properly load your agent one must install the
-agent, there are several ways to do so: 1. create a new agent within
-``src/splendor/agents`` and when installing splendor your agent will be
-installed as well. (i.e. when invoking ``pip install .``) 2. create a
-new package and develop your agent there and then install it. 3. create
-a new agent within ``src/splendor/agents`` and **ONLY DURING
-DEVELOPMENT** install splendor by using ``pip install -e .`` (instead of
-the ``pip install .``) which allows you to edit and adjust your agent
-as you please without the necessity to re-install the package.
+agent, there are several ways to do so:
+
+#. create a new agent within ``src/splendor/agents`` and when installing splendor your agent will be installed as well. (i.e. when invoking ``pip install .``)
+#. create a new package and develop your agent there and then install it. 
+#. create a new agent within ``src/splendor/agents`` and **ONLY DURING DEVELOPMENT** install splendor by using ``pip install -e .`` (instead of the ``pip install .``) which allows you to edit and adjust your agent as you please without the necessity to re-install the package.
 
 Training Our Agents:
 ~~~~~~~~~~~~~~~~~~~~
@@ -18,10 +15,14 @@ Training The Genetic Algorithm Agent:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 In order to train the genetic algorithm agent with the following
-hyper-parameters: 1. Specify the population size in each generation to
-be 24 (should be a multiple of 12). 2. Train for 20 generations. 3. Fix
-the mutation rate chance to be 0.1(%). 4. Use a fixed random seed. Use
-the following command:
+hyper-parameters:
+
+#. Specify the population size in each generation to be 24 (should be a multiple of 12).
+#. Train for 20 generations.
+#. Fix the mutation rate chance to be 0.1(%).
+#. Use a fixed random seed.
+
+Use the following command:
 
 .. code-block:: bash
 
