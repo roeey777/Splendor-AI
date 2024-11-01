@@ -72,7 +72,7 @@ def calculate_policy_loss(
     :param log_prob_actions: the log-probabilities of the actions.
     :param advantages: the advantages.
     :param ppo_clip: the PPO clipped objective clipping epsilon.
-    :return: the policy loss, the Kullback–Leibler divergence estimate & the entropy gain.
+    :return: the policy loss, the Kullback-Leibler divergence estimate & the entropy gain.
     """
     dist = distributions.Categorical(action_prob)
 

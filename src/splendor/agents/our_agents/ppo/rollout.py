@@ -73,7 +73,7 @@ class RolloutBuffer:
             self.hidden_states = torch.zeros(self.size, dtype=torch.float64)
             self.cell_states = torch.zeros(self.size, dtype=torch.float64)
 
-    def remember(  # noqa: PLR0913
+    def remember(  # noqa: PLR0913,PLR0917
         self,
         state: torch.Tensor,
         action: torch.Tensor,

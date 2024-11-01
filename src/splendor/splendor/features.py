@@ -4,7 +4,7 @@ Features extraction from SplendorState.
 
 from collections.abc import ValuesView
 from functools import cache
-from itertools import chain, repeat
+from itertools import chain, repeat, starmap
 
 import numpy as np
 from numpy.typing import NDArray
@@ -140,7 +140,7 @@ def build_array(base_array: NDArray, instruction: tuple[int, ...]) -> NDArray:
     construct an ``np.array`` from given instructions.
     """
     building_blocks = zip(base_array, instruction, strict=True)
-    iters = (repeat(value, times) for value, times in building_blocks)
+    iters = starmap(repeat, building_blocks)
     match len(base_array.shape):
         case 1:
             return np.hstack(tuple(chain(*iters)), dtype=base_array.dtype)
@@ -211,7 +211,7 @@ METRIC_NORMALIZATION: NDArray = np.array(
 )
 
 
-def extract_metrics(game_state: SplendorState, agent_index: int) -> NDArray:
+def extract_metrics(game_state: SplendorState, agent_index: int) -> NDArray:  # noqa: PLR0914
     # pylint: disable=too-many-locals
     """
     Extract metrics/features from a given state.

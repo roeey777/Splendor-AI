@@ -8,10 +8,8 @@ from .constants import Color
 from .splendor_model import Card
 
 CollectActionType = Literal[
-    (
-        "collect_diff",
-        "collect_same",
-    )
+    "collect_diff",
+    "collect_same",
 ]
 
 ReserveActionType = Literal["reserve"]

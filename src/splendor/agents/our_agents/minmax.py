@@ -2,6 +2,7 @@
 Implementation of an agent that selects the first legal action.
 """
 
+import operator
 import random
 from typing import override
 
@@ -39,7 +40,7 @@ class MiniMaxAgent(Agent):
         assert selected_action is not None
         return selected_action
 
-    def _select_action_recursion(  # noqa: PLR0913
+    def _select_action_recursion(  # noqa: PLR0913,PLR0917
         self,
         game_state: SplendorState,
         game_rule: SplendorGameRule,
@@ -54,7 +55,7 @@ class MiniMaxAgent(Agent):
         agent_id = self.id if is_maximizing else 1 - self.id
         actions = game_rule.getLegalActions(game_state, agent_id)
         random.shuffle(actions)
-        actions.sort(key=lambda action: action["type"])
+        actions.sort(key=operator.itemgetter("type"))
         assert len(actions) != 0
 
         best_action = None
