@@ -66,9 +66,12 @@ optional-dependencies = { dev = { file = [
   "requirements/development.txt",
 ] }, docs = { file = [
   "requirements/docs.txt",
+] }, extra = { file = [
+  "requirements/extra.txt",
 ] } }
 
 # External Tools
+
 [tool.ruff]
 line-length = 88
 exclude = [
