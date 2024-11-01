@@ -5,6 +5,7 @@ Genetic algorithm based agent evolution program.
 import shutil
 from csv import writer as csv_writer
 from datetime import datetime
+from itertools import starmap
 from multiprocessing import Pool, cpu_count
 from pathlib import Path
 from typing import cast
@@ -110,9 +111,8 @@ def crossover(mom: Gene, dad: Gene) -> tuple[Gene, Gene]:
             child_dna_1, child_dna_2 = _crossover(mom.raw_dna, dad.raw_dna)
             return cls(child_dna_1), cls(child_dna_2)
         case 2:
-            children_dna = (
-                _crossover(dna1, dna2)
-                for dna1, dna2 in zip(mom.raw_dna.T, dad.raw_dna.T, strict=True)
+            children_dna = starmap(
+                _crossover, zip(mom.raw_dna.T, dad.raw_dna.T, strict=True)
             )
             child_dna_1, child_dna_2 = zip(*children_dna, strict=True)
             return (
@@ -319,7 +319,7 @@ def generate_initial_population(population_size: int) -> list[GeneAlgoAgent]:
     ]
 
 
-def evolve(  # noqa: PLR0913
+def evolve(  # noqa: PLR0913,PLR0917
     population_size: int = POPULATION_SIZE,
     generations: int = GENERATIONS,
     mutation_rate: float = MUTATION_RATE,

@@ -10,6 +10,7 @@ description = "Splendor Game Engine & automatic agents"
 readme = "README.md"
 keywords = [
   "AI",
+  "Deep Learning",
   "game",
   "Genetic Algorithm",
   "gymnasium",
@@ -37,24 +38,20 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Topic :: Documentation :: Sphinx",
   "Topic :: Games/Entertainment :: Board Games",
   "Topic :: Scientific/Engineering",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dynamic = [ "dependencies", "optional-dependencies" ]
 
-[project.urls]
-Homepage = "https://roeey777.github.io/Splendor-AI/"
-Documentation = "https://roeey777.github.io/Splendor-AI/"
-Repository = "https://github.com/roeey777/Splendor-AI"
-Issues = "https://github.com/roeey777/Splendor-AI/issues"
-
-[project.scripts]
-evolve = "splendor.agents.our_agents.genetic_algorithm.evolve:main"
-ppo = "splendor.agents.our_agents.ppo.ppo:main"
-
-[project.gui-scripts]
-splendor = "splendor.general_game_runner:main"
+urls.Documentation = "https://roeey777.github.io/Splendor-AI/"
+urls.Homepage = "https://roeey777.github.io/Splendor-AI/"
+urls.Issues = "https://github.com/roeey777/Splendor-AI/issues"
+urls.Repository = "https://github.com/roeey777/Splendor-AI"
+scripts.evolve = "splendor.agents.our_agents.genetic_algorithm.evolve:main"
+scripts.ppo = "splendor.agents.our_agents.ppo.ppo:main"
+gui-scripts.splendor = "splendor.general_game_runner:main"
 
 [tool.setuptools]
 include-package-data = true
@@ -65,10 +62,13 @@ where = [ "src" ]
 
 [tool.setuptools.dynamic]
 dependencies = { file = [ "requirements/runtime.txt" ] }
-optional-dependencies = { dev = { file = [ "requirements/development.txt" ] } }
+optional-dependencies = { dev = { file = [
+  "requirements/development.txt",
+] }, docs = { file = [
+  "requirements/docs.txt",
+] } }
 
 # External Tools
-
 [tool.ruff]
 line-length = 88
 exclude = [
@@ -94,28 +94,31 @@ format.line-ending = "auto"
 # Like Black, respect magic trailing commas.
 format.skip-magic-trailing-comma = false
 lint.select = [
-  "A",   # use flake8-builtins
-  "ANN", # use flake8-annotations
-  "B",   # use flake8-bugbear
+  "A",    # use flake8-builtins
+  "ANN",  # use flake8-annotations
+  "B",    # use flake8-bugbear
   "C",
-  "C4",  # use flake8-comprehensions
-  "COM", # use flake8-commas
-  "F",   # use pyflakes
-  "I",   # use isort
-  "PL",  # use pylint
-  "PTH", # use flake8-use-pathlib
-  "Q",   # use flake8-quotes
-  "SLF", # use flake8-self
-  "UP",  # use pyupgrade
+  "C4",   # use flake8-comprehensions
+  "COM",  # use flake8-commas
+  "F",    # use pyflakes
+  "FURB", # use refurb
+  "I",    # use isort
+  "PL",   # use pylint
+  "PTH",  # use flake8-use-pathlib
+  "Q",    # use flake8-quotes
+  "RUF",  # use ruff-specific rules
+  "SLF",  # use flake8-self
+  "UP",   # use pyupgrade
 ]
 lint.ignore = [
   "ANN002", # ignore ANN002 - Missing type annotation for *args.
   "ANN003", # ignore ANN003 - Missing type annotation for **kwargs.
   "ANN101", # ignore ANN101 - Missing type annotation for self in method.
   "COM812", # ignore COM812 - Trailing comma missing.
-  "F722",   # ignore F722 - Syntax error in forward annotation due to lack of integration between jaxtyping and ruff.
+  "F722",   # ignore F722   - Syntax error in forward annotation due to lack of integration between jaxtyping and ruff.
 ]
 lint.unfixable = [ "F401" ]
+lint.flake8-builtins.builtins-allowed-modules = [ "random", "types" ]
 
 [tool.mypy]
 plugins = [ "numpy.typing.mypy_plugin" ]

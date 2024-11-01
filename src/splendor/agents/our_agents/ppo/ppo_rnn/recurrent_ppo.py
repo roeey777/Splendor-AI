@@ -28,7 +28,8 @@ class RecurrentPPO(PPOBase):
         super().__init__(input_dim, output_dim)
         self.recurrent_unit = recurrent_unit
 
-    def _init_weights(self, module: nn.Module) -> None:
+    @staticmethod
+    def _init_weights(module: nn.Module) -> None:
         """
         Orthogonal initialization of the weights as suggested by (bullet #2):
         https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/
@@ -79,7 +80,7 @@ class RecurrentPPO(PPOBase):
         raise NotImplementedError()
 
     @abstractmethod
-    def init_hidden_state(self, device: torch.device) -> tuple[Any, Any]:  # noqa: ANN401
+    def init_hidden_state(self, device: torch.device) -> tuple[Any, Any]:
         """
         return the initial hidden state to be used.
         """

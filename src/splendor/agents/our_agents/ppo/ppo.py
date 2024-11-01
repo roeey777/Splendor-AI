@@ -111,7 +111,7 @@ def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> list[f
             list(
                 filter(
                     lambda c: c.deck_id == FIRST_DECK,
-                    chain(*agent_state.cards.values()),
+                    chain.from_iterable(agent_state.cards.values()),
                 )
             )
         ),
@@ -119,7 +119,7 @@ def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> list[f
             list(
                 filter(
                     lambda c: c.deck_id == SECOND_DECK,
-                    chain(*agent_state.cards.values()),
+                    chain.from_iterable(agent_state.cards.values()),
                 )
             )
         ),
@@ -127,7 +127,7 @@ def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> list[f
             list(
                 filter(
                     lambda c: c.deck_id == THIRD_DECK,
-                    chain(*agent_state.cards.values()),
+                    chain.from_iterable(agent_state.cards.values()),
                 )
             )
         ),
@@ -136,7 +136,7 @@ def extract_game_stats(final_game_state: SplendorState, agent_id: int) -> list[f
 
 
 # pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-positional-arguments
-def train(  # noqa: C901,PLR0913,PLR0912,PLR0915
+def train(  # noqa: C901,PLR0912,PLR0913,PLR0914,PLR0915,PLR0917
     working_dir: Path = WORKING_DIR,
     learning_rate: float = LEARNING_RATE,
     weight_decay: float = WEIGHT_DECAY,

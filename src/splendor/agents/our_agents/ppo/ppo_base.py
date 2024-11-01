@@ -10,6 +10,13 @@ from jaxtyping import Float
 from torch import nn
 
 
+def unused(x: Any) -> None:  # noqa: ANN401
+    """
+    Mark the given argument as unused, like casting to void in C.
+    """
+    _ = x
+
+
 class PPOBase(nn.Module, ABC):
     """
     Base class for all neural network that should be used by a PPO agent.
@@ -58,11 +65,12 @@ class PPOBase(nn.Module, ABC):
         """
         return the initial hidden state to be used.
         """
-        # device is unused.
-        _ = device
+        unused(self)
+        unused(device)
 
+    @staticmethod
     def create_hidden_layers(
-        self, input_dim: int, hidden_layers_dims: list[int], dropout: float
+        input_dim: int, hidden_layers_dims: list[int], dropout: float
     ) -> nn.Module:
         """
         Create hidden layers based on given dimensions.
@@ -70,10 +78,14 @@ class PPOBase(nn.Module, ABC):
         layers: list[nn.Module] = []
         prev_dim = input_dim
         for next_dim in hidden_layers_dims:
-            layers.append(nn.Linear(prev_dim, next_dim))
-            layers.append(nn.LayerNorm(next_dim))
-            layers.append(nn.Dropout(dropout))
-            layers.append(nn.ReLU())
+            layers.extend(
+                [
+                    nn.Linear(prev_dim, next_dim),
+                    nn.LayerNorm(next_dim),
+                    nn.Dropout(dropout),
+                    nn.ReLU(),
+                ]
+            )
             prev_dim = next_dim
         return nn.Sequential(*layers)
 

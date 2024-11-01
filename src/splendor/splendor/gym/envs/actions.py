@@ -97,7 +97,7 @@ class Action:
                 card_index = state.board.dealt[tier].index(card)
                 position = CardPosition(tier, card_index, -1)
 
-        if action_type in (ActionEnum.BUY_AVAILABLE, ActionEnum.BUY_RESERVE):
+        if action_type in {ActionEnum.BUY_AVAILABLE, ActionEnum.BUY_RESERVE}:
             # ignore cost of buying a card by set returned_gems to None.
             # this minimizes by order of magnitude the length of ALL_ACTIONS.
             collected_gems = None
@@ -114,7 +114,7 @@ def _card_gen() -> Generator[CardPosition, None, None]:
 
 def _generate_all_reserve_card_actions() -> Generator[Action, None, None]:
     for position in _card_gen():
-        for noble_index in [None] + NOBLES_INDICES:
+        for noble_index in [None, *NOBLES_INDICES]:
             # reserve a card, without collecting the yellow gem.
             yield Action(
                 type_enum=ActionEnum.RESERVE,
@@ -144,7 +144,7 @@ def _generate_all_reserve_card_actions() -> Generator[Action, None, None]:
 
 def _generate_all_collect_same_actions() -> Generator[Action, None, None]:
     for c in NORMAL_COLORS:
-        for noble_index in [None] + NOBLES_INDICES:
+        for noble_index in [None, *NOBLES_INDICES]:
             # no gems are returned.
             yield Action(
                 type_enum=ActionEnum.COLLECT_SAME,
@@ -177,12 +177,12 @@ def _generate_all_collect_same_actions() -> Generator[Action, None, None]:
 def _generate_all_collect_different_actions() -> Generator[Action, None, None]:
     for combination_length in [1, 2, 3]:
         for combination in combinations(NORMAL_COLORS, combination_length):
-            for noble_index in [None] + NOBLES_INDICES:
+            for noble_index in [None, *NOBLES_INDICES]:
                 # no gems are returned.
                 yield Action(
                     type_enum=ActionEnum.COLLECT_DIFF,
                     noble_index=noble_index,
-                    collected_gems={color: 1 for color in combination},
+                    collected_gems=dict.fromkeys(combination, 1),
                     returned_gems={},
                 )
                 for num_gems_to_return in range(1, combination_length + 1):
@@ -194,14 +194,14 @@ def _generate_all_collect_different_actions() -> Generator[Action, None, None]:
                         yield Action(
                             type_enum=ActionEnum.COLLECT_DIFF,
                             noble_index=noble_index,
-                            collected_gems={color: 1 for color in combination},
+                            collected_gems=dict.fromkeys(combination, 1),
                             returned_gems=dict(Counter(to_return)),
                         )
 
 
 def _generate_all_buy_reserve_card_actions() -> Generator[Action, None, None]:
     for reserved_index in range(MAX_RESERVED):
-        for noble_index in [None] + NOBLES_INDICES:
+        for noble_index in [None, *NOBLES_INDICES]:
             yield Action(
                 type_enum=ActionEnum.BUY_RESERVE,
                 noble_index=noble_index,
@@ -211,7 +211,7 @@ def _generate_all_buy_reserve_card_actions() -> Generator[Action, None, None]:
 
 def _generate_all_buy_available_card_actions() -> Generator[Action, None, None]:
     for position in _card_gen():
-        for noble_index in [None] + NOBLES_INDICES:
+        for noble_index in [None, *NOBLES_INDICES]:
             yield Action(
                 type_enum=ActionEnum.BUY_AVAILABLE,
                 noble_index=noble_index,

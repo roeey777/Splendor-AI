@@ -50,7 +50,7 @@ class LearningParams:
     hidden_states_shape: tuple[int, ...] | None = None
 
 
-def train_single_episode(
+def train_single_episode(  # noqa: PLR0914
     env: gym.Env,
     policy: nn.Module,
     learning_params: LearningParams,
@@ -145,7 +145,7 @@ def train_single_episode(
     return policy_loss, value_loss, episode_reward
 
 
-def update_policy(
+def update_policy(  # noqa: PLR0914
     policy: nn.Module,
     rollout_buffer: RolloutBuffer,
     learning_params: LearningParams,

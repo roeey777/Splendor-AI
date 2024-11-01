@@ -26,7 +26,7 @@ class PpoLstm(RecurrentPPO):
 
     # pylint: disable=too-many-instance-attributes
 
-    def __init__(  # noqa: PLR0913
+    def __init__(  # noqa: PLR0913,PLR0917
         self,
         input_dim: int,
         output_dim: int,
@@ -64,8 +64,8 @@ class PpoLstm(RecurrentPPO):
         # Initialize weights (recursively)
         self.apply(self._init_weights)
 
+    @staticmethod
     def _order_x_shape(
-        self,
         x: (
             Float[torch.Tensor, "batch sequence features"]
             | Float[torch.Tensor, "batch features"]
@@ -89,8 +89,8 @@ class PpoLstm(RecurrentPPO):
                 )
         return ordered_x
 
+    @staticmethod
     def _order_hidden_state(
-        self,
         hidden_state: (
             tuple[
                 Float[torch.Tensor, "batch sequence dim"],

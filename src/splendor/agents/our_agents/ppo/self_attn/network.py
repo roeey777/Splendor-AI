@@ -50,7 +50,8 @@ class PPOSelfAttention(PPOBase):
         # Initialize weights (recursively)
         self.apply(self._init_weights)
 
-    def _init_weights(self, module: nn.Module) -> None:
+    @staticmethod
+    def _init_weights(module: nn.Module) -> None:
         """
         Orthogonal initialization of the weights as suggested by (bullet #2):
         https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/.
