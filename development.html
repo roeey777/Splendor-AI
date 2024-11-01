@@ -8,6 +8,8 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
   <!--[if lt IE 9]>
@@ -21,6 +23,8 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
+        <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -53,7 +57,11 @@
 <li class="toctree-l1"><a class="reference internal" href="run_splendor.html">Run the game</a></li>
 <li class="toctree-l1"><a class="reference internal" href="developing_agents.html">Developing an Agent</a></li>
 <li class="toctree-l1"><a class="reference internal" href="generate_docs.html">Generate The Documentation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Development</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#executation-of-automatic-tools-by-hand">Executation of Automatic Tools by Hand</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-pre-commit-git-hooks">Using Pre-Commit Git Hooks</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="agents.html">Agents</a></li>
 </ul>
@@ -100,6 +108,109 @@ In order to activate this hook one should execute the following command:</p>
 <p>In earlier stages of this project, we’ve used <code class="docutils literal notranslate"><span class="pre">black</span></code>, <code class="docutils literal notranslate"><span class="pre">isort</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">pylint</span></code>, however we’ve seen that <code class="docutils literal notranslate"><span class="pre">ruff</span></code> offers the same functionality (and more) but takes only a fraction of the execution time (real world, wall clock time).
 Even though we’ve ditched <code class="docutils literal notranslate"><span class="pre">isort</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">black</span></code> in favor of <code class="docutils literal notranslate"><span class="pre">ruff</span></code> you can still use them since <code class="docutils literal notranslate"><span class="pre">ruff</span></code> maintains compatibility with those tools.
 You could also still use <code class="docutils literal notranslate"><span class="pre">pylint</span></code> as it isn’t checks the same rules as <code class="docutils literal notranslate"><span class="pre">ruff</span></code> and the project still maintains a high score of over 9.9 with <code class="docutils literal notranslate"><span class="pre">pylint</span></code>.</p>
+<section id="executation-of-automatic-tools-by-hand">
+<h2>Executation of Automatic Tools by Hand<a class="headerlink" href="#executation-of-automatic-tools-by-hand" title="Link to this heading"></a></h2>
+<p>All the automatic tools can be also used manually as follows:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+<col style="width: 25.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Automatic Tool Name</p></th>
+<th class="head"><p>Purpose of the Tool</p></th>
+<th class="head"><p>Commands</p></th>
+<th class="head"><p>Replaced by <code class="docutils literal notranslate"><span class="pre">ruff</span></code></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Ruff</p></td>
+<td><p>Formatted &amp; Linter</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ruff<span class="w"> </span>check<span class="w"> </span>--preview<span class="w"> </span>.
+ruff<span class="w"> </span>format<span class="w"> </span>.
+</pre></div>
+</div>
+</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>mypy</p></td>
+<td><p>Types Validation</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mypy<span class="w"> </span>.
+</pre></div>
+</div>
+</td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>Black</p></td>
+<td><p>Formatter</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>black<span class="w"> </span>.
+</pre></div>
+</div>
+</td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>isort</p></td>
+<td><p>Formatter of <code class="docutils literal notranslate"><span class="pre">import</span></code> statements</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>isort<span class="w"> </span>.
+</pre></div>
+</div>
+</td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>pylint</p></td>
+<td><p>Linter</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pylint<span class="w"> </span>.
+</pre></div>
+</div>
+</td>
+<td><p>Yes (Partially)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="using-pre-commit-git-hooks">
+<h2>Using Pre-Commit Git Hooks<a class="headerlink" href="#using-pre-commit-git-hooks" title="Link to this heading"></a></h2>
+<p>We use <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> instead of some CICD like Github Action or Travis CI since We haven’t configured any runners yet.
+However enforcing the usage of those automatic tools is still very important and therefore we’ve settled for enforcing them through <code class="docutils literal notranslate"><span class="pre">git</span></code> hooks.
+In order to allow those hooks you should execute the following command once (the installation of the hook).</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Purpose</p></th>
+<th class="head"><p>Command</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Install the hook (needs to be executed only once)</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><p>Uninstall the hook</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>uninstall
+</pre></div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><p>Run all checks on the entire repository</p></td>
+<td><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>By default <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> tries to optimize the actual time it takes to run the checks by running them <strong>ONLY</strong> on the editted files rather than on the entire repository.</p>
+</div>
+</section>
 </section>
 
 

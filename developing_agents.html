@@ -8,6 +8,8 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
       <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
   <!--[if lt IE 9]>
@@ -21,6 +23,8 @@
         <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
         <script src="_static/clipboard.min.js?v=a7894cd8"></script>
         <script src="_static/copybutton.js?v=f281be69"></script>
+        <script src="_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+        <script src="_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -95,24 +99,26 @@
   <section id="developing-an-agent">
 <h1>Developing an Agent<a class="headerlink" href="#developing-an-agent" title="Link to this heading"></a></h1>
 <p>In order for the game to properly load your agent one must install the
-agent, there are several ways to do so: 1. create a new agent within
-<code class="docutils literal notranslate"><span class="pre">src/splendor/agents</span></code> and when installing splendor your agent will be
-installed as well. (i.e. when invoking <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>) 2. create a
-new package and develop your agent there and then install it. 3. create
-a new agent within <code class="docutils literal notranslate"><span class="pre">src/splendor/agents</span></code> and <strong>ONLY DURING
-DEVELOPMENT</strong> install splendor by using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> (instead of
-the <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>) which allows you to edit and adjust your agent
-as you please without the necessity to re-install the package.</p>
+agent, there are several ways to do so:</p>
+<ol class="arabic simple">
+<li><p>create a new agent within <code class="docutils literal notranslate"><span class="pre">src/splendor/agents</span></code> and when installing splendor your agent will be installed as well. (i.e. when invoking <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>)</p></li>
+<li><p>create a new package and develop your agent there and then install it.</p></li>
+<li><p>create a new agent within <code class="docutils literal notranslate"><span class="pre">src/splendor/agents</span></code> and <strong>ONLY DURING DEVELOPMENT</strong> install splendor by using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code> (instead of the <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">.</span></code>) which allows you to edit and adjust your agent as you please without the necessity to re-install the package.</p></li>
+</ol>
 <section id="training-our-agents">
 <h2>Training Our Agents:<a class="headerlink" href="#training-our-agents" title="Link to this heading"></a></h2>
 </section>
 <section id="training-the-genetic-algorithm-agent">
 <h2>Training The Genetic Algorithm Agent:<a class="headerlink" href="#training-the-genetic-algorithm-agent" title="Link to this heading"></a></h2>
 <p>In order to train the genetic algorithm agent with the following
-hyper-parameters: 1. Specify the population size in each generation to
-be 24 (should be a multiple of 12). 2. Train for 20 generations. 3. Fix
-the mutation rate chance to be 0.1(%). 4. Use a fixed random seed. Use
-the following command:</p>
+hyper-parameters:</p>
+<ol class="arabic simple">
+<li><p>Specify the population size in each generation to be 24 (should be a multiple of 12).</p></li>
+<li><p>Train for 20 generations.</p></li>
+<li><p>Fix the mutation rate chance to be 0.1(%).</p></li>
+<li><p>Use a fixed random seed.</p></li>
+</ol>
+<p>Use the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>evolve<span class="w"> </span>--population-size<span class="w"> </span><span class="m">24</span><span class="w"> </span>--generations<span class="w"> </span><span class="m">20</span><span class="w"> </span>--mutation-rate<span class="w"> </span><span class="m">0</span>.1<span class="w"> </span>--seed<span class="w"> </span><span class="m">1234</span>
 </pre></div>
 </div>
