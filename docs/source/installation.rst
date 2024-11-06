@@ -1,8 +1,11 @@
 Installation of Splendor
 ------------------------
 
-There are 2 possible ways to install the requirements of splendor. 1.
-using ``conda``. 2. using ``pip``.
+There are 2 possible ways to install the requirements of splendor.
+
+#. using ``conda``.
+#. using ``pip``.
+
 
 Install Splendor using ``conda``:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
