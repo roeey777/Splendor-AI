@@ -109,39 +109,40 @@
 <h1>Run the game<a class="headerlink" href="#run-the-game" title="Link to this heading"></a></h1>
 <p>Execute the following command for help message (location is no longer
 relevant):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">--</span><span class="n">help</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>--help
 </pre></div>
 </div>
 <section id="interactive-mode">
 <h2>Interactive mode<a class="headerlink" href="#interactive-mode" title="Link to this heading"></a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">--</span><span class="n">interactive</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>--interactive
 </pre></div>
 </div>
 </section>
 <section id="specify-opponents">
 <h2>Specify Opponents<a class="headerlink" href="#specify-opponents" title="Link to this heading"></a></h2>
-<p>There are a few option for specifying agents: 1. The specified agent is
-part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code>. 2. The specified agent is <strong>not</strong> part of
-<code class="docutils literal notranslate"><span class="pre">splendor</span></code>, however he is installed as a part of a different package.
-3. The specified agent is <strong>not</strong> part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code> and he is <strong>not
-installed</strong> as a part of a different package.</p>
-<p>We’ll now address each case.</p>
+<p>There are a few option for specifying agents:</p>
+<ol class="arabic simple">
+<li><p>The specified agent is part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code>.</p></li>
+<li><p>The specified agent is <strong>not</strong> part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code>, however he is installed as a part of a different package.</p></li>
+<li><p>The specified agent is <strong>not</strong> part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code> and he is <strong>not installed</strong> as a part of a different package.</p></li>
+</ol>
+<p>We will now address each case.</p>
 <section id="case-1-specifying-opponents-from-splendor">
 <h3>Case #1 - Specifying Opponents from <code class="docutils literal notranslate"><span class="pre">splendor</span></code><a class="headerlink" href="#case-1-specifying-opponents-from-splendor" title="Link to this heading"></a></h3>
 <p>Whenever you wish to invoke/use a specific agent (from <code class="docutils literal notranslate"><span class="pre">splendor</span></code>) you
 need to specify the <strong>absolute import path</strong>. The absolute import path
 must be specified <strong>regardless of the working directory</strong>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">random</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">first_move</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">random</span><span class="p">,</span><span class="n">first_move</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.generic.random,splendor.agents.generic.first_move<span class="w"> </span>--agent_names<span class="o">=</span>random,first_move
 </pre></div>
 </div>
 </section>
 <section id="case-2-specifying-opponents-not-from-splendor-installed-via-other-package">
 <h3>Case #2 - Specifying Opponents not from <code class="docutils literal notranslate"><span class="pre">splendor</span></code> (installed via other package)<a class="headerlink" href="#case-2-specifying-opponents-not-from-splendor-installed-via-other-package" title="Link to this heading"></a></h3>
-<p>Let’s assume we’ve installed a package called <code class="docutils literal notranslate"><span class="pre">external</span></code> and there is
+<p>Let’s assume We have installed a package called <code class="docutils literal notranslate"><span class="pre">external</span></code> and there is
 an agent called <code class="docutils literal notranslate"><span class="pre">best</span></code> within <code class="docutils literal notranslate"><span class="pre">external.agents</span></code> and we want to
 flesh out this agent against the random agent we would execute the
 following command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">random</span><span class="p">,</span><span class="n">external</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">best</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">random</span><span class="p">,</span><span class="n">external</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.generic.random,external.agents.best<span class="w"> </span>--agent_names<span class="o">=</span>random,external
 </pre></div>
 </div>
 </section>
@@ -151,8 +152,8 @@ following command:</p>
 part of <code class="docutils literal notranslate"><span class="pre">splendor</span></code> nor installed via another package. We would utilize
 the fact that the game adds the current working directory to the module
 search path when loading agents. So we would act as follows:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span>
-<span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">agent_in_my_cwd</span><span class="p">,</span><span class="n">another_agent_in_my_cwd</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">external_1</span><span class="p">,</span><span class="n">external_2</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span>
+splendor<span class="w"> </span>-a<span class="w"> </span>agent_in_my_cwd,another_agent_in_my_cwd<span class="w"> </span>--agent_names<span class="o">=</span>external_1,external_2
 </pre></div>
 </div>
 <section id="note-use-with-caution">
@@ -183,7 +184,7 @@ random agents to fill the void.</p></li>
 <section id="without-gui-textual-mode">
 <h2>Without GUI (Textual Mode)<a class="headerlink" href="#without-gui-textual-mode" title="Link to this heading"></a></h2>
 <p>just add the <code class="docutils literal notranslate"><span class="pre">-t</span></code> option, for example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">random</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">generic</span><span class="o">.</span><span class="n">first_move</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">random</span><span class="p">,</span><span class="n">first_move</span> <span class="o">-</span><span class="n">t</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.generic.random,splendor.agents.generic.first_move<span class="w"> </span>--agent_names<span class="o">=</span>random,first_move<span class="w"> </span>-t
 </pre></div>
 </div>
 </section>
@@ -192,15 +193,15 @@ random agents to fill the void.</p></li>
 <section id="interactively-play-against-our-trained-agents">
 <h3>Interactively play against our trained agents<a class="headerlink" href="#interactively-play-against-our-trained-agents" title="Link to this heading"></a></h3>
 <p>Interactively play against the trained genetic algorithm agent:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">genetic_algorithm</span><span class="o">.</span><span class="n">genetic_algorithm_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">genetic</span><span class="p">,</span><span class="n">human</span> <span class="o">--</span><span class="n">interactive</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent<span class="w"> </span>--agent_names<span class="o">=</span>genetic,human<span class="w"> </span>--interactive
 </pre></div>
 </div>
 <p>Interactively play against the trained PPO agent:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo</span><span class="p">,</span><span class="n">human</span> <span class="o">--</span><span class="n">interactive</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.our_agents.ppo.ppo_agent<span class="w"> </span>--agent_names<span class="o">=</span>ppo,human<span class="w"> </span>--interactive
 </pre></div>
 </div>
 <p>Interactively play against the trained a recurrent PPO agent (using GRU):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_rnn</span><span class="o">.</span><span class="n">gru</span><span class="o">.</span><span class="n">ppo_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo_gru</span><span class="p">,</span><span class="n">human</span> <span class="o">--</span><span class="n">interactive</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent<span class="w"> </span>--agent_names<span class="o">=</span>ppo_gru,human<span class="w"> </span>--interactive
 </pre></div>
 </div>
 </section>
@@ -208,20 +209,20 @@ random agents to fill the void.</p></li>
 <h3>Let them play by them selves<a class="headerlink" href="#let-them-play-by-them-selves" title="Link to this heading"></a></h3>
 <p>Let the genetic algorithm agent play against minimax (with alpha-beta
 pruning) agent:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">genetic_algorithm</span><span class="o">.</span><span class="n">genetic_algorithm_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">minmax</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">genetic</span><span class="p">,</span><span class="n">minimax</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent,splendor.agents.our_agents.minmax<span class="w"> </span>--agent_names<span class="o">=</span>genetic,minimax
 </pre></div>
 </div>
 <p>Let the genetic algorithm agent play against minimax (with alpha-beta
 pruning) agent for 10 consecutive games (only text display):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">genetic_algorithm</span><span class="o">.</span><span class="n">genetic_algorithm_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">minmax</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">genetic</span><span class="p">,</span><span class="n">minimax</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">m</span> <span class="mi">10</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.our_agents.genetic_algorithm.genetic_algorithm_agent,splendor.agents.our_agents.minmax<span class="w"> </span>--agent_names<span class="o">=</span>genetic,minimax<span class="w"> </span>-t<span class="w"> </span>-m<span class="w"> </span><span class="m">10</span>
 </pre></div>
 </div>
 <p>Let the PPO agent play against minimax (with alpha-beta pruning) agent for 10 consecutive games (only text display):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">minmax</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo</span><span class="p">,</span><span class="n">minimax</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">m</span> <span class="mi">10</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.our_agents.ppo.ppo_agent,splendor.agents.our_agents.minmax<span class="w"> </span>--agent_names<span class="o">=</span>ppo,minimax<span class="w"> </span>-t<span class="w"> </span>-m<span class="w"> </span><span class="m">10</span>
 </pre></div>
 </div>
 <p>Let the PPO agent play against the recurrent PPO (with GRU) agent for 10 consecutive games (only text display):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">splendor</span> <span class="o">-</span><span class="n">a</span> <span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_agent</span><span class="p">,</span><span class="n">splendor</span><span class="o">.</span><span class="n">agents</span><span class="o">.</span><span class="n">our_agents</span><span class="o">.</span><span class="n">ppo</span><span class="o">.</span><span class="n">ppo_rnn</span><span class="o">.</span><span class="n">gru</span><span class="o">.</span><span class="n">ppo_agent</span> <span class="o">--</span><span class="n">agent_names</span><span class="o">=</span><span class="n">ppo</span><span class="p">,</span><span class="n">recurrent_ppo</span> <span class="o">-</span><span class="n">t</span> <span class="o">-</span><span class="n">m</span> <span class="mi">10</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>splendor<span class="w"> </span>-a<span class="w"> </span>splendor.agents.our_agents.ppo.ppo_agent,splendor.agents.our_agents.ppo.ppo_rnn.gru.ppo_agent<span class="w"> </span>--agent_names<span class="o">=</span>ppo,recurrent_ppo<span class="w"> </span>-t<span class="w"> </span>-m<span class="w"> </span><span class="m">10</span>
 </pre></div>
 </div>
 </section>
