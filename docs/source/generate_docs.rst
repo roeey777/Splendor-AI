@@ -64,3 +64,23 @@ After this verification we can add all the new documentation.
 
 And Your'e Done!
 
+
+Highly Autonomous Documentation Generation & Publication
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There is also another way which automates this procedure even further.
+All one has to do is simply execute the following (from the top directory of the repository)
+
+.. code-block:: bash
+
+   make docs
+
+
+This command will generate the documentation using ``sphinx``.
+The following command will generate the documentation and publish them onto `Github Pages <https://roeey777.github.io/Splendor-AI/>`_.
+
+.. code-block:: bash
+
+   make publish-docs
+
+
