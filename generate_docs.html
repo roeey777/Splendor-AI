@@ -59,6 +59,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Generate The Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#automatic-generation-of-documentation">Automatic generation of documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#publishing-the-documentation-to-github-pages">Publishing the Documentation to Github Pages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#highly-autonomous-documentation-generation-publication">Highly Autonomous Documentation Generation &amp; Publication</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Development</a></li>
@@ -139,6 +140,19 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
 </pre></div>
 </div>
 <p>And Your’e Done!</p>
+</section>
+<section id="highly-autonomous-documentation-generation-publication">
+<h2>Highly Autonomous Documentation Generation &amp; Publication<a class="headerlink" href="#highly-autonomous-documentation-generation-publication" title="Link to this heading"></a></h2>
+<p>There is also another way which automates this procedure even further.
+All one has to do is simply execute the following (from the top directory of the repository)</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>docs
+</pre></div>
+</div>
+<p>This command will generate the documentation using <code class="docutils literal notranslate"><span class="pre">sphinx</span></code>.
+The following command will generate the documentation and publish them onto <a class="reference external" href="https://roeey777.github.io/Splendor-AI/">Github Pages</a>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>make<span class="w"> </span>publish-docs
+</pre></div>
+</div>
 </section>
 </section>
 
