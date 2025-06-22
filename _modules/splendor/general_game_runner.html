@@ -1,22 +1,37 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>splendor.general_game_runner &mdash; Splendor-AI 0.0.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
-        <script src="../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="canonical" href="https://roeey777.github.io/Splendor-AI/_modules/splendor/general_game_runner.html" />
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -46,7 +61,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation of Splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../run_splendor.html">Run the game</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../developing_agents.html">Developing an Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../agents.html">Agents</a></li>
 </ul>
 
@@ -75,7 +92,9 @@
            <div itemprop="articleBody">
              
   <h1>Source code for splendor.general_game_runner</h1><div class="highlight"><pre>
-<span></span><span class="c1"># INFORMATION ------------------------------------------------------------------------------------------------------- #</span>
+<span></span><span class="c1"># pylint: skip-file</span>
+
+<span class="c1"># INFORMATION ------------------------------------------------------------------------------------------------------- #</span>
 
 
 <span class="c1"># Author:  Steven Spratley, extending code by Guang Ho and Michelle Blom</span>
@@ -87,25 +106,26 @@
 <span class="c1"># IMPORTS ------------------------------------------------------------------------------------------------------------#</span>
 
 
-<span class="kn">from</span> <span class="nn">re</span> <span class="kn">import</span> <span class="n">L</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">import</span> <span class="nn">traceback</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">contextlib</span>
-<span class="kn">import</span> <span class="nn">git</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">pytz</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">.template</span> <span class="kn">import</span> <span class="n">Agent</span> <span class="k">as</span> <span class="n">DummyAgent</span>
-<span class="kn">from</span> <span class="nn">.game</span> <span class="kn">import</span> <span class="n">Game</span><span class="p">,</span> <span class="n">GameReplayer</span>
-<span class="kn">from</span> <span class="nn">optparse</span> <span class="kn">import</span> <span class="n">OptionParser</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">optparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptionParser</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">git</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pytz</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.game</span><span class="w"> </span><span class="kn">import</span> <span class="n">Game</span><span class="p">,</span> <span class="n">GameReplayer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span> <span class="k">as</span> <span class="n">DummyAgent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.version</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_version</span>
 
 <span class="c1"># CONSTANTS ----------------------------------------------------------------------------------------------------------#</span>
 
@@ -124,7 +144,7 @@
 
 <div class="viewcode-block" id="is_git_repo">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.is_git_repo">[docs]</a>
-<span class="k">def</span> <span class="nf">is_git_repo</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_git_repo</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">_</span> <span class="o">=</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">git_dir</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -136,7 +156,7 @@
 <span class="c1"># Extract the timestamp for a given tag in a repo</span>
 <div class="viewcode-block" id="get_commit_time">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.get_commit_time">[docs]</a>
-<span class="k">def</span> <span class="nf">get_commit_time</span><span class="p">(</span><span class="n">repo</span><span class="p">:</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_commit_time</span><span class="p">(</span><span class="n">repo</span><span class="p">:</span> <span class="n">git</span><span class="o">.</span><span class="n">Repo</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the commit time based on the TIMEZONE</span>
 
@@ -151,7 +171,7 @@
 
 <div class="viewcode-block" id="gitCloneTeam">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.gitCloneTeam">[docs]</a>
-<span class="k">def</span> <span class="nf">gitCloneTeam</span><span class="p">(</span><span class="n">team_info</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gitCloneTeam</span><span class="p">(</span><span class="n">team_info</span><span class="p">,</span> <span class="n">output_path</span><span class="p">):</span>
     <span class="n">token</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">GIT_TOKEN_PATH</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">token</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
@@ -247,7 +267,7 @@
 
 <div class="viewcode-block" id="loadAgent">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.loadAgent">[docs]</a>
-<span class="k">def</span> <span class="nf">loadAgent</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">superQuiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">loadAgent</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">superQuiet</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">teams</span> <span class="o">=</span> <span class="n">matches</span><span class="p">[</span><span class="s2">&quot;teams&quot;</span><span class="p">]</span>
     <span class="n">num_of_agents</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">teams</span><span class="p">)</span>
     <span class="n">agents</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_of_agents</span>
@@ -289,15 +309,15 @@
 
 <div class="viewcode-block" id="HidePrint">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.HidePrint">[docs]</a>
-<span class="k">class</span> <span class="nc">HidePrint</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">HidePrint</span><span class="p">:</span>
     <span class="c1"># setting output stream</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">f_name</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">,</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">f_name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">file_path</span> <span class="o">=</span> <span class="n">file_path</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">f_name</span> <span class="o">=</span> <span class="n">f_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_original_stdout</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 
-    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">):</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">)</span>
@@ -308,7 +328,7 @@
             <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span>
 
     <span class="c1"># Restore</span>
-    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_original_stdout</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span></div>
@@ -318,7 +338,7 @@
 <div class="viewcode-block" id="add_cwd_to_sys_path">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.add_cwd_to_sys_path">[docs]</a>
 <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-<span class="k">def</span> <span class="nf">add_cwd_to_sys_path</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_cwd_to_sys_path</span><span class="p">():</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
@@ -330,7 +350,7 @@
 
 <div class="viewcode-block" id="run">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.run">[docs]</a>
-<span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
     <span class="n">num_of_agents</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">num_of_agents</span>
 
     <span class="c1"># fill in the defaults</span>
@@ -372,11 +392,11 @@
 
     <span class="c1"># import GameRule</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;splendor.</span><span class="si">{</span><span class="n">game_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">game_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_model&quot;</span>
+        <span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;splendor.</span><span class="si">{</span><span class="n">game_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">game_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_model&quot;</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
         <span class="n">GameRule</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">game_name</span><span class="si">}</span><span class="s2">GameRule&quot;</span><span class="p">)</span>
         <span class="n">displayer</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;splendor.</span><span class="si">{</span><span class="n">game_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">game_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_displayer&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;splendor.</span><span class="si">{</span><span class="n">game_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">game_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_displayer&quot;</span>
         <span class="p">)</span>
         <span class="n">TextDisplayer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">displayer</span><span class="p">,</span> <span class="s2">&quot;TextDisplayer&quot;</span><span class="p">)</span>
         <span class="n">GUIDisplayer</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">displayer</span><span class="p">,</span> <span class="s2">&quot;GUIDisplayer&quot;</span><span class="p">)</span>
@@ -589,7 +609,7 @@
 
 <div class="viewcode-block" id="loadParameter">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.loadParameter">[docs]</a>
-<span class="k">def</span> <span class="nf">loadParameter</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">loadParameter</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Processes the command used to run Yinsh from the command line.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -600,7 +620,7 @@
 <span class="s2">                (2) python runner.py -c MyAgent</span>
 <span class="s2">                    - starts a fully automated game where Citrine team is a custom agent and the rest are random.</span>
 <span class="s2">    &quot;&quot;&quot;</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">OptionParser</span><span class="p">(</span><span class="n">usageStr</span><span class="p">)</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">OptionParser</span><span class="p">(</span><span class="n">usageStr</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">get_version</span><span class="p">())</span>
     <span class="c1"># parser.add_option(&#39;-r&#39;,&#39;--red&#39;, help=&#39;Red team agent file&#39;, default=DEFAULT_AGENT)</span>
     <span class="c1"># parser.add_option(&#39;-b&#39;,&#39;--blue&#39;, help=&#39;Blue team agent file&#39;, default=DEFAULT_AGENT)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_option</span><span class="p">(</span>
@@ -767,7 +787,7 @@
 
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../splendor.html#splendor.general_game_runner.main">[docs]</a>
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The main function called when advance_model.py is run</span>
 <span class="sd">    from the command line:</span>
@@ -802,7 +822,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Eyal Royee.</p>
+    <p>&#169; Copyright 2025, Eyal Royee.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

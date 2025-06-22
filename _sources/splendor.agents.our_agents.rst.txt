@@ -18,13 +18,13 @@ splendor.agents.our\_agents.minmax module
 
 .. automodule:: splendor.agents.our_agents.minmax
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: splendor.agents.our_agents
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

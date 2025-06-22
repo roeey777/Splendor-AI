@@ -1,22 +1,37 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>splendor.agents.our_agents.ppo.ppo &mdash; Splendor-AI 0.0.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
-        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="canonical" href="https://roeey777.github.io/Splendor-AI/_modules/splendor/agents/our_agents/ppo/ppo.html" />
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../../../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
@@ -46,7 +61,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
 </ul>
 
@@ -75,33 +92,58 @@
            <div itemprop="articleBody">
              
   <h1>Source code for splendor.agents.our_agents.ppo.ppo</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">random</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">entry-point for PPO training.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">argparse</span> <span class="kn">import</span> <span class="n">ArgumentParser</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
-<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">csv</span><span class="w"> </span><span class="kn">import</span> <span class="n">writer</span> <span class="k">as</span> <span class="n">csv_writer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">importlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_module</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">gymnasium</span> <span class="k">as</span> <span class="nn">gym</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
-<span class="kn">import</span> <span class="nn">torch.optim</span> <span class="k">as</span> <span class="nn">optim</span>
-<span class="kn">from</span> <span class="nn">csv</span> <span class="kn">import</span> <span class="n">writer</span> <span class="k">as</span> <span class="n">csv_writer</span>
-
-<span class="kn">from</span> <span class="nn">splendor.Splendor.splendor_model</span> <span class="kn">import</span> <span class="n">SplendorState</span>
-
-<span class="kn">from</span> <span class="nn">.network</span> <span class="kn">import</span> <span class="n">PPO</span><span class="p">,</span> <span class="n">DROPOUT</span>
-<span class="kn">from</span> <span class="nn">.training</span> <span class="kn">import</span> <span class="n">train_single_episode</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">gymnasium</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gym</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gymnasium.spaces.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">flatdim</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">nn</span><span class="p">,</span> <span class="n">optim</span>
 
 <span class="c1"># import this would register splendor as one of gym&#39;s environments.</span>
-<span class="kn">import</span> <span class="nn">splendor.Splendor.gym</span>
+<span class="c1"># pylint: disable=unused-import</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">splendor.splendor.gym</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.gym.envs.splendor_env</span><span class="w"> </span><span class="kn">import</span> <span class="n">SplendorEnv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.splendor_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">SplendorState</span>
 
-<span class="kn">from</span> <span class="nn">splendor.agents.generic.random</span> <span class="kn">import</span> <span class="n">myAgent</span> <span class="k">as</span> <span class="n">RandomAgent</span>
-<span class="n">opponents</span> <span class="o">=</span> <span class="p">[</span><span class="n">RandomAgent</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.arguments_parsing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_ARCHITECTURE</span><span class="p">,</span>
+    <span class="n">DEFAULT_OPPONENT</span><span class="p">,</span>
+    <span class="n">DEFAULT_TEST_OPPONENT</span><span class="p">,</span>
+    <span class="n">NN_ARCHITECTURES</span><span class="p">,</span>
+    <span class="n">OPPONENTS_AGENTS_FACTORY</span><span class="p">,</span>
+    <span class="n">WORKING_DIR</span><span class="p">,</span>
+    <span class="n">NeuralNetArch</span><span class="p">,</span>
+    <span class="n">OpponentsFactory</span><span class="p">,</span>
+    <span class="n">parse_args</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DISCOUNT_FACTOR</span><span class="p">,</span>
+    <span class="n">FIRST_DECK</span><span class="p">,</span>
+    <span class="n">LEARNING_RATE</span><span class="p">,</span>
+    <span class="n">MAX_EPISODES</span><span class="p">,</span>
+    <span class="n">N_TRIALS</span><span class="p">,</span>
+    <span class="n">PPO_CLIP</span><span class="p">,</span>
+    <span class="n">PPO_STEPS</span><span class="p">,</span>
+    <span class="n">SECOND_DECK</span><span class="p">,</span>
+    <span class="n">SEED</span><span class="p">,</span>
+    <span class="n">THIRD_DECK</span><span class="p">,</span>
+    <span class="n">WEIGHT_DECAY</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.ppo_agent_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">PPOAgentBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.training</span><span class="w"> </span><span class="kn">import</span> <span class="n">LearningParams</span><span class="p">,</span> <span class="n">evaluate</span><span class="p">,</span> <span class="n">train_single_episode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_saved_model</span>
 
-<span class="n">WORKING_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">()</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
 <span class="n">FOLDER_FORMAT</span> <span class="o">=</span> <span class="s2">&quot;%y-%m-</span><span class="si">%d</span><span class="s2">_%H-%M-%S&quot;</span>
 <span class="n">STATS_FILE</span> <span class="o">=</span> <span class="s2">&quot;stats.csv&quot;</span>
 <span class="n">STATS_HEADERS</span> <span class="o">=</span> <span class="p">(</span>
@@ -119,20 +161,16 @@
     <span class="s2">&quot;test_reward&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">SEED</span> <span class="o">=</span> <span class="mi">1234</span>
-<span class="n">LEARNING_RATE</span> <span class="o">=</span> <span class="mf">1e-5</span>
-<span class="n">WEIGHT_DECAY</span> <span class="o">=</span> <span class="mf">1e-4</span>
-<span class="n">MAX_EPISODES</span> <span class="o">=</span> <span class="mi">50000</span>
-
-<span class="n">DISCOUNT_FACTOR</span> <span class="o">=</span> <span class="mf">0.99</span>
-<span class="n">N_TRIALS</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">PPO_STEPS</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">PPO_CLIP</span> <span class="o">=</span> <span class="mf">0.2</span>
-
 
 <div class="viewcode-block" id="save_model">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.save_model">[docs]</a>
-<span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">save_model</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Save given model weights into a file at given path.</span>
+
+<span class="sd">    :param model: the model whose weights should be stored.</span>
+<span class="sd">    :param path: Where to store the weights.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
         <span class="p">{</span>
             <span class="s2">&quot;model_state_dict&quot;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
@@ -152,79 +190,152 @@
 
 
 
-<div class="viewcode-block" id="evaluate">
-<a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.evaluate">[docs]</a>
-<span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">device</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="n">policy</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
-    <span class="n">rewards</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="n">state</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)</span>
-
-    <span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="n">action_mask</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">from_numpy</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">get_legal_actions_mask</span><span class="p">())</span>
-                <span class="o">.</span><span class="n">double</span><span class="p">()</span>
-                <span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">action_prob</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">policy</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action_mask</span><span class="p">)</span>
-
-        <span class="n">action</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">action_prob</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">next_state</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">__</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-        <span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward</span>
-        <span class="n">state</span> <span class="o">=</span> <span class="n">next_state</span>
-
-    <span class="k">return</span> <span class="n">episode_reward</span></div>
-
-
-
 <div class="viewcode-block" id="extract_game_stats">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.extract_game_stats">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_game_stats</span><span class="p">(</span><span class="n">final_game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_game_stats</span><span class="p">(</span><span class="n">final_game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract game statistics from the final (terminal) game state.</span>
+
+<span class="sd">    :param final_game_state: the final, terminal state of the game.</span>
+<span class="sd">    :param agent_id: the ID (turn) of the PPO agent in training.</span>
+<span class="sd">    :return: list of the statistics values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">agent_state</span> <span class="o">=</span> <span class="n">final_game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">agent_id</span><span class="p">]</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="p">[</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">final_game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">),</span>  <span class="c1"># players_count</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">agent_trace</span><span class="o">.</span><span class="n">action_reward</span><span class="p">),</span>  <span class="c1"># &quot;rounds_count&quot;,</span>
         <span class="n">agent_state</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>  <span class="c1"># &quot;score&quot;,</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">nobles</span><span class="p">),</span>  <span class="c1"># &quot;nobles_taken&quot;,</span>
-        <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">deck_id</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">values</span><span class="p">())))),</span>
-        <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">deck_id</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">values</span><span class="p">())))),</span>
-        <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">deck_id</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">values</span><span class="p">())))),</span>
+        <span class="nb">len</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">deck_id</span> <span class="o">==</span> <span class="n">FIRST_DECK</span><span class="p">,</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="nb">len</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">deck_id</span> <span class="o">==</span> <span class="n">SECOND_DECK</span><span class="p">,</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
+        <span class="nb">len</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">filter</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">deck_id</span> <span class="o">==</span> <span class="n">THIRD_DECK</span><span class="p">,</span>
+                    <span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">),</span>
     <span class="p">]</span>
     <span class="k">return</span> <span class="n">stats</span></div>
 
 
 
+<span class="c1"># pylint: disable=too-many-arguments,too-many-locals,too-many-branches,too-many-statements,too-many-positional-arguments</span>
 <div class="viewcode-block" id="train">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.train">[docs]</a>
-<span class="k">def</span> <span class="nf">train</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span>  <span class="c1"># noqa: C901,PLR0912,PLR0913,PLR0914,PLR0915,PLR0917</span>
     <span class="n">working_dir</span><span class="p">:</span> <span class="n">Path</span> <span class="o">=</span> <span class="n">WORKING_DIR</span><span class="p">,</span>
     <span class="n">learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">LEARNING_RATE</span><span class="p">,</span>
     <span class="n">weight_decay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">WEIGHT_DECAY</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">SEED</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torch</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+    <span class="n">device_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="n">transfer_learning</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">saved_weights</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">opponent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_OPPONENT</span><span class="p">,</span>
+    <span class="n">test_opponent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_TEST_OPPONENT</span><span class="p">,</span>
+    <span class="n">architecture</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">DEFAULT_ARCHITECTURE</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Train a PPO agent.</span>
+
+<span class="sd">    :param working_dir: Where to store the statistics and weights.</span>
+<span class="sd">    :param learning_rate: The learning rate of the gradient descent based learning.</span>
+<span class="sd">    :param weight_decay: L2 regularization coefficient.</span>
+<span class="sd">    :param seed: Which seed to use during training.</span>
+<span class="sd">    :param device_name: Name of the device used for mathematical computations.</span>
+<span class="sd">    :param transfer_learning: Whether or not the PPO agent should be initialized from</span>
+<span class="sd">                              a pre-trained weights.</span>
+<span class="sd">    :param saved_weights: Path to the weights of a pre-trained PPO agent that would be</span>
+<span class="sd">                          loaded and used as initialization for this training session.</span>
+<span class="sd">                          This argument would be ignored if ``transfer_learning`` is ``False``</span>
+<span class="sd">                          and required if ``transfer_learning`` is ``True``.</span>
+<span class="sd">    :param opponent: Opponent agent name that the PPO would train against.</span>
+<span class="sd">    :param test_opponent: Test opponent name that the PPO would be evaluated against.</span>
+<span class="sd">    :param architecture: PPO network architecture name that should be used.</span>
+<span class="sd">    :return: The trained model (PPO agent).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span>
+        <span class="n">device_name</span> <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">torch</span><span class="p">,</span> <span class="n">device_name</span><span class="p">)</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">nn_arch</span><span class="p">:</span> <span class="n">NeuralNetArch</span> <span class="o">=</span> <span class="n">NN_ARCHITECTURES</span><span class="p">[</span><span class="n">architecture</span><span class="p">]</span>
+
+    <span class="n">load_net_later</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">opponent</span> <span class="ow">in</span> <span class="n">OPPONENTS_AGENTS_FACTORY</span><span class="p">:</span>
+        <span class="n">opponents_factory</span><span class="p">:</span> <span class="n">OpponentsFactory</span> <span class="o">=</span> <span class="n">OPPONENTS_AGENTS_FACTORY</span><span class="p">[</span><span class="n">opponent</span><span class="p">]</span>
+        <span class="n">opponents</span> <span class="o">=</span> <span class="n">opponents_factory</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># assume that the PPO is meant to train against itself.</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">nn_arch</span><span class="o">.</span><span class="n">agent_relative_import_path</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="n">__package__</span><span class="p">)</span>
+        <span class="n">opponents</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">myAgent</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">load_net</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+        <span class="n">load_net_later</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">load_test_net_later</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">test_opponent</span> <span class="ow">in</span> <span class="n">OPPONENTS_AGENTS_FACTORY</span><span class="p">:</span>
+        <span class="n">test_opponents_factory</span><span class="p">:</span> <span class="n">OpponentsFactory</span> <span class="o">=</span> <span class="n">OPPONENTS_AGENTS_FACTORY</span><span class="p">[</span>
+            <span class="n">test_opponent</span>
+        <span class="p">]</span>
+        <span class="n">test_opponents</span> <span class="o">=</span> <span class="n">test_opponents_factory</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># assume that the PPO is meant to be evaluated against itself.</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">nn_arch</span><span class="o">.</span><span class="n">agent_relative_import_path</span><span class="p">,</span> <span class="n">package</span><span class="o">=</span><span class="n">__package__</span><span class="p">)</span>
+        <span class="n">test_opponents</span> <span class="o">=</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">myAgent</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">load_net</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
+        <span class="n">load_test_net_later</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Training PPO (arch: </span><span class="si">{</span><span class="n">nn_arch</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">) against opponent: </span><span class="si">{</span><span class="n">opponent</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="sa">f</span><span class="s2">&quot; and evaluating against test opponent: </span><span class="si">{</span><span class="n">test_opponent</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
 
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
     <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-    <span class="n">folder</span> <span class="o">=</span> <span class="n">working_dir</span> <span class="o">/</span> <span class="n">start_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">FOLDER_FORMAT</span><span class="p">)</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="n">working_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">start_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">FOLDER_FORMAT</span><span class="p">)</span><span class="si">}</span><span class="s2">__arch_</span><span class="si">{</span><span class="n">nn_arch</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">models_folder</span> <span class="o">=</span> <span class="n">folder</span> <span class="o">/</span> <span class="s2">&quot;models&quot;</span>
     <span class="n">models_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">train_env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;splendor-v1&quot;</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="n">opponents</span><span class="p">)</span>
-    <span class="n">test_env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;splendor-v1&quot;</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="n">opponents</span><span class="p">)</span>
+    <span class="n">train_env</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;splendor-v1&quot;</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="n">opponents</span><span class="p">)</span>
+    <span class="n">test_env</span><span class="p">:</span> <span class="n">gym</span><span class="o">.</span><span class="n">Env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;splendor-v1&quot;</span><span class="p">,</span> <span class="n">agents</span><span class="o">=</span><span class="n">test_opponents</span><span class="p">)</span>
+    <span class="n">custom_train_env</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">SplendorEnv</span><span class="p">,</span> <span class="n">train_env</span><span class="o">.</span><span class="n">unwrapped</span><span class="p">)</span>
 
-    <span class="n">input_dim</span> <span class="o">=</span> <span class="n">train_env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">output_dim</span> <span class="o">=</span> <span class="n">train_env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">n</span>
+    <span class="n">input_dim</span> <span class="o">=</span> <span class="n">flatdim</span><span class="p">(</span><span class="n">train_env</span><span class="o">.</span><span class="n">observation_space</span><span class="p">)</span>
+    <span class="n">output_dim</span> <span class="o">=</span> <span class="n">flatdim</span><span class="p">(</span><span class="n">train_env</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span>
 
-    <span class="n">policy</span> <span class="o">=</span> <span class="n">PPO</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">DROPOUT</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">transfer_learning</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using pre-trained weights as initialization&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">saved_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">policy</span> <span class="o">=</span> <span class="n">load_saved_model</span><span class="p">(</span><span class="n">saved_weights</span><span class="p">,</span> <span class="n">nn_arch</span><span class="o">.</span><span class="n">ppo_factory</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">policy</span> <span class="o">=</span> <span class="n">load_saved_model</span><span class="p">(</span>
+                <span class="n">nn_arch</span><span class="o">.</span><span class="n">default_saved_weights</span><span class="p">,</span> <span class="n">nn_arch</span><span class="o">.</span><span class="n">ppo_factory</span>
+            <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">policy</span> <span class="o">=</span> <span class="n">nn_arch</span><span class="o">.</span><span class="n">ppo_factory</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span><span class="o">.</span><span class="n">double</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">load_net_later</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">opponents</span><span class="p">:</span>
+            <span class="n">ppo_opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">PPOAgentBase</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+            <span class="n">ppo_opponent</span><span class="o">.</span><span class="n">load_policy</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">load_test_net_later</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">test_opponents</span><span class="p">:</span>
+            <span class="n">ppo_test_opponent</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">PPOAgentBase</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+            <span class="n">ppo_test_opponent</span><span class="o">.</span><span class="n">load_policy</span><span class="p">(</span><span class="n">policy</span><span class="p">)</span>
 
     <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span>
         <span class="n">policy</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span>
@@ -236,9 +347,23 @@
     <span class="n">train_rewards</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">test_rewards</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">folder</span> <span class="o">/</span> <span class="n">STATS_FILE</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stats_file</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">Path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+        <span class="n">folder</span> <span class="o">/</span> <span class="n">STATS_FILE</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;ascii&quot;</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">stats_file</span><span class="p">:</span>
         <span class="n">stats_csv</span> <span class="o">=</span> <span class="n">csv_writer</span><span class="p">(</span><span class="n">stats_file</span><span class="p">)</span>
         <span class="n">stats_csv</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">STATS_HEADERS</span><span class="p">)</span>
+
+        <span class="n">learning_params</span> <span class="o">=</span> <span class="n">LearningParams</span><span class="p">(</span>
+            <span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">DISCOUNT_FACTOR</span><span class="p">,</span>
+            <span class="n">PPO_STEPS</span><span class="p">,</span>
+            <span class="n">PPO_CLIP</span><span class="p">,</span>
+            <span class="n">loss_function</span><span class="p">,</span>
+            <span class="n">seed</span><span class="p">,</span>
+            <span class="n">device</span><span class="p">,</span>
+            <span class="n">nn_arch</span><span class="o">.</span><span class="n">is_recurrent</span><span class="p">,</span>
+            <span class="n">nn_arch</span><span class="o">.</span><span class="n">hidden_state_dim</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="c1"># Main training loop</span>
         <span class="k">for</span> <span class="n">episode</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">MAX_EPISODES</span><span class="p">):</span>
@@ -246,19 +371,11 @@
             <span class="n">policy_loss</span><span class="p">,</span> <span class="n">value_loss</span><span class="p">,</span> <span class="n">train_reward</span> <span class="o">=</span> <span class="n">train_single_episode</span><span class="p">(</span>
                 <span class="n">train_env</span><span class="p">,</span>
                 <span class="n">policy</span><span class="p">,</span>
-                <span class="n">optimizer</span><span class="p">,</span>
-                <span class="n">DISCOUNT_FACTOR</span><span class="p">,</span>
-                <span class="n">PPO_STEPS</span><span class="p">,</span>
-                <span class="n">PPO_CLIP</span><span class="p">,</span>
-                <span class="n">loss_function</span><span class="p">,</span>
-                <span class="n">seed</span><span class="p">,</span>
-                <span class="n">device</span><span class="p">,</span>
+                <span class="n">learning_params</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">test_reward</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">test_env</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
+            <span class="n">test_reward</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">test_env</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">nn_arch</span><span class="o">.</span><span class="n">is_recurrent</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">device</span><span class="p">)</span>
 
-            <span class="n">stats</span> <span class="o">=</span> <span class="n">extract_game_stats</span><span class="p">(</span>
-                <span class="n">train_env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">train_env</span><span class="o">.</span><span class="n">unwrapped</span><span class="o">.</span><span class="n">my_turn</span>
-            <span class="p">)</span>
+            <span class="n">stats</span> <span class="o">=</span> <span class="n">extract_game_stats</span><span class="p">(</span><span class="n">custom_train_env</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="n">custom_train_env</span><span class="o">.</span><span class="n">my_turn</span><span class="p">)</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">episode</span><span class="p">)</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">policy_loss</span><span class="p">,</span> <span class="n">value_loss</span><span class="p">,</span> <span class="n">train_reward</span><span class="p">,</span> <span class="n">test_reward</span><span class="p">])</span>
             <span class="n">stats_csv</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">stats</span><span class="p">)</span>
@@ -269,60 +386,27 @@
             <span class="k">if</span> <span class="p">(</span><span class="n">episode</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">N_TRIALS</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">mean_train_rewards</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">train_rewards</span><span class="p">[</span><span class="o">-</span><span class="n">N_TRIALS</span><span class="p">:])</span>
                 <span class="n">mean_test_rewards</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">test_rewards</span><span class="p">[</span><span class="o">-</span><span class="n">N_TRIALS</span><span class="p">:])</span>
-                <span class="n">train_rewards_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">train_rewards</span><span class="p">[</span><span class="o">-</span><span class="n">N_TRIALS</span><span class="p">:])</span>
-                <span class="n">test_rewards_std</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">test_rewards</span><span class="p">[</span><span class="o">-</span><span class="n">N_TRIALS</span><span class="p">:])</span>
                 <span class="nb">print</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;| Episode: </span><span class="si">{</span><span class="n">episode</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">3</span><span class="si">}</span><span class="s2"> | Mean Train Rewards: </span><span class="si">{</span><span class="n">mean_train_rewards</span><span class="si">:</span><span class="s2">5.1f</span><span class="si">}</span><span class="s2"> | Mean Test Rewards: </span><span class="si">{</span><span class="n">mean_test_rewards</span><span class="si">:</span><span class="s2">5.1f</span><span class="si">}</span><span class="s2"> |&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;| Episode: </span><span class="si">{</span><span class="n">episode</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">3</span><span class="si">}</span><span class="s2"> | Mean Train Rewards: </span><span class="si">{</span><span class="n">mean_train_rewards</span><span class="si">:</span><span class="s2">5.2f</span><span class="si">}</span><span class="s2"> | &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Mean Test Rewards: </span><span class="si">{</span><span class="n">mean_test_rewards</span><span class="si">:</span><span class="s2">5.2f</span><span class="si">}</span><span class="s2"> |&quot;</span>
                 <span class="p">)</span>
                 <span class="n">save_model</span><span class="p">(</span>
                     <span class="n">policy</span><span class="p">,</span>
                     <span class="n">models_folder</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;ppo_model_</span><span class="si">{</span><span class="n">episode</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="n">N_TRIALS</span><span class="si">}</span><span class="s2">.pth&quot;</span><span class="p">,</span>
-                <span class="p">)</span></div>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">policy</span></div>
 
 
 
 <div class="viewcode-block" id="main">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.ppo.html#splendor.agents.our_agents.ppo.ppo.main">[docs]</a>
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span>
-        <span class="n">prog</span><span class="o">=</span><span class="s2">&quot;ppo&quot;</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Train a PPO agent.&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-l&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--learning-rate&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="n">LEARNING_RATE</span><span class="p">,</span>
-        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The learning rate to use during training with gradient descent&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--weight-decay&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="n">WEIGHT_DECAY</span><span class="p">,</span>
-        <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;The weight decay (L2 regularization) to use during training with gradient descent&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-w&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--working-dir&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="n">WORKING_DIR</span><span class="p">,</span>
-        <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to directory to work in (will create a directory with &quot;</span>
-        <span class="s2">&quot;current timestamp for each run)&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;--seed&quot;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="n">SEED</span><span class="p">,</span>
-        <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Seed to set for numpy&#39;s, torch&#39;s and random&#39;s random number generators.&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;--device&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;mps&quot;</span><span class="p">)</span>
-    <span class="p">)</span>
-
-    <span class="n">options</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
-    <span class="n">train</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span></div>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Entry-point for the ``ppo`` console script.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+    <span class="n">train</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)</span></div>
 
 
 
@@ -337,7 +421,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Eyal Royee.</p>
+    <p>&#169; Copyright 2025, Eyal Royee.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

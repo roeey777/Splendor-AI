@@ -9,29 +9,29 @@ splendor.splendor.gym.envs.actions module
 
 .. automodule:: splendor.splendor.gym.envs.actions
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 splendor.splendor.gym.envs.splendor\_env module
 -----------------------------------------------
 
 .. automodule:: splendor.splendor.gym.envs.splendor_env
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 splendor.splendor.gym.envs.utils module
 ---------------------------------------
 
 .. automodule:: splendor.splendor.gym.envs.utils
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:
 
 Module contents
 ---------------
 
 .. automodule:: splendor.splendor.gym.envs
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

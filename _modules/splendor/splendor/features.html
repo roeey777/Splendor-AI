@@ -1,25 +1,37 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>splendor.splendor.features &mdash; Splendor-AI 0.0.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=e3a6060d"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <link rel="canonical" href="https://roeey777.github.io/Splendor-AI/_modules/splendor/splendor/features.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -81,18 +93,18 @@
              
   <h1>Source code for splendor.splendor.features</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Features extraction from SplendorState</span>
+<span class="sd">Features extraction from SplendorState.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">cache</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">repeat</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">ValuesView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValuesView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">chain</span><span class="p">,</span> <span class="n">repeat</span><span class="p">,</span> <span class="n">starmap</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneHotEncoder</span>
 
-<span class="kn">from</span> <span class="nn">.constants</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.constants</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">MAX_CARD_GEMS_DIST_1</span><span class="p">,</span>
     <span class="n">MAX_CARD_GEMS_DIST_2</span><span class="p">,</span>
     <span class="n">MAX_CARD_GEMS_DIST_3</span><span class="p">,</span>
@@ -116,8 +128,8 @@
     <span class="n">WINNING_SCORE_TRESHOLD</span><span class="p">,</span>
     <span class="n">Color</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.splendor_model</span> <span class="kn">import</span> <span class="n">Card</span><span class="p">,</span> <span class="n">SplendorState</span>
-<span class="kn">from</span> <span class="nn">.splendor_utils</span> <span class="kn">import</span> <span class="n">COLOURS</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.splendor_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Card</span><span class="p">,</span> <span class="n">SplendorState</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.splendor_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">COLOURS</span>
 
 <span class="c1">### RANDOM VALUES (change?) ###</span>
 <span class="n">MAX_CARDS_PER_COLOR</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># normal value is 5</span>
@@ -136,7 +148,7 @@
 <span class="c1"># ********************************</span>
 <div class="viewcode-block" id="get_agent">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.get_agent">[docs]</a>
-<span class="k">def</span> <span class="nf">get_agent</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_agent</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the AgentState of a specific agent from the game state.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -149,7 +161,7 @@
 
 <div class="viewcode-block" id="agent_buying_power">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.agent_buying_power">[docs]</a>
-<span class="k">def</span> <span class="nf">agent_buying_power</span><span class="p">(</span><span class="n">agent</span><span class="p">:</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">agent_buying_power</span><span class="p">(</span><span class="n">agent</span><span class="p">:</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Find the buying power of a specific agent.</span>
 
@@ -164,7 +176,7 @@
 
 <div class="viewcode-block" id="diminish_return">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.diminish_return">[docs]</a>
-<span class="k">def</span> <span class="nf">diminish_return</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">diminish_return</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculate the diminished return of a value.</span>
 
@@ -180,7 +192,7 @@
 
 <div class="viewcode-block" id="agent_won">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.agent_won">[docs]</a>
-<span class="k">def</span> <span class="nf">agent_won</span><span class="p">(</span><span class="n">agent</span><span class="p">:</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">agent_won</span><span class="p">(</span><span class="n">agent</span><span class="p">:</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Check if a given agent has won.</span>
 
@@ -193,7 +205,7 @@
 
 <div class="viewcode-block" id="turns_made_by_agent">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.turns_made_by_agent">[docs]</a>
-<span class="k">def</span> <span class="nf">turns_made_by_agent</span><span class="p">(</span><span class="n">agent</span><span class="p">:</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">turns_made_by_agent</span><span class="p">(</span><span class="n">agent</span><span class="p">:</span> <span class="n">SplendorState</span><span class="o">.</span><span class="n">AgentState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the number of turns made by a given agent.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -203,9 +215,9 @@
 
 <div class="viewcode-block" id="missing_gems_to_card">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.missing_gems_to_card">[docs]</a>
-<span class="k">def</span> <span class="nf">missing_gems_to_card</span><span class="p">(</span>
-    <span class="n">card</span><span class="p">:</span> <span class="n">Card</span><span class="p">,</span> <span class="n">buying_power</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">missing_gems_to_card</span><span class="p">(</span>
+    <span class="n">card</span><span class="p">:</span> <span class="n">Card</span><span class="p">,</span> <span class="n">buying_power</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    find how many gems are required in order to buy a specific card.</span>
 
@@ -223,7 +235,7 @@
 
 <div class="viewcode-block" id="turns_to_buy_card">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.turns_to_buy_card">[docs]</a>
-<span class="k">def</span> <span class="nf">turns_to_buy_card</span><span class="p">(</span><span class="n">missing_gems</span><span class="p">:</span> <span class="n">ValuesView</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">turns_to_buy_card</span><span class="p">(</span><span class="n">missing_gems</span><span class="p">:</span> <span class="n">ValuesView</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    calculate an optimistic estimate for the amount of turns required</span>
 <span class="sd">    in order to buy a card by collecting all the missing gems without any</span>
@@ -240,12 +252,12 @@
 
 <div class="viewcode-block" id="build_array">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.build_array">[docs]</a>
-<span class="k">def</span> <span class="nf">build_array</span><span class="p">(</span><span class="n">base_array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">instruction</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_array</span><span class="p">(</span><span class="n">base_array</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">instruction</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    construct an ``np.array`` from given instructions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">building_blocks</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">base_array</span><span class="p">,</span> <span class="n">instruction</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">iters</span> <span class="o">=</span> <span class="p">(</span><span class="n">repeat</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">times</span> <span class="ow">in</span> <span class="n">building_blocks</span><span class="p">)</span>
+    <span class="n">iters</span> <span class="o">=</span> <span class="n">starmap</span><span class="p">(</span><span class="n">repeat</span><span class="p">,</span> <span class="n">building_blocks</span><span class="p">)</span>
     <span class="k">match</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_array</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
         <span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">iters</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">base_array</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
@@ -259,7 +271,7 @@
 <span class="c1"># ********************************</span>
 <span class="c1"># Features Extraction Functions</span>
 <span class="c1"># ********************************</span>
-<span class="n">METRICS_SHAPE</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+<span class="n">METRICS_SHAPE</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
     <span class="mi">1</span><span class="p">,</span>  <span class="c1"># constant (hopefully would be used by the manager)</span>
     <span class="mi">1</span><span class="p">,</span>  <span class="c1"># agent&#39;s turns count</span>
     <span class="mi">1</span><span class="p">,</span>  <span class="c1"># agent&#39;s score</span>
@@ -319,7 +331,7 @@
 
 <div class="viewcode-block" id="extract_metrics">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.extract_metrics">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_metrics</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_metrics</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>  <span class="c1"># noqa: PLR0914</span>
     <span class="c1"># pylint: disable=too-many-locals</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract metrics/features from a given state.</span>
@@ -332,7 +344,7 @@
     <span class="n">buying_power</span> <span class="o">=</span> <span class="n">agent_buying_power</span><span class="p">(</span><span class="n">agent</span><span class="p">)</span>
     <span class="n">owned_cards</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">color</span><span class="p">])</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">NORMAL_COLORS</span><span class="p">)</span>
 
-    <span class="n">card_distance_per_color</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">card_distance_per_color</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Color</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">color</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">color</span> <span class="ow">in</span> <span class="n">NORMAL_COLORS</span>
     <span class="p">}</span>
     <span class="n">distance_in_gems</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span>
@@ -353,8 +365,8 @@
             <span class="p">)</span>
             <span class="n">card_distance_per_color</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distance_in_gems</span><span class="p">)</span>
 
-    <span class="n">reserved_distances_in_gems</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_CARD_GEMS_DEFAULT</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_RESERVED</span>
-    <span class="n">reserved_distances_in_turns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_CARD_TURNS_DEFAULT</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_RESERVED</span>
+    <span class="n">reserved_distances_in_gems</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_CARD_GEMS_DEFAULT</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_RESERVED</span>
+    <span class="n">reserved_distances_in_turns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_CARD_TURNS_DEFAULT</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_RESERVED</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">card</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">RESERVED</span><span class="p">]):</span>
         <span class="n">card_missing_gems</span> <span class="o">=</span> <span class="n">missing_gems_to_card</span><span class="p">(</span><span class="n">card</span><span class="p">,</span> <span class="n">buying_power</span><span class="p">)</span>
         <span class="n">distance_in_gems</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">card_missing_gems</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -365,8 +377,8 @@
     <span class="k">for</span> <span class="n">distances</span> <span class="ow">in</span> <span class="n">card_distance_per_color</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="n">distances</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
 
-    <span class="n">nobles_distances_in_cards</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_NOBLE_CARDS_DISTANCE</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_NOBLES</span>
-    <span class="n">nobles_distances_in_gems</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_NOBLE_GEMS_DISTANCE</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_NOBLES</span>
+    <span class="n">nobles_distances_in_cards</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_NOBLE_CARDS_DISTANCE</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_NOBLES</span>
+    <span class="n">nobles_distances_in_gems</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">MISSING_NOBLE_GEMS_DISTANCE</span><span class="p">]</span> <span class="o">*</span> <span class="n">MAX_NOBLES</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">noble_cost</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">game_state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">):</span>
         <span class="n">missing_cards</span> <span class="o">=</span> <span class="p">{</span>
             <span class="n">color</span><span class="p">:</span> <span class="n">cost</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">color</span><span class="p">])</span>
@@ -421,7 +433,7 @@
 
 <div class="viewcode-block" id="normalize_metrics">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.normalize_metrics">[docs]</a>
-<span class="k">def</span> <span class="nf">normalize_metrics</span><span class="p">(</span><span class="n">metrics</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">normalize_metrics</span><span class="p">(</span><span class="n">metrics</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    normalize the feature vector.</span>
 
@@ -437,9 +449,9 @@
 <div class="viewcode-block" id="get_color_encoder">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.get_color_encoder">[docs]</a>
 <span class="nd">@cache</span>
-<span class="k">def</span> <span class="nf">get_color_encoder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">OneHotEncoder</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_color_encoder</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">OneHotEncoder</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return an encoder of all the colors (including yellow)</span>
+<span class="sd">    Return an encoder of all the colors (including yellow).</span>
 
 <span class="sd">    :note: this function is cached in order to avoid re-creation of this encoder.</span>
 <span class="sd">           however this means that we uses the same encoder.</span>
@@ -460,7 +472,7 @@
 <div class="viewcode-block" id="get_yellow_gem_index">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.get_yellow_gem_index">[docs]</a>
 <span class="nd">@cache</span>
-<span class="k">def</span> <span class="nf">get_yellow_gem_index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_yellow_gem_index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the index of the yellow color within the one-hot representation</span>
 <span class="sd">    of the colors.</span>
@@ -480,7 +492,7 @@
 <div class="viewcode-block" id="get_indices_access_by_color">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.get_indices_access_by_color">[docs]</a>
 <span class="nd">@cache</span>
-<span class="k">def</span> <span class="nf">get_indices_access_by_color</span><span class="p">(</span><span class="n">color_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_indices_access_by_color</span><span class="p">(</span><span class="n">color_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    convert gem&#39;s color name to an indexing array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -497,7 +509,7 @@
 
 <div class="viewcode-block" id="vectorize_card">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.vectorize_card">[docs]</a>
-<span class="k">def</span> <span class="nf">vectorize_card</span><span class="p">(</span><span class="n">card</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Card</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">vectorize_card</span><span class="p">(</span><span class="n">card</span><span class="p">:</span> <span class="n">Card</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the vector form a given card.</span>
 <span class="sd">    This is required when supplying an agent such as the DQN or PPO</span>
@@ -539,9 +551,9 @@
 
 <div class="viewcode-block" id="extract_reserved_cards">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.extract_reserved_cards">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_reserved_cards</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_reserved_cards</span><span class="p">(</span>
     <span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract all the vector representations of the cards (only reserved).</span>
 
@@ -556,7 +568,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">agent</span> <span class="o">=</span> <span class="n">get_agent</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
 
-    <span class="n">reserved</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">reserved</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">RESERVED</span><span class="p">]:</span>
         <span class="n">reserved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vectorize_card</span><span class="p">(</span><span class="n">card</span><span class="p">))</span>
 
@@ -569,7 +581,7 @@
 
 <div class="viewcode-block" id="extract_cards">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.extract_cards">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_cards</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_cards</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract all the vector representations of the cards (both dealt &amp; reserved).</span>
 
@@ -586,9 +598,9 @@
 <span class="sd">           if for example there aren&#39;t any reserved cards then the 3 reserved cards slots would</span>
 <span class="sd">           be filled with zeros.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">reserved</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract_reserved_cards</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
+    <span class="n">reserved</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract_reserved_cards</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">)</span>
 
-    <span class="n">dealt</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dealt</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">NDArray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">deck</span> <span class="ow">in</span> <span class="n">game_state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">dealt</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">deck</span><span class="p">:</span>
             <span class="n">dealt</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vectorize_card</span><span class="p">(</span><span class="n">card</span><span class="p">))</span>
@@ -599,7 +611,7 @@
 
 <div class="viewcode-block" id="extract_metrics_with_cards">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.features.extract_metrics_with_cards">[docs]</a>
-<span class="k">def</span> <span class="nf">extract_metrics_with_cards</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_metrics_with_cards</span><span class="p">(</span><span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract metrics from state &amp; encoded the cards as vectors.</span>
 
@@ -627,7 +639,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Eyal Royee.</p>
+    <p>&#169; Copyright 2025, Eyal Royee.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

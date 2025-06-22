@@ -1,25 +1,37 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>splendor.splendor.splendor_displayer &mdash; Splendor-AI 0.0.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../_static/documentation_options.js?v=e3a6060d"></script>
-        <script src="../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <link rel="canonical" href="https://roeey777.github.io/Splendor-AI/_modules/splendor/splendor/splendor_displayer.html" />
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=f281be69"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -90,16 +102,16 @@
 
 <span class="c1"># IMPORTS ------------------------------------------------------------------------------------------------------------#</span>
 
-<span class="kn">import</span> <span class="nn">copy</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">import</span> <span class="nn">tkinter</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">realpath</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tkinter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">os.path</span><span class="w"> </span><span class="kn">import</span> <span class="n">abspath</span><span class="p">,</span> <span class="n">join</span><span class="p">,</span> <span class="n">realpath</span>
 
-<span class="kn">from</span> <span class="nn">splendor.template</span> <span class="kn">import</span> <span class="n">Displayer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">Displayer</span>
 
-<span class="kn">from</span> <span class="nn">.splendor_utils</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.splendor_utils</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">SPLENDOR_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
 
@@ -109,7 +121,7 @@
 
 <div class="viewcode-block" id="make_label">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.make_label">[docs]</a>
-<span class="k">def</span> <span class="nf">make_label</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">make_label</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">f</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Frame</span><span class="p">(</span><span class="n">master</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="n">h</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="n">w</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">pack_propagate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">place</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
@@ -121,8 +133,8 @@
 
 <div class="viewcode-block" id="AgentArea">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea">[docs]</a>
-<span class="k">class</span> <span class="nc">AgentArea</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">agent_title</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentArea</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">,</span> <span class="n">agent_title</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span> <span class="o">=</span> <span class="n">agent_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">title_text</span> <span class="o">=</span> <span class="n">agent_title</span>
@@ -150,7 +162,7 @@
     <span class="c1"># Set agent title labels.</span>
 <div class="viewcode-block" id="AgentArea.set_agent_title">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea.set_agent_title">[docs]</a>
-    <span class="k">def</span> <span class="nf">set_agent_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_agent_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">title_text</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">agent_title_var</span><span class="o">.</span><span class="n">set</span><span class="p">(</span>
                 <span class="s2">&quot;Agent #</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">. Score: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">title_text</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
@@ -162,7 +174,7 @@
     <span class="c1"># Place images of gems, cards, and nobles in this agent&#39;s area, colour by colour.</span>
 <div class="viewcode-block" id="AgentArea.update">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.AgentArea.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent</span><span class="p">,</span> <span class="n">resources</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_agent_title</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">score</span><span class="p">)</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">colour</span> <span class="ow">in</span> <span class="n">COLOURS</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -218,7 +230,7 @@
 
 <div class="viewcode-block" id="can_buy">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.can_buy">[docs]</a>
-<span class="k">def</span> <span class="nf">can_buy</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">card</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">can_buy</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">card</span><span class="p">):</span>
     <span class="n">wild</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">cost</span> <span class="ow">in</span> <span class="n">card</span><span class="o">.</span><span class="n">cost</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">wild</span> <span class="o">-=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cost</span> <span class="o">-</span> <span class="n">agent</span><span class="o">.</span><span class="n">gems</span><span class="p">[</span><span class="n">colour</span><span class="p">]</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">colour</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
@@ -230,8 +242,8 @@
 
 <div class="viewcode-block" id="BoardArea">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.BoardArea">[docs]</a>
-<span class="k">class</span> <span class="nc">BoardArea</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BoardArea</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">root</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dealt</span> <span class="o">=</span> <span class="p">[[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="mi">4</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
@@ -250,7 +262,7 @@
     <span class="c1"># Update text and images on the gameboard.</span>
 <div class="viewcode-block" id="BoardArea.update">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.BoardArea.update">[docs]</a>
-    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">no_highlighting</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">resources</span><span class="p">,</span> <span class="n">no_highlighting</span><span class="p">):</span>
         <span class="n">agent</span><span class="p">,</span> <span class="n">board</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">state</span><span class="o">.</span><span class="n">agent_to_move</span><span class="p">],</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span>
         <span class="c1"># If first update (start of the game), stagger image placements to make a simple animation.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">:</span>
@@ -368,8 +380,8 @@
 
 <div class="viewcode-block" id="GUIDisplayer">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer">[docs]</a>
-<span class="k">class</span> <span class="nc">GUIDisplayer</span><span class="p">(</span><span class="n">Displayer</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">half_scale</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">no_highlighting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GUIDisplayer</span><span class="p">(</span><span class="n">Displayer</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">half_scale</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">no_highlighting</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">delay</span> <span class="o">=</span> <span class="n">delay</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">no_highlighting</span> <span class="o">=</span> <span class="n">no_highlighting</span>
         <span class="c1"># Absolute positions for resources (cards, gems, nobles). All positions align with top-left of assets.</span>
@@ -403,7 +415,7 @@
 
 <div class="viewcode-block" id="GUIDisplayer.InitDisplayer">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.InitDisplayer">[docs]</a>
-    <span class="k">def</span> <span class="nf">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
         <span class="c1"># Initialise root frame.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span> <span class="o">=</span> <span class="n">tkinter</span><span class="o">.</span><span class="n">Tk</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">protocol</span><span class="p">(</span><span class="s2">&quot;WM_DELETE_WINDOW&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">close_window</span><span class="p">)</span>
@@ -583,35 +595,35 @@
 
 <div class="viewcode-block" id="GUIDisplayer.toggle_fullscreen">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.toggle_fullscreen">[docs]</a>
-    <span class="k">def</span> <span class="nf">toggle_fullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">toggle_fullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">&quot;-fullscreen&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GUIDisplayer.end_fullscreen">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.end_fullscreen">[docs]</a>
-    <span class="k">def</span> <span class="nf">end_fullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">end_fullscreen</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">maximised</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">attributes</span><span class="p">(</span><span class="s2">&quot;-fullscreen&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GUIDisplayer.close_window">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.close_window">[docs]</a>
-    <span class="k">def</span> <span class="nf">close_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close_window</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># Unblock user_input() from waiting on selection.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="GUIDisplayer.get_selection">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.get_selection">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
         <span class="n">w</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">widget</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">curselection</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="GUIDisplayer.prime_action_box">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.prime_action_box">[docs]</a>
-    <span class="k">def</span> <span class="nf">prime_action_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">prime_action_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">wait_variable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">selection</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_box</span><span class="o">.</span><span class="n">size</span><span class="p">())</span></div>
@@ -619,14 +631,14 @@
 
 <div class="viewcode-block" id="GUIDisplayer.user_input">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.user_input">[docs]</a>
-    <span class="k">def</span> <span class="nf">user_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
-        <span class="k">def</span> <span class="nf">combo_to_str</span><span class="p">(</span><span class="n">combo</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">combo_to_str</span><span class="p">(</span><span class="n">combo</span><span class="p">):</span>
             <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
             <span class="k">for</span> <span class="n">colour</span><span class="p">,</span> <span class="n">number</span> <span class="ow">in</span> <span class="n">combo</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">string</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">colour</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="k">return</span> <span class="n">string</span>
 
-        <span class="k">def</span> <span class="nf">str_to_combo</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">str_to_combo</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
             <span class="n">combo</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">values</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
             <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
@@ -733,7 +745,7 @@
                     <span class="k">return</span> <span class="n">a</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_InsertState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_InsertState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
         <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">game_state</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">tkinter</span><span class="o">.</span><span class="n">END</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
@@ -741,7 +753,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">selection_clear</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">last</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 
     <span class="c1"># Rebuild canvas images.</span>
-    <span class="k">def</span> <span class="nf">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
         <span class="c1"># Destroy select canvas text and images.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;card_small&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;gem_small&quot;</span><span class="p">)</span>
@@ -759,7 +771,7 @@
 
 <div class="viewcode-block" id="GUIDisplayer.ExcuteAction">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.ExcuteAction">[docs]</a>
-    <span class="k">def</span> <span class="nf">ExcuteAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ExcuteAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span><span class="n">ActionToString</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">action</span><span class="p">),</span> <span class="n">game_state</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span>
         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">delay</span><span class="p">)</span></div>
@@ -767,7 +779,7 @@
 
 <div class="viewcode-block" id="GUIDisplayer.TimeOutWarning">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.TimeOutWarning">[docs]</a>
-    <span class="k">def</span> <span class="nf">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span>
             <span class="s2">&quot;Agent </span><span class="si">{}</span><span class="s2"> time out, </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">. Choosing random action instead.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="nb">id</span><span class="p">,</span> <span class="n">runner</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span> <span class="n">runner</span><span class="o">.</span><span class="n">warning_limit</span>
@@ -783,7 +795,7 @@
 
 <div class="viewcode-block" id="GUIDisplayer.EndGame">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.GUIDisplayer.EndGame">[docs]</a>
-    <span class="k">def</span> <span class="nf">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span><span class="s2">&quot;--------------End of game-------------&quot;</span><span class="p">,</span> <span class="n">game_state</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">plr_state</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_InsertState</span><span class="p">(</span>
@@ -792,13 +804,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">def</span> <span class="nf">OnHistorySelect</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">OnHistorySelect</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
             <span class="n">w</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">widget</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">curselection</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">game_state_history</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">])</span>
 
-        <span class="k">def</span> <span class="nf">OnHistoryAction</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">OnHistoryAction</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">keysym</span> <span class="o">==</span> <span class="s2">&quot;Up&quot;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">focus</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">move_box</span><span class="o">.</span><span class="n">select_clear</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">focus</span><span class="p">)</span>
@@ -825,14 +837,14 @@
 
 <div class="viewcode-block" id="TextDisplayer">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer">[docs]</a>
-<span class="k">class</span> <span class="nc">TextDisplayer</span><span class="p">(</span><span class="n">Displayer</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TextDisplayer</span><span class="p">(</span><span class="n">Displayer</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------&quot;</span><span class="p">)</span>
         <span class="k">return</span>
 
 <div class="viewcode-block" id="TextDisplayer.InitDisplayer">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.InitDisplayer">[docs]</a>
-    <span class="k">def</span> <span class="nf">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">InitDisplayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;------------------------GAME STARTED--------------------------------&quot;</span><span class="p">)</span>
         <span class="c1"># self._DisplayState(runner.)</span>
         <span class="k">pass</span></div>
@@ -840,7 +852,7 @@
 
 <div class="viewcode-block" id="TextDisplayer.user_input">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.user_input">[docs]</a>
-    <span class="k">def</span> <span class="nf">user_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">user_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">):</span>
         <span class="n">action_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
@@ -862,11 +874,11 @@
 
 <div class="viewcode-block" id="TextDisplayer.StartRound">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.StartRound">[docs]</a>
-    <span class="k">def</span> <span class="nf">StartRound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">StartRound</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
         <span class="k">pass</span></div>
 
 
-    <span class="k">def</span> <span class="nf">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_DisplayState</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;------------------------GAME STATE----------------------------------&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------&quot;</span><span class="p">)</span>
@@ -874,7 +886,7 @@
 
 <div class="viewcode-block" id="TextDisplayer.ExcuteAction">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.ExcuteAction">[docs]</a>
-    <span class="k">def</span> <span class="nf">ExcuteAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">move</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ExcuteAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">move</span><span class="p">,</span> <span class="n">game_state</span><span class="p">):</span>
         <span class="n">player_state</span> <span class="o">=</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Agent </span><span class="si">{}</span><span class="s2"> has chosen the following move:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">ActionToString</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">move</span><span class="p">))</span>
@@ -889,7 +901,7 @@
 
 <div class="viewcode-block" id="TextDisplayer.TimeOutWarning">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.TimeOutWarning">[docs]</a>
-    <span class="k">def</span> <span class="nf">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">TimeOutWarning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span>
             <span class="s2">&quot;Agent </span><span class="si">{}</span><span class="s2"> Time Out, </span><span class="si">{}</span><span class="s2"> out of </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="nb">id</span><span class="p">,</span> <span class="n">runner</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="nb">id</span><span class="p">],</span> <span class="n">runner</span><span class="o">.</span><span class="n">warning_limit</span>
@@ -899,7 +911,7 @@
 
 <div class="viewcode-block" id="TextDisplayer.EndGame">
 <a class="viewcode-back" href="../../../splendor.splendor.html#splendor.splendor.splendor_displayer.TextDisplayer.EndGame">[docs]</a>
-    <span class="k">def</span> <span class="nf">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">EndGame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">scores</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;GAME HAS ENDED&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--------------------------------------------------------------------&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">plr_state</span> <span class="ow">in</span> <span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">:</span>
@@ -918,7 +930,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Eyal Royee.</p>
+    <p>&#169; Copyright 2025, Eyal Royee.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

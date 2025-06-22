@@ -1,25 +1,37 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>splendor.splendor.gym.envs.utils &mdash; Splendor-AI 0.0.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
       <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
-        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
-        <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
-        <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+    <link rel="canonical" href="https://roeey777.github.io/Splendor-AI/_modules/splendor/splendor/gym/envs/utils.html" />
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../../../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
@@ -84,19 +96,17 @@
 <span class="sd">Collection of useful utility functions used in the implementation of SplendorEnv.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">NDArray</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">MAX_TIER_CARDS</span><span class="p">,</span> <span class="n">NUMBER_OF_TIERS</span><span class="p">,</span> <span class="n">RESERVED</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.splendor_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">SplendorState</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionType</span>
 
-<span class="kn">from</span> <span class="nn">splendor.splendor.constants</span> <span class="kn">import</span> <span class="n">MAX_TIER_CARDS</span><span class="p">,</span> <span class="n">NUMBER_OF_TIERS</span><span class="p">,</span> <span class="n">RESERVED</span>
-<span class="kn">from</span> <span class="nn">splendor.splendor.splendor_model</span> <span class="kn">import</span> <span class="n">SplendorState</span>
-<span class="kn">from</span> <span class="nn">splendor.splendor.types</span> <span class="kn">import</span> <span class="n">ActionType</span>
-
-<span class="kn">from</span> <span class="nn">.actions</span> <span class="kn">import</span> <span class="n">ALL_ACTIONS</span><span class="p">,</span> <span class="n">Action</span><span class="p">,</span> <span class="n">ActionEnum</span><span class="p">,</span> <span class="n">CardPosition</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.actions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ALL_ACTIONS</span><span class="p">,</span> <span class="n">Action</span><span class="p">,</span> <span class="n">ActionEnum</span><span class="p">,</span> <span class="n">CardPosition</span>
 
 
-<span class="k">def</span> <span class="nf">_valid_position</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">CardPosition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_valid_position</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">CardPosition</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    check if the given card position is a valid position in the given state.</span>
 <span class="sd">    useful for validating that a position of a card can be purchased/reserved.</span>
@@ -111,7 +121,7 @@
     <span class="k">return</span> <span class="kc">True</span>
 
 
-<span class="k">def</span> <span class="nf">_valid_reserved_position</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_valid_reserved_position</span><span class="p">(</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">position</span><span class="p">:</span> <span class="n">CardPosition</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -126,11 +136,11 @@
 
 <div class="viewcode-block" id="build_action">
 <a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.utils.build_action">[docs]</a>
-<span class="k">def</span> <span class="nf">build_action</span><span class="p">(</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_action</span><span class="p">(</span>
     <span class="n">action_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span>
     <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Construct the action to be taken from it&#39;s action index in the ALL_ACTION list.</span>
 
@@ -165,7 +175,7 @@
         <span class="k">else</span> <span class="kc">None</span>
     <span class="p">)</span>
 
-    <span class="k">match</span> <span class="n">action</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+    <span class="k">match</span> <span class="n">action</span><span class="o">.</span><span class="n">type_enum</span><span class="p">:</span>
         <span class="k">case</span> <span class="n">ActionEnum</span><span class="o">.</span><span class="n">PASS</span><span class="p">:</span>
             <span class="n">action_to_execute</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;pass&quot;</span><span class="p">,</span>
@@ -225,7 +235,7 @@
             <span class="p">}</span>
         <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unknown action type: </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2"> of the action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Unknown action type: </span><span class="si">{</span><span class="n">action</span><span class="o">.</span><span class="n">type_enum</span><span class="si">}</span><span class="s2"> of the action </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">action_to_execute</span></div>
@@ -234,8 +244,8 @@
 
 <div class="viewcode-block" id="create_legal_actions_mask">
 <a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.utils.create_legal_actions_mask">[docs]</a>
-<span class="k">def</span> <span class="nf">create_legal_actions_mask</span><span class="p">(</span>
-    <span class="n">legal_actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_legal_actions_mask</span><span class="p">(</span>
+    <span class="n">legal_actions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
     <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span>
     <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
@@ -256,9 +266,9 @@
 
 <div class="viewcode-block" id="create_action_mapping">
 <a class="viewcode-back" href="../../../../../splendor.splendor.gym.envs.html#splendor.splendor.gym.envs.utils.create_action_mapping">[docs]</a>
-<span class="k">def</span> <span class="nf">create_action_mapping</span><span class="p">(</span>
-    <span class="n">legal_actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">ActionType</span><span class="p">]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_action_mapping</span><span class="p">(</span>
+    <span class="n">legal_actions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span> <span class="n">agent_index</span><span class="p">:</span> <span class="nb">int</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">ActionType</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create the mapping between action indices to legal actions.</span>
 <span class="sd">    This would be in use by both SplendorEnv &amp; by the PPO agent.</span>
@@ -281,7 +291,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Eyal Royee.</p>
+    <p>&#169; Copyright 2025, Eyal Royee.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

@@ -15,5 +15,5 @@ Module contents
 
 .. automodule:: splendor.agents
    :members:
-   :undoc-members:
    :show-inheritance:
+   :undoc-members:

@@ -1,22 +1,37 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>splendor.agents.our_agents.minmax &mdash; Splendor-AI 0.0.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../_static/documentation_options.js?v=e3a6060d"></script>
-        <script src="../../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="canonical" href="https://roeey777.github.io/Splendor-AI/_modules/splendor/agents/our_agents/minmax.html" />
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=f281be69"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
@@ -46,7 +61,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation of Splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../run_splendor.html">Run the game</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../developing_agents.html">Developing an Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../agents.html">Agents</a></li>
 </ul>
 
@@ -75,55 +92,82 @@
            <div itemprop="articleBody">
              
   <h1>Source code for splendor.agents.our_agents.minmax</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">splendor.template</span> <span class="kn">import</span> <span class="n">Agent</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Implementation of an agent that selects the first legal action.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">operator</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">override</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">WINNING_SCORE_TRESHOLD</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.splendor_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">SplendorGameRule</span><span class="p">,</span> <span class="n">SplendorState</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">ActionType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
 
 <span class="c1"># This agent supports only a game of 2 players</span>
-
+<span class="n">EXPECTED_AMOUNT_OF_PLAYERS</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="n">DEPTH</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">GEMS_AMOUNT_THRESHOLD</span> <span class="o">=</span> <span class="mi">8</span>
 
 
-<div class="viewcode-block" id="myAgent">
-<a class="viewcode-back" href="../../../../splendor.agents.our_agents.html#splendor.agents.our_agents.minmax.myAgent">[docs]</a>
-<span class="k">class</span> <span class="nc">myAgent</span><span class="p">(</span><span class="n">Agent</span><span class="p">):</span>
-<div class="viewcode-block" id="myAgent.SelectAction">
-<a class="viewcode-back" href="../../../../splendor.agents.our_agents.html#splendor.agents.our_agents.minmax.myAgent.SelectAction">[docs]</a>
-    <span class="k">def</span> <span class="nf">SelectAction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actions</span><span class="p">,</span> <span class="n">game_state</span><span class="p">,</span> <span class="n">game_rule</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_action_recursion</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">game_rule</span><span class="p">,</span> <span class="n">DEPTH</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+<div class="viewcode-block" id="MiniMaxAgent">
+<a class="viewcode-back" href="../../../../splendor.agents.our_agents.html#splendor.agents.our_agents.minmax.MiniMaxAgent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MiniMaxAgent</span><span class="p">(</span><span class="n">Agent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A Minimax agent, utilizing the zero-sum property of the game,</span>
+<span class="sd">    there is only a single winner in each game, for determining which</span>
+<span class="sd">    action to play.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="c1"># pylint: disable=too-few-public-methods</span>
 
-<div class="viewcode-block" id="myAgent.select_action_recursion">
-<a class="viewcode-back" href="../../../../splendor.agents.our_agents.html#splendor.agents.our_agents.minmax.myAgent.select_action_recursion">[docs]</a>
-    <span class="k">def</span> <span class="nf">select_action_recursion</span><span class="p">(</span>
+<div class="viewcode-block" id="MiniMaxAgent.SelectAction">
+<a class="viewcode-back" href="../../../../splendor.agents.our_agents.html#splendor.agents.our_agents.minmax.MiniMaxAgent.SelectAction">[docs]</a>
+    <span class="nd">@override</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">SelectAction</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">game_state</span><span class="p">,</span>
-        <span class="n">game_rule</span><span class="p">,</span>
-        <span class="n">depth</span><span class="p">,</span>
-        <span class="n">is_maximizing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">alpha</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-        <span class="n">beta</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-    <span class="p">):</span>
+        <span class="n">actions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
+        <span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span>
+        <span class="n">game_rule</span><span class="p">:</span> <span class="n">SplendorGameRule</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActionType</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">game_state</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span> <span class="o">==</span> <span class="n">EXPECTED_AMOUNT_OF_PLAYERS</span>
+        <span class="n">selected_action</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_action_recursion</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">game_rule</span><span class="p">,</span> <span class="n">DEPTH</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">selected_action</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">selected_action</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_select_action_recursion</span><span class="p">(</span>  <span class="c1"># noqa: PLR0913,PLR0917</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">game_state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">,</span>
+        <span class="n">game_rule</span><span class="p">:</span> <span class="n">SplendorGameRule</span><span class="p">,</span>
+        <span class="n">depth</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">is_maximizing</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+        <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">ActionType</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="c1"># pylint: disable=too-many-arguments,too-many-positional-arguments</span>
         <span class="k">if</span> <span class="n">depth</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluation_function</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span><span class="p">(</span><span class="n">game_state</span><span class="p">)</span>
         <span class="n">agent_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">is_maximizing</span> <span class="k">else</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
         <span class="n">actions</span> <span class="o">=</span> <span class="n">game_rule</span><span class="o">.</span><span class="n">getLegalActions</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
         <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
-        <span class="n">actions</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">action</span><span class="p">:</span> <span class="n">action</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+        <span class="n">actions</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">operator</span><span class="o">.</span><span class="n">itemgetter</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">))</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span>
 
         <span class="n">best_action</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">best_value</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="n">is_maximizing</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
         <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
             <span class="n">next_state</span> <span class="o">=</span> <span class="n">game_rule</span><span class="o">.</span><span class="n">generateSuccessor</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">action_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_action_recursion</span><span class="p">(</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">action_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_action_recursion</span><span class="p">(</span>
                 <span class="n">next_state</span><span class="p">,</span> <span class="n">game_rule</span><span class="p">,</span> <span class="n">depth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">not</span> <span class="n">is_maximizing</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span>
             <span class="p">)</span>
             <span class="c1"># generateSuccessor alternates the game_state inplace,</span>
             <span class="c1"># that&#39;s why we need to call generatePredecessor to revert</span>
             <span class="c1"># it (even though we do not need its output)</span>
-            <span class="n">prev_state</span> <span class="o">=</span> <span class="n">game_rule</span><span class="o">.</span><span class="n">generatePredecessor</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">game_rule</span><span class="o">.</span><span class="n">generatePredecessor</span><span class="p">(</span><span class="n">game_state</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">is_maximizing</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">action_value</span> <span class="o">&gt;</span> <span class="n">best_value</span><span class="p">:</span>
@@ -140,12 +184,10 @@
                 <span class="k">if</span> <span class="n">beta</span> <span class="o">&lt;=</span> <span class="n">alpha</span><span class="p">:</span>
                     <span class="k">break</span>
 
-        <span class="k">return</span> <span class="n">best_action</span><span class="p">,</span> <span class="n">best_value</span></div>
+        <span class="k">return</span> <span class="n">best_action</span><span class="p">,</span> <span class="n">best_value</span>
 
-
-<div class="viewcode-block" id="myAgent.evaluation_function">
-<a class="viewcode-back" href="../../../../splendor.agents.our_agents.html#splendor.agents.our_agents.minmax.myAgent.evaluation_function">[docs]</a>
-    <span class="k">def</span> <span class="nf">evaluation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">SplendorState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="c1"># pylint: disable=too-many-locals</span>
         <span class="n">agent_state</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
         <span class="n">score_factor</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">cards_factor</span> <span class="o">=</span> <span class="mf">0.7</span>
@@ -155,18 +197,18 @@
         <span class="n">reward</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="n">max_score</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">score</span> <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">agents</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">max_score</span> <span class="o">&gt;=</span> <span class="mi">15</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">max_score</span> <span class="o">&gt;=</span> <span class="n">WINNING_SCORE_TRESHOLD</span><span class="p">:</span>
             <span class="n">reward</span> <span class="o">=</span> <span class="mi">99999</span> <span class="o">+</span> <span class="n">max_score</span>
             <span class="k">if</span> <span class="n">max_score</span> <span class="o">&gt;</span> <span class="n">agent_state</span><span class="o">.</span><span class="n">score</span><span class="p">:</span>
                 <span class="n">reward</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span>
             <span class="k">return</span> <span class="n">reward</span>
-        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="mi">8</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">sum</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">&gt;=</span> <span class="n">GEMS_AMOUNT_THRESHOLD</span><span class="p">:</span>
             <span class="n">gems_factor</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.7</span>
         <span class="n">gems_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
 
         <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">dealt_list</span><span class="p">()</span> <span class="o">+</span> <span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="s2">&quot;yellow&quot;</span><span class="p">]:</span>
             <span class="n">relevant_to_nobles</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">noble_id</span><span class="p">,</span> <span class="n">noble_cost</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">noble_cost</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">board</span><span class="o">.</span><span class="n">nobles</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="n">card</span><span class="o">.</span><span class="n">colour</span> <span class="ow">in</span> <span class="n">noble_cost</span>
                     <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">cards</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">noble_cost</span><span class="p">[</span><span class="n">card</span><span class="o">.</span><span class="n">colour</span><span class="p">]</span>
@@ -191,8 +233,10 @@
             <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">agent_state</span><span class="o">.</span><span class="n">gems</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">*</span> <span class="n">gems_factor</span>
             <span class="o">+</span> <span class="n">gems_var</span> <span class="o">*</span> <span class="n">gems_var_factor</span>
         <span class="p">)</span></div>
-</div>
 
+
+
+<span class="n">myAgent</span> <span class="o">=</span> <span class="n">MiniMaxAgent</span>  <span class="c1"># pylint: disable=invalid-name</span>
 </pre></div>
 
            </div>
@@ -202,7 +246,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Eyal Royee.</p>
+    <p>&#169; Copyright 2025, Eyal Royee.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

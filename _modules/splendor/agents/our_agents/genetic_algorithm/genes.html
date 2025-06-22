@@ -1,22 +1,37 @@
+
+
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="../../../../../">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>splendor.agents.our_agents.genetic_algorithm.genes &mdash; Splendor-AI 0.0.2 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=80d5e7a1" />
-      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css?v=4ae1632d" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/dark_mode_css/general.css?v=c0a7eb24" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/dark_mode_css/dark.css?v=70edf1c7" />
 
   
-  <!--[if lt IE 9]>
-    <script src="../../../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
-        <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
-        <script src="../../../../../_static/doctools.js?v=9a2dae69"></script>
-        <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="canonical" href="https://roeey777.github.io/Splendor-AI/_modules/splendor/agents/our_agents/genetic_algorithm/genes.html" />
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=e3a6060d"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=f281be69"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";import elkLayouts from "https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs";mermaid.registerLayoutLoaders(elkLayouts);mermaid.initialize({startOnLoad:false});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.2.0/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+      <script src="../../../../../_static/dark_mode_js/default_dark.js?v=fd565c74"></script>
+      <script src="../../../../../_static/dark_mode_js/theme_switcher.js?v=358d3910"></script>
     <script src="../../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../../search.html" /> 
@@ -46,7 +61,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../installation.html">Installation of Splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../run_splendor.html">Run the game</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../developing_agents.html">Developing an Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">Modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../generate_docs.html">Generate The Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development.html">Development</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../modules.html">splendor</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../agents.html">Agents</a></li>
 </ul>
 
@@ -75,32 +92,46 @@
            <div itemprop="articleBody">
              
   <h1>Source code for splendor.agents.our_agents.genetic_algorithm.genes</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">splendor.Splendor.features</span> <span class="kn">import</span> <span class="n">METRICS_SHAPE</span><span class="p">,</span> <span class="n">build_array</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defining how to represent agents as genes (i.e. vectors) so they</span>
+<span class="sd">could be optimized with a genetic algorithm.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">splendor.splendor.features</span><span class="w"> </span><span class="kn">import</span> <span class="n">METRICS_SHAPE</span><span class="p">,</span> <span class="n">build_array</span>
+
+<span class="n">GeneTypeVar</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;GeneTypeVar&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;Gene&quot;</span><span class="p">)</span>
+<span class="n">Mutator</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">float</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="Gene">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene">[docs]</a>
-<span class="k">class</span> <span class="nc">Gene</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Gene</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A generic gene representation class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">LOWER_BOUND</span> <span class="o">=</span> <span class="o">-</span><span class="mi">20</span>
     <span class="n">UPPER_BOUND</span> <span class="o">=</span> <span class="mi">20</span>
-    <span class="n">SHAPE</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">SHAPE</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dna</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dna</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">dna</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHAPE</span><span class="p">,</span> <span class="s2">&quot;Given DNA has the wrong shape&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dna</span> <span class="o">=</span> <span class="n">dna</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_prepared_dna</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepared_dna</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">dna</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dna</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        We want some metrics to have the same weight (in places the is no</span>
 <span class="sd">        meaning to the order). This methods returns a dna which matches in</span>
-<span class="sd">        dimentions to the metrics we get in practice by repeting some value</span>
+<span class="sd">        dimensions to the metrics we get in practice by repeating some value</span>
 <span class="sd">        multiple time (according to the instructions of `METRICS_SHAPE`).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepared_dna</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -108,10 +139,18 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepared_dna</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">raw_dna</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a direct access to the private _dna attribute.</span>
+<span class="sd">        This is useful when implementing the crossover functionality.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dna</span>
+
 <div class="viewcode-block" id="Gene.random">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.random">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">random</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">random</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">GeneTypeVar</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">GeneTypeVar</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initiate a gene with random DNA.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -121,7 +160,7 @@
 <div class="viewcode-block" id="Gene.load">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.load">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path_or_file</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">cls</span><span class="p">:</span> <span class="nb">type</span><span class="p">[</span><span class="n">GeneTypeVar</span><span class="p">],</span> <span class="n">path_or_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeneTypeVar</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initiate a gene with DNA from a saved file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -130,7 +169,7 @@
 
 <div class="viewcode-block" id="Gene.save">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.save">[docs]</a>
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_or_file</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path_or_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Saves a gene&#39;s DNA to a file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -139,11 +178,14 @@
 
 <div class="viewcode-block" id="Gene.mutate">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.Gene.mutate">[docs]</a>
-    <span class="k">def</span> <span class="nf">mutate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mutate_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mutator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">mutate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mutate_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mutator</span><span class="p">:</span> <span class="n">Mutator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Mutates a gene&#39;s DNA (in place).</span>
 <span class="sd">        Should be the only thing that edits the DNA of an existing gene.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># this assertion is only for mypy.</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">SHAPE</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
         <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">ndindex</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SHAPE</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">mutate_rate</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_dna</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">mutator</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dna</span><span class="p">[</span><span class="n">pos</span><span class="p">])</span>
@@ -155,7 +197,7 @@
 
 <div class="viewcode-block" id="StrategyGene">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene">[docs]</a>
-<span class="k">class</span> <span class="nc">StrategyGene</span><span class="p">(</span><span class="n">Gene</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StrategyGene</span><span class="p">(</span><span class="n">Gene</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represent a gene that helps to choose an action each turn.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -164,9 +206,9 @@
 
 <div class="viewcode-block" id="StrategyGene.evaluate_state">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.StrategyGene.evaluate_state">[docs]</a>
-    <span class="k">def</span> <span class="nf">evaluate_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_metrics</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_metrics</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Evaluates a state&#39;s value according to its metrics</span>
+<span class="sd">        Evaluates a state&#39;s value according to its metrics.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">state_metrics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dna</span><span class="p">)</span></div>
 </div>
@@ -175,23 +217,29 @@
 
 <div class="viewcode-block" id="ManagerGene">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene">[docs]</a>
-<span class="k">class</span> <span class="nc">ManagerGene</span><span class="p">(</span><span class="n">Gene</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ManagerGene</span><span class="p">(</span><span class="n">Gene</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Represent a gene that helps to choose a strategy to follow (from 3 options)</span>
+<span class="sd">    Represent a gene that helps to choose a strategy to follow (from 3 options).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">SHAPE</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">METRICS_SHAPE</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ManagerGene.select_strategy">
 <a class="viewcode-back" href="../../../../../splendor.agents.our_agents.genetic_algorithm.html#splendor.agents.our_agents.genetic_algorithm.genes.ManagerGene.select_strategy">[docs]</a>
-    <span class="k">def</span> <span class="nf">select_strategy</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">state_metrics</span><span class="p">,</span> <span class="n">strategies</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">StrategyGene</span><span class="p">]</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">select_strategy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">state_metrics</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">strategies</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">StrategyGene</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StrategyGene</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select which strategy should be used based on given state.</span>
+
+<span class="sd">        :param state_metrics: the feature vector extracted from the state.</span>
+<span class="sd">        :param strategies: all the available strategies.</span>
+<span class="sd">        :return: the selected strategy.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">state_metrics</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dna</span><span class="p">)</span>
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">strategies</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Mismatching lengths (</span><span class="si">{</span><span class="n">output</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="c1"># might replace this with output.argmax()</span>
         <span class="n">index</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">output</span><span class="p">)),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="c1"># with open(&quot;shit.txt&quot;, &#39;a&#39;) as f:</span>
-        <span class="c1">#     print(index, file=f)</span>
 
         <span class="k">return</span> <span class="n">strategies</span><span class="p">[</span><span class="n">index</span><span class="p">]</span></div>
 </div>
@@ -205,7 +253,7 @@
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2024, Eyal Royee.</p>
+    <p>&#169; Copyright 2025, Eyal Royee.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
